@@ -57,7 +57,7 @@ public class SimpleMemoryFeatureRepository implements FeatureControlRepository {
         try {
             lock.writeLock().lock();
             FeatureControl old = featureControls.get(key);
-
+            if(old!=null && featureControl.variants == null)featureControl.variants = old.variants;
             //if (old == null || old.version < featureControl.version) {
                 featureControls.put(key, featureControl);
             //}

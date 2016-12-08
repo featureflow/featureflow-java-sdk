@@ -39,6 +39,7 @@ public class FeatureFlowContext{
             return this;
         }
         public FeatureFlowContext build(){
+            if(key==null)key = "anonymous";
             FeatureFlowContext context = new FeatureFlowContext(key);
             context.values = values;
             return context;
