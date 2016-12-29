@@ -2,6 +2,7 @@ package io.featureflow.client;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +25,7 @@ public class FeatureFlowClientImplTestInt {
         @Override
         public void onUpdate(FeatureControl control) {
 
-            System.out.println(control.getKey() + " set to " + control.enabled + " for environment BIGBANK LIVE");
+            System.out.println(control.getKey() + " set to " + control.toString());
             this.latch.countDown();
         }
     }
@@ -33,34 +34,19 @@ public class FeatureFlowClientImplTestInt {
     @Test
     public void isEnabled() throws Exception {
         final CountDownLatch latch = new CountDownLatch(10); //set the coundown latch to however many calls you want to test with
-        //private final FctestEventHandler handler = new FctestEventHandler(new CountDownLatch(1));
-
-
-
-        //featureflow.io TEST1
-        //String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1N2JiYjJiNGU0YjAyNjM5NDVhMDA4NjciLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.4WJXZ4ENJliMmJUp-7OPPKUhKErPNIKnHc5fygZlBEaLkCS_5i5eEFhd5ezW-VU6ABswspWtEysjJDgoU0vMzQ";
-
-
-        //LOCALHOST BIGBANK LIVE
-        //String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1N2FjMTJkM2Q0YzZiMDJjYWRkODNhYmMiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.mXnk16FkWBkr7GWAiL6n2TqHKjjN2MYOqBgXx85kdGI-NZG2t1pPU4U1XYmO8q2igm3wn98D6vtLl9CTO5iw1w";
-
-        //featureflow.dev TEST environment key  "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODE2YjE3M2EzNzc2NDAwMDdhODk1NWIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.nt4j7v5x8TOqtAscFtF8mMwT9GF6jpEivG0dk-dANVT-EoKUY7g4jApgRQL-J_WcF2Rz3BmeqSYj2QUm-p4DRA"
-        //featureflow.dev baseUri
-        //"http://localhost:8081"
-
-
-        String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODE2YjE3M2EzNzc2NDAwMDdhODk1NWIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.nt4j7v5x8TOqtAscFtF8mMwT9GF6jpEivG0dk-dANVT-EoKUY7g4jApgRQL-J_WcF2Rz3BmeqSYj2QUm-p4DRA";
-        //String baseUri = "http://featureflow.dev";
-        String baseUri = "http://localhost:8081";
+        String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODY0NTNjMzdjNzk1ZjA1MWY4MjQzZTMiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.PdUWedk4wk0MVxxvpIu09DZ6bgk9RYJZO0p05kLGWDEblIvL_sgA73YAFxRvNJFzmoEUET-ECYovAKdPHDtdHg";
+        String baseUri = "http://featureflow.dev";
+        //String baseUri = "http://localhost:8081";
         FeatureFlowConfig config = new FeatureFlowConfig.Builder()
                 .withBaseURI(baseUri).build();
 
         featureFlowClient = FeatureFlowClient.builder(apiKey)
                 .withConfig(config)
-                /*.withFeatureRegistrations(
+                .withFeatureRegistrations(
                         Arrays.asList(
-                                new FeatureRegistration(FeaturesDefinitions.FEATURE_ONE)
-                        ))*/
+                                new FeatureRegistration("manage"),
+                                new FeatureRegistration("task")
+                        ))
                 .withCallback(new FctestEventHandler(latch))
                 .build();
 

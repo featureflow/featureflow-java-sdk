@@ -20,9 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class FeatureControlStreamManager implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(FeatureControlStreamManager.class);
-    private static final String PUT = "put";
-    private static final String PATCH = "patch";
-    private static final String DELETE = "delete";
     private final FeatureFlowConfig config;
     private final FeatureControlRepository repository;
     private final FeatureControlEventHandler callback;
@@ -114,50 +111,6 @@ public class FeatureControlStreamManager implements Closeable {
                                         initFuture.completed(null);
                                         logger.info("Featureflow client inititalised.");
                                     }
-
-                /*if (name.equals(PUT)) {
-                    //Type type = new TypeToken<Map<String,FeatureRep<?>>>(){}.getType();
-                    Type type = new TypeToken<Map<String, FeatureControl>>() {}.getType();
-                    Map<String, FeatureControl> controls = gson.fromJson(event.getData(), type);
-                    //store.init(features);
-                    repository.init(controls);
-                    if (!initialized.getAndSet(true)) {
-                        initFuture.completed(null);
-                        logger.info("Featureflow client inititalised.");
-                    }
-                }*/
-                /*else if (name.equals(PATCH)) {
-                    FeaturePatchData data = gson.fromJson(event.getData(), FeaturePatchData.class);
-                    store.upsert(data.key(), data.feature());
-                }
-                else if (name.equals(DELETE)) {
-                    FeatureDeleteData data = gson.fromJson(event.getData(), FeatureDeleteData.class);
-                    store.delete(data.key(), data.version());
-                }
-                else if (name.equals(INDIRECT_PUT)) {
-                    try {
-                        Map<String, FeatureRep<?>> features = requestor.makeAllRequest(true);
-                        store.init(features);
-                        if (!initialized.getAndSet(true)) {
-                            initFuture.completed(null);
-                            logger.info("Initialized Featureflow client.");
-                        }
-                    } catch (IOException e) {
-                        logger.error("Encountered exception in Featureflow client", e);
-                    }
-                }
-                else if (name.equals(INDIRECT_PATCH)) {
-                    String key = event.getData();
-                    try {
-                        FeatureRep<?> feature = requestor.makeRequest(key, true);
-                        store.upsert(key, feature);
-                    } catch (IOException e) {
-                        logger.error("Encountered exception in Featureflow client", e);
-                    }
-                }*/
-                /*else {
-                    logger.warn("Unexpected event found in stream: " + event.getData());
-                }*/
                                 }
 
                                 @Override

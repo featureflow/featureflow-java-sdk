@@ -14,6 +14,11 @@ public class FeatureRegistration {
         this.key = key;
         this.variants = variants;
     }
+    public FeatureRegistration(String key) {
+        this.key = key;
+        this.variants = null; //if null then we check for existing variants in config or default to on/off
+    }
+
 
     class Builder {
         private String key;

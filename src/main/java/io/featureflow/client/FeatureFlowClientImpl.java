@@ -28,7 +28,7 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     private final FeatureControlStreamManager featureControlStreamManager; // manages pubsub events to update a feature control
     private final FeatureControlRepository featureControlRepository; //holds the featureControls
     private final FeatureControlRestClient featureControlRestClient; //manages retrieving features and pushing updates
-    private final Map<String, FeatureRegistration> featureRegistrationsMap = new HashMap<>();;
+    private final Map<String, FeatureRegistration> featureRegistrationsMap = new HashMap<>();
     private Queue<FeatureControlEventHandler> handlers;
 
     FeatureFlowClientImpl(String apiKey, List<FeatureRegistration> featureRegistrations, FeatureFlowConfig config, FeatureControlEventHandler callback) {
@@ -43,6 +43,7 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
         featureControlRepository = new SimpleMemoryFeatureRepository();
         featureControlRestClient = new FeatureControlRestClient(apiKey, config);
         featureControlStreamManager = new FeatureControlStreamManager(apiKey, config, featureControlRepository, featureControlRestClient, callback);
+
         Future<Void> startFuture = featureControlStreamManager.start();
     }
 

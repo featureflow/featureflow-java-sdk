@@ -50,4 +50,26 @@ public class FeatureControl {//<V> {
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule
     }
+
+
+    @Override
+    public String toString() {
+        /*String variants;
+        for (Variant variant : variants) {
+            variants += variant.name + " ";
+        }*/
+        return "FeatureControl{" + "\n" +
+                "  key='" + key + '\'' + "\n" +
+                "  environmentId='" + environmentId + '\'' + "\n" +
+                "  variationsSeed=" + variationsSeed + "\n" +
+                "  enabled=" + enabled + "\n" +
+                "  available=" + available + "\n" +
+                "  deleted=" + deleted + "\n" +
+                //insert barely readable one-liner here:
+                "  rules=" + rules.stream().map(r -> "Rule " + r.getPriority() + ": " + r.getVariantSplits().stream().map(s -> s.getVariant() + ":" + s.getSplit() +"% ").reduce("", String::concat) + "\n").reduce("", String::concat) + "\n" +
+                "  offVariant=" + offVariant + "\n" +
+                "  inClientApi=" + inClientApi + "\n" +
+                "  variants=" + variants.stream().map(v -> v.name +" ").reduce("", String::concat) + "\n" +
+                '}';
+    }
 }

@@ -53,6 +53,28 @@ public class FeatureControlRestClient {
     }
 
 
+    public String registerFeatures(Map<String, FeatureRegistration> featureRegistrationMap){
+        if (client==null)client = createHttpClient();
+        logger.info("Loading feature controls");
+        Gson gson = new Gson();
+        HttpCacheContext context = HttpCacheContext.create();
+
+        String resource = FeatureFlowConfig.DEFAULT_FEATURE_CONTROL_REST_PATH;
+
+        HttpGet request = getRequest(apiKey, resource);
+
+        CloseableHttpResponse response = null;
+        try {
+           ///..... REGISTER
+        }
+        finally {
+            try {
+                if (response != null) response.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+
     public Map<String, FeatureControl> getFeatureControls() throws IOException{
         if (client==null)client = createHttpClient();
         logger.info("Loading feature controls");
