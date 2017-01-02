@@ -14,7 +14,8 @@ public class FeatureFlowConfig {
 
     public static final String DEFAULT_BASE_URI = "https://featureflow.io";
     private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/app/v1/stream";
-    static final String DEFAULT_FEATURE_CONTROL_REST_PATH = "/api/app/v1/feature-controls";
+    static final String FEATURE_CONTROL_REST_PATH = "/api/app/v1/feature-controls";
+    static final String REGISTER_REST_PATH = "/api/app/v1/register";
 
     private boolean offline = false;
     String proxyHost = null;

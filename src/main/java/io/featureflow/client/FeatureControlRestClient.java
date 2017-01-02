@@ -13,9 +13,12 @@ import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
@@ -40,7 +43,7 @@ import java.util.stream.Collectors;
  * Created by oliver on 26/05/2016.
  */
 public class FeatureControlRestClient {
-
+    public static final String VERSION = "0.0.1";
     private final String apiKey;
     private final FeatureFlowConfig config;
     private CloseableHttpClient client = null;
@@ -53,7 +56,7 @@ public class FeatureControlRestClient {
     }
 
 
-    public String registerFeatures(Map<String, FeatureRegistration> featureRegistrationMap){
+   /* public String registerFeatures(Map<String, FeatureRegistration> featureRegistrationMap){
         if (client==null)client = createHttpClient();
         logger.info("Loading feature controls");
         Gson gson = new Gson();
@@ -73,6 +76,37 @@ public class FeatureControlRestClient {
             } catch (IOException e) {
             }
         }
+    }*/
+
+    /**
+     * Register any code defined feature controls as available and retrieve a list of features form the server
+     * @return
+     * @throws IOException
+     */
+    public Map<String, FeatureControl> registerFeatureControls(Map<String, FeatureRegistration> featureRegistrationMap) throws IOException{
+        logger.info("Registering feature controls");
+        Gson gson = new Gson();
+        HttpCacheContext context = HttpCacheContext.create();
+        String resource = FeatureFlowConfig.REGISTER_REST_PATH;
+        HttpPut request = putRequest(apiKey, resource, gson.toJson(featureRegistrationMap));
+        CloseableHttpResponse response = null;
+        try {
+            logger.debug("Requesting: " + request);
+            response = client.execute(request, context);
+            handleStatusCode(response.getStatusLine().getStatusCode(), null);
+            //Type type = new TypeToken<Map<String, FeatureControl>>() {}.getType();
+            Type type = new TypeToken<List<FeatureControl>>() {}.getType();
+            String json = EntityUtils.toString(response.getEntity());
+            logger.debug("Response: " + response.toString());
+            logger.debug("Response JSON: " + json);
+            List<FeatureControl> result = gson.fromJson(json, type);
+            return result.stream().collect(Collectors.toMap(FeatureControl::getKey, Function.identity()));
+        }
+        finally {
+            try {
+                if (response != null) response.close();
+            } catch (IOException e) {}
+        }
     }
 
     public Map<String, FeatureControl> getFeatureControls() throws IOException{
@@ -81,7 +115,7 @@ public class FeatureControlRestClient {
         Gson gson = new Gson();
         HttpCacheContext context = HttpCacheContext.create();
 
-        String resource = FeatureFlowConfig.DEFAULT_FEATURE_CONTROL_REST_PATH;
+        String resource = FeatureFlowConfig.FEATURE_CONTROL_REST_PATH ;
 
         HttpGet request = getRequest(apiKey, resource);
 
@@ -153,7 +187,7 @@ public class FeatureControlRestClient {
         try {
             HttpGet request = new HttpGet(builder.build());
             request.addHeader("Authorization", "Bearer " + apiKey);
-            request.addHeader("User-Agent", "JavaClient/" + "0.0.1");
+            request.addHeader("User-Agent", "JavaClient/" + VERSION);
 
             return request;
         } catch (Exception e) {
@@ -161,6 +195,43 @@ public class FeatureControlRestClient {
             return null;
         }
     }
+    private HttpPut putRequest(String apiKey, String path, String data) {
+        URIBuilder builder = this.getBuilder().setPath(path);
+
+        try {
+            HttpPut request = new HttpPut(builder.build());
+            StringEntity params =new StringEntity(data,"UTF-8");
+            params.setContentType("application/json");
+            request.addHeader("content-type", "application/json");
+            request.addHeader("Accept", "*/*");
+            request.addHeader("Accept-Encoding", "gzip,deflate,sdch");
+            request.addHeader("Accept-Language", "en-US,en;q=0.8");
+            request.setEntity(params);
+
+            request.addHeader("Authorization", "Bearer " + apiKey);
+            request.addHeader("User-Agent", "JavaClient/" + VERSION);
+
+            return request;
+        } catch (Exception e) {
+            logger.error("Problem in PUT request ", e);
+            return null;
+        }
+    }
+    /*private HttpPost postRequest(String apiKey, String path) {
+        URIBuilder builder = this.getBuilder().setPath(path);
+
+        try {
+            HttpPost request = new HttpPost(builder.build());
+            request.addHeader("Authorization", "Bearer " + apiKey);
+            request.addHeader("User-Agent", "JavaClient/" + "0.0.1");
+
+            return request;
+        } catch (Exception e) {
+            logger.error("Problem in POST request ", e);
+            return null;
+        }
+    }*/
+
     private URIBuilder getBuilder() {
         URI base = URI.create(config.baseURI);
         return new URIBuilder()
