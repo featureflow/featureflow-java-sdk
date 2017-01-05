@@ -10,7 +10,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,7 +21,7 @@ public class FeatureControlStreamManager implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(FeatureControlStreamManager.class);
     private final FeatureFlowConfig config;
     private final FeatureControlRepository repository;
-    private final FeatureControlEventHandler callback;
+    private final FeatureControlUpdateHandler callback;
     private EventSource eventSource; //   from https://github.com/aslakhellesoy/eventsource-java/blob/master/src/main/java/com/github/eventsource/client/EventSource.java
 
     private final FeatureControlRestClient featureControlRestClient;
@@ -40,7 +39,7 @@ public class FeatureControlStreamManager implements Closeable {
                                        FeatureFlowConfig config,
                                        FeatureControlRepository repository,
                                        FeatureControlRestClient featureControlRestClient,
-                                       FeatureControlEventHandler callback) {
+                                       FeatureControlUpdateHandler callback) {
         this.apiKey = apiKey;
         this.config = config;
         this.repository = repository;

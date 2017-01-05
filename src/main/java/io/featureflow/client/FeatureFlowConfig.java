@@ -9,13 +9,12 @@ import java.net.URI;
  */
 public class FeatureFlowConfig {
 
-    private static final int DEFAULT_CONNECT_TIMEOUT = 30000;
-    private static final int DEFAULT_SOCKET_TIMEOUT = 20000;
-
-    public static final String DEFAULT_BASE_URI = "https://featureflow.io";
+    private static final int DEFAULT_CONNECT_TIMEOUT        = 30000;
+    private static final int DEFAULT_SOCKET_TIMEOUT         = 20000;
+    public static final String DEFAULT_BASE_URI             = "https://app.featureflow.io";
     private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/app/v1/stream";
-    static final String FEATURE_CONTROL_REST_PATH = "/api/app/v1/feature-controls";
-    static final String REGISTER_REST_PATH = "/api/app/v1/register";
+    static final String FEATURE_CONTROL_REST_PATH           = "/api/app/v1/feature-controls";
+    static final String REGISTER_REST_PATH                  = "/api/app/v1/register";
 
     private boolean offline = false;
     String proxyHost = null;
@@ -23,7 +22,6 @@ public class FeatureFlowConfig {
     int proxyPort = -1;
     int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
     int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
-    
     String baseURI = DEFAULT_BASE_URI;
     String controlStreamPath = DEFAULT_CONTROL_STREAM_PATH;
 
@@ -104,7 +102,9 @@ public class FeatureFlowConfig {
         return controlStreamPath==null?URI.create(getBaseURI() + DEFAULT_CONTROL_STREAM_PATH):URI.create(baseURI+controlStreamPath);
     }
 
-
+    class Event {
+        int queueSize = 10000;
+    }
 
     public static Builder builder(){
         return new Builder();

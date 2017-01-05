@@ -15,10 +15,10 @@ public class FeatureFlowClientImplTestInt {
 
     FeatureFlowClient featureFlowClient;
 
-    class FctestEventHandler implements FeatureControlEventHandler{
+    class FctestUpdateHandler implements FeatureControlUpdateHandler {
         private final CountDownLatch latch;
 
-        FctestEventHandler(CountDownLatch latch) {
+        FctestUpdateHandler(CountDownLatch latch) {
             this.latch = latch;
         }
 
@@ -47,7 +47,7 @@ public class FeatureFlowClientImplTestInt {
                                 new FeatureRegistration("manage"),
                                 new FeatureRegistration("task")
                         ))
-                .withCallback(new FctestEventHandler(latch))
+                .withCallback(new FctestUpdateHandler(latch))
                 .build();
 
         //System.out.println(featureFlowClient.getAllFeatureStatuses(new FeatureFlowContext("dave")));

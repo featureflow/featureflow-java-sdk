@@ -28,10 +28,11 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     private final FeatureControlStreamManager featureControlStreamManager; // manages pubsub events to update a feature control
     private final FeatureControlRepository featureControlRepository; //holds the featureControls
     private final FeatureControlRestClient featureControlRestClient; //manages retrieving features and pushing updates
-    private final Map<String, FeatureRegistration> featureRegistrationsMap = new HashMap<>();
-    private Queue<FeatureControlEventHandler> handlers;
 
-    FeatureFlowClientImpl(String apiKey, List<FeatureRegistration> featureRegistrations, FeatureFlowConfig config, FeatureControlEventHandler callback) {
+    private final Map<String, FeatureRegistration> featureRegistrationsMap = new HashMap<>();
+    private Queue<FeatureControlUpdateHandler> handlers;
+
+    FeatureFlowClientImpl(String apiKey, List<FeatureRegistration> featureRegistrations, FeatureFlowConfig config, FeatureControlUpdateHandler callback) {
         //set config, use a builder
         this.config = config;
         //Actively defining registrations helps alert if features are available in an environment
@@ -59,7 +60,12 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
             logger.error("Unknown Feature {}, returning failoverVariant value of {}", featureKey, failoverVariant);
             return failoverVariant;
         }
+
+
+
         return control.evaluate(featureFlowContext);
+
+
     }
 
     @Override

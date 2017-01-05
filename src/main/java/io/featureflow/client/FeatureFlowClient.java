@@ -19,15 +19,15 @@ public interface FeatureFlowClient extends Closeable {
     class Builder {
         private FeatureFlowConfig config = null;
         private String apiKey;
-        private FeatureControlEventHandler featureControlEventHandler;
+        private FeatureControlUpdateHandler featureControlUpdateHandler;
         private List<FeatureRegistration> featureRegistrations;
 
         public Builder (String apiKey){
             this.apiKey = apiKey;
         }
 
-        public Builder withCallback(FeatureControlEventHandler featureControlEventHandler){
-            this.featureControlEventHandler = featureControlEventHandler;
+        public Builder withCallback(FeatureControlUpdateHandler featureControlUpdateHandler){
+            this.featureControlUpdateHandler = featureControlUpdateHandler;
             return this;
         }
 
@@ -43,7 +43,7 @@ public interface FeatureFlowClient extends Closeable {
 
         public FeatureFlowClient build(){
             if(config==null){ config = new FeatureFlowConfig.Builder().build();}
-            return new FeatureFlowClientImpl(apiKey, featureRegistrations, config, featureControlEventHandler);
+            return new FeatureFlowClientImpl(apiKey, featureRegistrations, config, featureControlUpdateHandler);
         }
     }
 
