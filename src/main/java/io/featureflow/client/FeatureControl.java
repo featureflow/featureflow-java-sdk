@@ -40,7 +40,9 @@ public class FeatureControl {//<V> {
 
     public String evaluate(FeatureFlowContext context) {
         //if off then offVariant
-        if(!enabled) return variants.get(offVariant).name;
+        if(!enabled) {
+            return variants.get(offVariant).name;
+        }
         //if we have rules (we should always have at least one - the default rule
         for (Rule rule : rules) {
             if(rule.matches(context)){
