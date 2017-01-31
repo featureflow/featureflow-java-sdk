@@ -18,18 +18,20 @@ public class RuleVariantsTest {
 
         Rule rule = new Rule();
 
+        String onId = "onId";
+        String offId = "ioffId";
         VariantSplit onSplit = new VariantSplit();
-        onSplit.setVariant(0);
+        onSplit.setVariantId(onId);
         onSplit.setSplit(100l);
 
         VariantSplit offSplit = new VariantSplit();
-        offSplit.setVariant(1);
+        offSplit.setVariantId(offId);
         offSplit.setSplit(0l);
 
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(0, rule.getEvaluatedVariant("oliver", 1));
+        Assert.assertEquals(onId, rule.getEvaluatedVariantId("oliver", 1));
     }
 
     @Test
@@ -37,44 +39,53 @@ public class RuleVariantsTest {
 
         Rule rule = new Rule();
 
+        String onId = "onId";
+        String offId = "ioffId";
+
         VariantSplit onSplit = new VariantSplit();
-        onSplit.setVariant(0);
+        onSplit.setVariantId(onId);
         onSplit.setSplit(0l);
 
         VariantSplit offSplit = new VariantSplit();
-        offSplit.setVariant(1);
+        offSplit.setVariantId(offId);
         offSplit.setSplit(100l);
 
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(1, rule.getEvaluatedVariant("oliver", 1));
+        Assert.assertEquals(offId, rule.getEvaluatedVariantId("oliver", 1));
     }
 
     @Test
     public void testMultiVariant() throws Exception {
 
+
         Rule rule = new Rule();
 
+        String id1 = "id1";
+        String id2 = "id2";
+        String id3 = "id3";
+
+
         VariantSplit redSplit = new VariantSplit();
-        redSplit.setVariant(0);
+        redSplit.setVariantId(id1);
         redSplit.setSplit(10l);
 
         VariantSplit blueSplit = new VariantSplit();
-        blueSplit.setVariant(1);
+        blueSplit.setVariantId(id2);
         blueSplit.setSplit(60l);
 
         VariantSplit greenSplit = new VariantSplit();
-        greenSplit.setVariant(2);
+        greenSplit.setVariantId(id3);
         greenSplit.setSplit(30l);
 
         rule.setVariantSplits(Arrays.asList(redSplit, blueSplit, greenSplit));
 
-        Assert.assertEquals(2, rule.getEvaluatedVariant("oliver", 1));
+        Assert.assertEquals(id3, rule.getEvaluatedVariantId("oliver", 1));
 
-        Assert.assertEquals(1, rule.getEvaluatedVariant("alan", 1));
+        Assert.assertEquals(id2, rule.getEvaluatedVariantId("alan", 1));
 
-        Assert.assertEquals(0, rule.getEvaluatedVariant("sarah", 1));
+        Assert.assertEquals(id1, rule.getEvaluatedVariantId("sarah", 1));
     }
 
 

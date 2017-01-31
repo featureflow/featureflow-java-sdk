@@ -29,7 +29,7 @@ public class FeatureControl {//<V> {
     boolean available; //is the feature available in the environment?
     boolean deleted; //has this been deleted then ignore in all evaluations
     List<Rule> rules = new ArrayList<>(); //A list of feature rules which contain rules to target variant splits at particular audiences
-    int offVariant; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
+    int offVariantId; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
     boolean inClientApi; //is this in the JS api (for any required logic)
 
     List<Variant> variants = new ArrayList<>();  //available variants for this feature
@@ -41,18 +41,35 @@ public class FeatureControl {//<V> {
     public String evaluate(FeatureFlowContext context) {
         //if off then offVariant
         if(!enabled) {
-            return variants.get(offVariant).name;
+            return variants.get(offVariantId).name;
         }
         //if we have rules (we should always have at least one - the default rule
         for (Rule rule : rules) {
             if(rule.matches(context)){
                 //if the rule matches then pass back the variant based on the split evaluation
-                return variants.get(rule.getEvaluatedVariant(context.key, variationsSeed)).name;
+                return getVariantById(rule.getEvaluatedVariantId(context.key, variationsSeed)).name;
             }
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule
     }
 
+    //helpers
+    public Variant getVariantByName(String name){
+        for (Variant v: variants) {
+            if(name.equals(v.name)){
+                return v;
+            }
+        }
+        return null;
+    }
+    public Variant getVariantById(String id){
+        for (Variant v: variants) {
+            if(id.equals(v.id)){
+                return v;
+            }
+        }
+        return null;
+    }
 
     @Override
     public String toString() {
@@ -68,10 +85,11 @@ public class FeatureControl {//<V> {
                 "  available=" + available + "\n" +
                 "  deleted=" + deleted + "\n" +
                 //insert barely readable one-liner here:
-                "  rules=" + rules.stream().map(r -> "Rule " + r.getPriority() + ": " + r.getVariantSplits().stream().map(s -> s.getVariant() + ":" + s.getSplit() +"% ").reduce("", String::concat) + "\n").reduce("", String::concat) + "\n" +
-                "  offVariant=" + offVariant + "\n" +
+                "  rules=" + rules.stream().map(r -> "Rule " + r.getPriority() + ": " + r.getVariantSplits().stream().map(s -> s.getVariantId() + ":" + s.getSplit() +"% ").reduce("", String::concat) + "\n").reduce("", String::concat) + "\n" +
+                "  offVariantId=" + offVariantId + "\n" +
                 "  inClientApi=" + inClientApi + "\n" +
                 "  variants=" + variants.stream().map(v -> v.name +" ").reduce("", String::concat) + "\n" +
                 '}';
     }
+
 }
