@@ -34,7 +34,7 @@ public class FeatureFlowClientImplTestInt {
     @Test
     public void isEnabled() throws Exception {
         final CountDownLatch latch = new CountDownLatch(10); //set the coundown latch to however many calls you want to test with
-        String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODY0NTNjMzdjNzk1ZjA1MWY4MjQzZTMiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.PdUWedk4wk0MVxxvpIu09DZ6bgk9RYJZO0p05kLGWDEblIvL_sgA73YAFxRvNJFzmoEUET-ECYovAKdPHDtdHg";
+        String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODkwNzJhZWIzZDIxMzA0MTNkNDk1ZGYiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.reeLuHhIQzqxi0UXya4P5YpVA-vdCHunYXKHlQ95vbZMmRZkjKbb0bVs_A4Na5gd3578vUCmEnkXjqQeOEeZiw";
         String baseUri = "http://featureflow.dev";
         //String baseUri = "http://localhost:8081";
         FeatureFlowConfig config = new FeatureFlowConfig.Builder()
