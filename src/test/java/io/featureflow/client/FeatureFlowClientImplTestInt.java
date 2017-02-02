@@ -72,12 +72,16 @@ public class FeatureFlowClientImplTestInt {
     }
 
     @Test
-    public void getVariation() throws Exception {
+    public void testEvaluate() throws Exception {
         FeatureFlowConfig config = FeatureFlowConfig.builder().withBaseURI("http://featureflow.dev").build();
         //FeatureFlowContext context = FeatureFlowContext.builder().withValue("tier", "gold").build();
         FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODE2YjE3M2EzNzc2NDAwMDdhODk1NWIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.nt4j7v5x8TOqtAscFtF8mMwT9GF6jpEivG0dk-dANVT-EoKUY7g4jApgRQL-J_WcF2Rz3BmeqSYj2QUm-p4DRA")
                 .withConfig(config).build();
-        client.evaluate("social-login", Variant.off);
+
+
+        String evaluatedVariant = client.evaluate("social-login", Variant.off);
+        System.out.println(evaluatedVariant);
+
         System.out.println(client.evaluate("social-login", Variant.on));
     }
 
