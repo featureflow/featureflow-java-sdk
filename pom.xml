@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.featureflow</groupId>
     <artifactId>featureflow-java-sdk</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Featurefloe Java SDK</name>
+    <name>Featureflow Java SDK</name>
     <description>The java SDK for featureflow feature management</description>
     <url>https://featureflow.io</url>
 
