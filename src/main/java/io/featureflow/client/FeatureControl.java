@@ -20,6 +20,7 @@ import java.util.List;
  *
  */
 public class FeatureControl {//<V> {
+    String id;
     String key; //the key which is unique per project and used as the human-readable unique key
     String environmentId; //the environmentId
     //String salt; //The salt is used to hash context details (this is in the environment config)  TBC
@@ -29,7 +30,7 @@ public class FeatureControl {//<V> {
     boolean available; //is the feature available in the environment?
     boolean deleted; //has this been deleted then ignore in all evaluations
     List<Rule> rules = new ArrayList<>(); //A list of feature rules which contain rules to target variant splits at particular audiences
-    int offVariantId; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
+    String offVariantId; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
     boolean inClientApi; //is this in the JS api (for any required logic)
 
     List<Variant> variants = new ArrayList<>();  //available variants for this feature
@@ -41,7 +42,7 @@ public class FeatureControl {//<V> {
     public String evaluate(FeatureFlowContext context) {
         //if off then offVariant
         if(!enabled) {
-            return variants.get(offVariantId).name;
+            return getVariantById(offVariantId).name;
         }
         //if we have rules (we should always have at least one - the default rule
         for (Rule rule : rules) {
@@ -52,7 +53,6 @@ public class FeatureControl {//<V> {
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule
     }
-
     //helpers
     public Variant getVariantByName(String name){
         for (Variant v: variants) {
@@ -64,7 +64,7 @@ public class FeatureControl {//<V> {
     }
     public Variant getVariantById(String id){
         for (Variant v: variants) {
-            if(id.equals(v.id)){
+            if(v.id.equals(id)){
                 return v;
             }
         }
