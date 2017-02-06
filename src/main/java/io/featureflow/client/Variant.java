@@ -13,8 +13,7 @@ import java.util.List;
 public class Variant {
     public static final String off = "off";
     public static final String on = "on";
-    String id; //unique id
-    String name; //the value of the variant - true/false/blue/green or another feature
-    String displayName;
+    String key; //unique key - true/false/blue/green or another feature
+    String name; //the value of the variant
 
 }

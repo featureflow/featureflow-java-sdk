@@ -49,14 +49,14 @@ public class Rule {
         return audience==null?true:audience.matches(context);
     }
 
-    public String getEvaluatedVariantId(String key, int seed){
+    public String getEvaluatedVariantKey(String key, int seed){
       //  if(variant!=null)return variant;
 
         int variantValue = getVariantValue(getHash(key, seed));
         int percent = 0;
         for (VariantSplit variantSplit : variantSplits) {
             percent += variantSplit.getSplit();
-            if(percent > variantValue)return variantSplit.getVariantId();
+            if(percent > variantValue)return variantSplit.getVariantKey();
         }
         return null;
     }

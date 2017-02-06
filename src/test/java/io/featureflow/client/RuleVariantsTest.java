@@ -21,17 +21,17 @@ public class RuleVariantsTest {
         String onId = "onId";
         String offId = "ioffId";
         VariantSplit onSplit = new VariantSplit();
-        onSplit.setVariantId(onId);
+        onSplit.setVariantKey(onId);
         onSplit.setSplit(100l);
 
         VariantSplit offSplit = new VariantSplit();
-        offSplit.setVariantId(offId);
+        offSplit.setVariantKey(offId);
         offSplit.setSplit(0l);
 
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(onId, rule.getEvaluatedVariantId("oliver", 1));
+        Assert.assertEquals(onId, rule.getEvaluatedVariantKey("oliver", 1));
     }
 
     @Test
@@ -43,17 +43,17 @@ public class RuleVariantsTest {
         String offId = "ioffId";
 
         VariantSplit onSplit = new VariantSplit();
-        onSplit.setVariantId(onId);
+        onSplit.setVariantKey(onId);
         onSplit.setSplit(0l);
 
         VariantSplit offSplit = new VariantSplit();
-        offSplit.setVariantId(offId);
+        offSplit.setVariantKey(offId);
         offSplit.setSplit(100l);
 
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(offId, rule.getEvaluatedVariantId("oliver", 1));
+        Assert.assertEquals(offId, rule.getEvaluatedVariantKey("oliver", 1));
     }
 
     @Test
@@ -68,24 +68,24 @@ public class RuleVariantsTest {
 
 
         VariantSplit redSplit = new VariantSplit();
-        redSplit.setVariantId(id1);
+        redSplit.setVariantKey(id1);
         redSplit.setSplit(10l);
 
         VariantSplit blueSplit = new VariantSplit();
-        blueSplit.setVariantId(id2);
+        blueSplit.setVariantKey(id2);
         blueSplit.setSplit(60l);
 
         VariantSplit greenSplit = new VariantSplit();
-        greenSplit.setVariantId(id3);
+        greenSplit.setVariantKey(id3);
         greenSplit.setSplit(30l);
 
         rule.setVariantSplits(Arrays.asList(redSplit, blueSplit, greenSplit));
 
-        Assert.assertEquals(id3, rule.getEvaluatedVariantId("oliver", 1));
+        Assert.assertEquals(id3, rule.getEvaluatedVariantKey("oliver", 1));
 
-        Assert.assertEquals(id2, rule.getEvaluatedVariantId("alan", 1));
+        Assert.assertEquals(id2, rule.getEvaluatedVariantKey("alan", 1));
 
-        Assert.assertEquals(id1, rule.getEvaluatedVariantId("sarah", 1));
+        Assert.assertEquals(id1, rule.getEvaluatedVariantKey("sarah", 1));
     }
 
 

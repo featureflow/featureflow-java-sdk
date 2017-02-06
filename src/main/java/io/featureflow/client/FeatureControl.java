@@ -30,7 +30,7 @@ public class FeatureControl {//<V> {
     boolean available; //is the feature available in the environment?
     boolean deleted; //has this been deleted then ignore in all evaluations
     List<Rule> rules = new ArrayList<>(); //A list of feature rules which contain rules to target variant splits at particular audiences
-    String offVariantId; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
+    String offVariantKey; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
     boolean inClientApi; //is this in the JS api (for any required logic)
 
     List<Variant> variants = new ArrayList<>();  //available variants for this feature
@@ -42,29 +42,21 @@ public class FeatureControl {//<V> {
     public String evaluate(FeatureFlowContext context) {
         //if off then offVariant
         if(!enabled) {
-            return getVariantById(offVariantId).name;
+            return getVariantByKey(offVariantKey).key;
         }
         //if we have rules (we should always have at least one - the default rule
         for (Rule rule : rules) {
             if(rule.matches(context)){
                 //if the rule matches then pass back the variant based on the split evaluation
-                return getVariantById(rule.getEvaluatedVariantId(context.key, variationsSeed)).name;
+                return getVariantByKey(rule.getEvaluatedVariantKey(context.key, variationsSeed)).key;
             }
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule
     }
     //helpers
-    public Variant getVariantByName(String name){
+    public Variant getVariantByKey(String key){
         for (Variant v: variants) {
-            if(name.equals(v.name)){
-                return v;
-            }
-        }
-        return null;
-    }
-    public Variant getVariantById(String id){
-        for (Variant v: variants) {
-            if(v.id.equals(id)){
+            if(v.key.equals(key)){
                 return v;
             }
         }
@@ -85,8 +77,8 @@ public class FeatureControl {//<V> {
                 "  available=" + available + "\n" +
                 "  deleted=" + deleted + "\n" +
                 //insert barely readable one-liner here:
-                "  rules=" + rules.stream().map(r -> "Rule " + r.getPriority() + ": " + r.getVariantSplits().stream().map(s -> s.getVariantId() + ":" + s.getSplit() +"% ").reduce("", String::concat) + "\n").reduce("", String::concat) + "\n" +
-                "  offVariantId=" + offVariantId + "\n" +
+                "  rules=" + rules.stream().map(r -> "Rule " + r.getPriority() + ": " + r.getVariantSplits().stream().map(s -> s.getVariantKey() + ":" + s.getSplit() +"% ").reduce("", String::concat) + "\n").reduce("", String::concat) + "\n" +
+                "  offVariantKey=" + offVariantKey + "\n" +
                 "  inClientApi=" + inClientApi + "\n" +
                 "  variants=" + variants.stream().map(v -> v.name +" ").reduce("", String::concat) + "\n" +
                 '}';
