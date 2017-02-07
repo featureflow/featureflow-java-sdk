@@ -42,13 +42,14 @@ public class FeatureControl {//<V> {
     public String evaluate(FeatureFlowContext context) {
         //if off then offVariant
         if(!enabled) {
-            return getVariantByKey(offVariantKey).key;
+            return offVariantKey;
         }
         //if we have rules (we should always have at least one - the default rule
         for (Rule rule : rules) {
             if(rule.matches(context)){
                 //if the rule matches then pass back the variant based on the split evaluation
-                return getVariantByKey(rule.getEvaluatedVariantKey(context.key, variationsSeed)).key;
+                //return //getVariantByKey(rule.getEvaluatedVariantKey(context.key, variationsSeed)).key;
+                return rule.getEvaluatedVariantKey(context.key, variationsSeed);
             }
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule
