@@ -8,6 +8,8 @@ import java.util.List;
  */
 public interface FeatureFlowClient extends Closeable {
 
+
+
     String evaluate(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant);
 
     String evaluate(String featureKey, String failoverVariant);
@@ -21,6 +23,7 @@ public interface FeatureFlowClient extends Closeable {
         private String apiKey;
         private FeatureControlUpdateHandler featureControlUpdateHandler;
         private List<FeatureRegistration> featureRegistrations;
+
 
         public Builder (String apiKey){
             this.apiKey = apiKey;

@@ -142,7 +142,7 @@ public class FeatureControlStreamManager implements Closeable {
 
    // @Override
     public boolean initialized() {
-        return initialized.get();
+        return true; //initialized.get();
     }
 
 }

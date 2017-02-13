@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -32,6 +34,9 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     private final Map<String, FeatureRegistration> featureRegistrationsMap = new HashMap<>();
     private Queue<FeatureControlUpdateHandler> handlers;
 
+    public FeatureFlowClientImpl(String apiKey){
+        this(apiKey, null, new FeatureFlowConfig.Builder().build(), null);
+    }
     FeatureFlowClientImpl(String apiKey, List<FeatureRegistration> featureRegistrations, FeatureFlowConfig config, FeatureControlUpdateHandler callback) {
         //set config, use a builder
         this.config = config;
@@ -46,6 +51,16 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
         featureControlStreamManager = new FeatureControlStreamManager(apiKey, config, featureControlRepository, featureControlRestClient, callback);
 
         Future<Void> startFuture = featureControlStreamManager.start();
+        //if (config.startWaitMillis > 0L) {
+            logger.info("Waiting for Featureflow to inititalise");
+            try {
+                startFuture.get(20000, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                logger.error("Timeout encountered waiting for Featureflow client initialise");
+            } catch (Exception e) {
+                logger.error("Exception encountered waiting for Featureflow client to initialise", e);
+            }
+        //}
     }
 
     @Override

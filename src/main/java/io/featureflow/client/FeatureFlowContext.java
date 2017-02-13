@@ -1,8 +1,14 @@
 package io.featureflow.client;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,11 +44,32 @@ public class FeatureFlowContext{
             this.values.put(key, value);
             return this;
         }
+        public Builder withValue(String key, String value){
+            JsonPrimitive jsonValue = new JsonPrimitive(value);
+            this.values.put(key, jsonValue);
+            return this;
+        }
+        public Builder withValue(String key, DateTime value){
+            JsonPrimitive jsonValue = new JsonPrimitive(toIso(value));
+            this.values.put(key, jsonValue);
+            return this;
+        }
+        public Builder withValue(String key, Number value){
+            JsonPrimitive jsonValue = new JsonPrimitive(value);
+            this.values.put(key, jsonValue);
+            return this;
+        }
         public FeatureFlowContext build(){
             if(key==null)key = "anonymous";
             FeatureFlowContext context = new FeatureFlowContext(key);
             context.values = values;
             return context;
+        }
+
+        protected static String toIso(DateTime date) {
+            DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+            String str = fmt.print(date);
+            return str;
         }
     }
 }

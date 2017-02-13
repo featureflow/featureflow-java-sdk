@@ -3,6 +3,8 @@ package io.featureflow.client;
 import com.google.gson.JsonPrimitive;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.regex.Pattern;
 
@@ -127,9 +129,15 @@ public enum Operator {
             long millis = date.getAsLong();
             return new DateTime(millis);
         } else if (date.isString()) {
-            try {
-                return new DateTime(date.getAsString(), DateTimeZone.UTC);
-            } catch (Throwable t) {}
+
+                try {
+                    DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
+                    return parser.parseDateTime(date.getAsString());
+                }catch(IllegalArgumentException ex){
+                    try {
+                        return new DateTime(date.getAsString(), DateTimeZone.UTC);
+                    } catch (Throwable t) {}
+                }
         }
         return null;
     }
