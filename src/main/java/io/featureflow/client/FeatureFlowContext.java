@@ -31,6 +31,10 @@ public class FeatureFlowContext{
         return new Builder();
     }
 
+    public Map<String,? extends JsonElement> getValues() {
+        return values;
+    }
+
     public static class Builder{
         private String key;
         private Map<String, JsonElement> values = new HashMap<>();
@@ -70,6 +74,11 @@ public class FeatureFlowContext{
             DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
             String str = fmt.print(date);
             return str;
+        }
+        protected static DateTime fromIso(String isoDate) {
+            DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+            DateTime dt = fmt.parseDateTime(isoDate);
+            return dt;
         }
     }
 }
