@@ -34,7 +34,7 @@ public class FeatureFlowClientImplTestInt {
     @Test
     public void isEnabled() throws Exception {
         final CountDownLatch latch = new CountDownLatch(10); //set the coundown latch to however many calls you want to test with
-        String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODkwNzJhZWIzZDIxMzA0MTNkNDk1ZGYiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.reeLuHhIQzqxi0UXya4P5YpVA-vdCHunYXKHlQ95vbZMmRZkjKbb0bVs_A4Na5gd3578vUCmEnkXjqQeOEeZiw";
+        String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4MzFiZThhZmQxODgzZDg4ZTQzMWEiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.1EvoDmtqOaAfYTtB3B1q7kSMp_Y27kQAa8GKM3fdHZcr1s6BQXHPW88U1j1K3Gwd4f0pHfZnSEJyZL0bd8kriA";
         String baseUri = "http://featureflow.dev";
         //String baseUri = "http://localhost:8081";
         FeatureFlowConfig config = new FeatureFlowConfig.Builder()
@@ -84,6 +84,8 @@ public class FeatureFlowClientImplTestInt {
 
         System.out.println(client.evaluate("social-login", Variant.on));
     }
+
+
 
 
 }

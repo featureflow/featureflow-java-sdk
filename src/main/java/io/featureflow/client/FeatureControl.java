@@ -81,7 +81,7 @@ public class FeatureControl {//<V> {
                 "  rules=" + rules.stream().map(r -> "Rule " + r.getPriority() + ": " + r.getVariantSplits().stream().map(s -> s.getVariantKey() + ":" + s.getSplit() +"% ").reduce("", String::concat) + "\n").reduce("", String::concat) + "\n" +
                 "  offVariantKey=" + offVariantKey + "\n" +
                 "  inClientApi=" + inClientApi + "\n" +
-                "  variants=" + variants.stream().map(v -> v.name +" ").reduce("", String::concat) + "\n" +
+                "  variants=" + variants==null?null:variants.stream().map(v -> v.name +" ").reduce("", String::concat) + "\n" +
                 '}';
     }
 

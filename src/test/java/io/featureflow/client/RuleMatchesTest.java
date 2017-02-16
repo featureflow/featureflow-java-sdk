@@ -21,7 +21,7 @@ public class RuleMatchesTest {
         Condition c1 = new Condition();
         c1.target = "name";
         c1.operator = Operator.equals;
-        c1.value = new JsonPrimitive("oliver");
+        c1.values.get(0) = new JsonPrimitive("oliver");
 
         Audience a = new Audience();
         a.conditions = Arrays.asList(c1);
@@ -44,7 +44,7 @@ public class RuleMatchesTest {
         Condition c1 = new Condition();
         c1.target = "age";
         c1.operator = Operator.greaterThan;
-        c1.value= new JsonPrimitive(25l);
+        c1.values.get(0)= new JsonPrimitive(25l);
 
         Audience a = new Audience();
         a.conditions = Arrays.asList(c1);
