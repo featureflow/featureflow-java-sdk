@@ -2,6 +2,7 @@ package io.featureflow.client;
 
 import com.google.gson.JsonPrimitive;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
 public class Condition {
     String target;    //name, age, date
     Operator operator; // = < > like in out
-    List<JsonPrimitive> values; //some value 1,2,dave,timestamp,2016-01-11-10:10:10:0000UTC
+    List<JsonPrimitive> values = new ArrayList<>(); //some value 1,2,dave,timestamp,2016-01-11-10:10:10:0000UTC
 
     public boolean matches(FeatureFlowContext context) {
         //see if context contains target
