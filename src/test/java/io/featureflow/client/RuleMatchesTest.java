@@ -21,7 +21,7 @@ public class RuleMatchesTest {
         Condition c1 = new Condition();
         c1.target = "name";
         c1.operator = Operator.equals;
-        c1.values.get(0) = new JsonPrimitive("oliver");
+        c1.values.add(new JsonPrimitive("oliver"));
 
         Audience a = new Audience();
         a.conditions = Arrays.asList(c1);
@@ -38,13 +38,11 @@ public class RuleMatchesTest {
 
     @Test
     public void testRuleGreaterThan() throws Exception {
-
         Rule rule = new Rule();
-
         Condition c1 = new Condition();
         c1.target = "age";
         c1.operator = Operator.greaterThan;
-        c1.values.get(0)= new JsonPrimitive(25l);
+        c1.values.add(new JsonPrimitive(25l));
 
         Audience a = new Audience();
         a.conditions = Arrays.asList(c1);
