@@ -67,15 +67,7 @@ public class EventSource implements ConnectionHandler, Closeable {
 
         try {
             while(!Thread.currentThread().isInterrupted() && this.state.get() != State.SHUTDOWN) {
-                if(this.reconnectTimeMillis > 0L) {
-                    log.info("Waiting to reconnect.." + this.reconnectTimeMillis);
 
-                    try {
-                        Thread.sleep(this.reconnectTimeMillis);
-                    } catch (InterruptedException var13) {
-                        ;
-                    }
-                }
 
                 State currentState = this.state.getAndSet(State.CONNECTING);
                 log.debug("state change: " + currentState + " to " + State.CONNECTING);
@@ -103,6 +95,7 @@ public class EventSource implements ConnectionHandler, Closeable {
                         String line;
                         while(!Thread.currentThread().isInterrupted() && (line = bs.readUtf8LineStrict()) != null) {
                             parser.line(line);
+                            log.info(line);
                         }
                     } else {
                         log.debug("Failed Response: " + response);
@@ -124,6 +117,15 @@ public class EventSource implements ConnectionHandler, Closeable {
                         this.call.cancel();
                     }
 
+                }
+                if(this.reconnectTimeMillis > 0L) {
+                    log.info("Waiting to reconnect.." + this.reconnectTimeMillis);
+
+                    try {
+                        Thread.sleep(this.reconnectTimeMillis);
+                    } catch (InterruptedException var13) {
+                        ;
+                    }
                 }
             }
         } catch (RejectedExecutionException var17) {

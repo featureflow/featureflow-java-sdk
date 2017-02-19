@@ -17,7 +17,7 @@ public class DebugClient {
                 .add("User-Agent", "JavaClient/" + "1.0")
                 .add("Accept", "text/event-stream")
                 .build();*/
-        EventSource es = new EventSource(URI.create("http://localhost:8081/api/app/v1/controls"), 0l, headers, new EventSourceHandler() {
+        EventSource es = new EventSource(URI.create("http://localhost:7999/api/sdk/v1/controls/stream"), 10000l, headers, new EventSourceHandler() {
             @Override
             public void onConnect() {
                 System.out.println("CONNECTED");
