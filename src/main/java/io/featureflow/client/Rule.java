@@ -51,7 +51,7 @@ public class Rule {
 
     public String getEvaluatedVariantKey(String key, int seed){
       //  if(variant!=null)return variant;
-
+        if(key==null)key="anonymous";
         int variantValue = getVariantValue(getHash(key, seed));
         int percent = 0;
         for (VariantSplit variantSplit : variantSplits) {

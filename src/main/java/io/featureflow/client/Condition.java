@@ -15,6 +15,7 @@ public class Condition {
 
     public boolean matches(FeatureFlowContext context) {
         //see if context contains target
+        if(context.values==null)return false;
         for(String key : context.values.keySet()){
             if(key.equals(target)){
                 //compare the value using the comparator
