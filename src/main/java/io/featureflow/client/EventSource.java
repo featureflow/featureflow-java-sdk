@@ -34,6 +34,7 @@ public class EventSource implements ConnectionHandler, Closeable {
     private volatile Call call;
 
     public static final Logger log = LoggerFactory.getLogger(EventSource.class);
+    private String lastEventId;
 
 
     public EventSource(URI uri, long reconnectTimeMillis, Headers headers, EventSourceHandler eventSourceHandler) {
@@ -71,13 +72,11 @@ public class EventSource implements ConnectionHandler, Closeable {
 
                 State currentState = this.state.getAndSet(State.CONNECTING);
                 log.debug("state change: " + currentState + " to " + State.CONNECTING);
-
                 try {
                     okhttp3.Request.Builder ioe = (new okhttp3.Request.Builder()).headers(this.headers).url(this.uri.toASCIIString()).get();
-                    /*if(this.lastEventId != null && !this.lastEventId.isEmpty()) {
+                    if(this.lastEventId != null && !this.lastEventId.isEmpty()) {
                         ioe.addHeader("Last-Event-ID", this.lastEventId);
-                    }*/
-
+                    }
                     this.call = this.client.newCall(ioe.build());
                     response = this.call.execute();
                     if(response.isSuccessful()) {
@@ -94,6 +93,7 @@ public class EventSource implements ConnectionHandler, Closeable {
 
                         String line;
                         while(!Thread.currentThread().isInterrupted() && (line = bs.readUtf8LineStrict()) != null) {
+
                             parser.line(line);
                             log.info(line);
                         }
@@ -141,7 +141,7 @@ public class EventSource implements ConnectionHandler, Closeable {
 
     @Override
     public void setLastEventId(String lastEventId) {
-
+        this.lastEventId = lastEventId;
     }
 
     @Override

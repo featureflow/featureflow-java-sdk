@@ -28,8 +28,8 @@ public class EventStreamParser {
     private String lastEventId;
     private String eventName = DEFAULT_EVENT;
 
-    EventStreamParser(URI origin, EventSourceHandler handler, ConnectionHandler connectionHandler) {
-        this.handler = handler;
+    EventStreamParser(URI origin, EventSourceHandler eventSourceHandler, ConnectionHandler connectionHandler) {
+        this.handler = eventSourceHandler;
         this.origin = origin;
         this.connectionHandler = connectionHandler;
     }
