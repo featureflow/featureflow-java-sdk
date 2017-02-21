@@ -12,7 +12,8 @@ public class FeatureFlowConfig {
     private static final int DEFAULT_CONNECT_TIMEOUT        = 30000;
     private static final int DEFAULT_SOCKET_TIMEOUT         = 20000;
     public static final String DEFAULT_BASE_URI             = "https://app.featureflow.io";
-    private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/stream";
+    //private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/stream";
+    private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/controls/stream";
     static final String FEATURE_CONTROL_REST_PATH           = "/api/sdk/v1/feature-controls";
     static final String REGISTER_REST_PATH                  = "/api/sdk/v1/register";
     static final String EVENTS_REST_PATH                    = "/api/sdk/v1/events";

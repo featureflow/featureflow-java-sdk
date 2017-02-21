@@ -19,9 +19,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * Created by oliver on 6/06/2016.
- */
 public class EventSource implements ConnectionHandler, Closeable {
 
     private final AtomicReference<State> state;
@@ -29,7 +26,7 @@ public class EventSource implements ConnectionHandler, Closeable {
     private final ExecutorService executor;
     private volatile long reconnectTimeMillis = 0L;
     private final Headers headers;
-    private final EventSourceHandler eventSourceHandler; //handles the event. Great comment.
+    private final EventSourceHandler eventSourceHandler;
     private final OkHttpClient client;
     private volatile Call call;
 
@@ -38,7 +35,6 @@ public class EventSource implements ConnectionHandler, Closeable {
 
 
     public EventSource(URI uri, long reconnectTimeMillis, Headers headers, EventSourceHandler eventSourceHandler) {
-
         this.state = new AtomicReference<>(State.UNINITIALISED);
         this.uri = uri;
         this.executor = Executors.newCachedThreadPool();
@@ -68,8 +64,6 @@ public class EventSource implements ConnectionHandler, Closeable {
 
         try {
             while(!Thread.currentThread().isInterrupted() && this.state.get() != State.SHUTDOWN) {
-
-
                 State currentState = this.state.getAndSet(State.CONNECTING);
                 log.debug("state change: " + currentState + " to " + State.CONNECTING);
                 try {
@@ -101,8 +95,8 @@ public class EventSource implements ConnectionHandler, Closeable {
                         log.debug("Failed Response: " + response);
                         this.eventSourceHandler.onError(new FailedResponseException(response.code()));
                     }
-                } catch (EOFException var14) {
-                    log.warn("Connection unexpectedly closed.");
+                } catch (EOFException eof) {
+                    log.warn("Connection unexpectedly closed due to {}.", eof.getMessage());
                 } catch (IOException var15) {
                     log.debug("Connection problem.", var15);
                     this.eventSourceHandler.onError(var15);
@@ -131,7 +125,6 @@ public class EventSource implements ConnectionHandler, Closeable {
         } catch (RejectedExecutionException var17) {
             ;
         }
-
     }
 
     @Override

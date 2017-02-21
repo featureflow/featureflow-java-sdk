@@ -11,6 +11,7 @@ public class Audience {
     List<Condition> conditions;
 
     public boolean matches(FeatureFlowContext context) {
+        if(conditions==null||conditions.size()==0)return true;
         for (Condition condition : conditions) {
             if(condition.matches(context)){
                 return true;

@@ -61,16 +61,16 @@ public class FeatureControlStreamManager implements Closeable {
             //We do this in a separate thread - the app will continue to start up - in featureflow this allows featureflow to start so it can serve itself its features :S
             CompletableFuture initF = CompletableFuture.supplyAsync(
                     () -> {
-                        try {
-                            Map<String, FeatureControl> featureControlMap = featureControlRestClient.getFeatureControls();
+                           // Map<String, FeatureControl> featureControlMap = featureControlRestClient.getFeatureControls();
                             //3. init repo
-                            repository.init(featureControlMap);
+                            //repository.init(featureControlMap);
                             //4. Subscribe to feature events feed
                             //subscribeToEvents();
                             Headers headers = new Headers.Builder()
                                     .add("Authorization", "Bearer " + this.apiKey)
                                     .add("User-Agent", "FeatureflowClient-Java/" + "1.0")
-                                    .add("Accept", "text/event-stream")
+                                    .add("Cache-Control", "no-cache")
+                                    //.add("Accept", "text/event-stream")
                                     .build();
 
                             EventSourceHandler handler = new EventSourceHandler() {
@@ -108,7 +108,7 @@ public class FeatureControlStreamManager implements Closeable {
                                     //repository.get()update(controls.get());
                                     if (!initialized.getAndSet(true)) {
                                         initFuture.completed(null);
-                                        logger.info("Featureflow client inititalised.");
+                                        logger.info("Featureflow client initialised.");
                                     }
                                 }
 
@@ -122,7 +122,7 @@ public class FeatureControlStreamManager implements Closeable {
 
                             eventSource.init();
 
-                        } catch (IOException e) { }
+
                         return initFuture;
                     });
 
@@ -142,7 +142,7 @@ public class FeatureControlStreamManager implements Closeable {
 
    // @Override
     public boolean initialized() {
-        return true; //initialized.get();
+        return initialized.get();
     }
 
 }

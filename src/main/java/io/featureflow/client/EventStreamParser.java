@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 /**
  * Created by oliver on 6/06/2016.
+ * Event source handler based on netty implementation here:
+ * https://github.com/michaelklishin/eventsource-netty5/blob/master/src/main/java/io/opensensors/sse/client/impl/EventStreamParser.java
  */
 public class EventStreamParser {
     private static final Logger logger = LoggerFactory.getLogger(EventStreamParser.class);
@@ -20,7 +22,7 @@ public class EventStreamParser {
     private static final String EMPTY_STRING = "";
     private static final Pattern DIGITS_ONLY = Pattern.compile("^[\\d]+$");
 
-    private final EventSourceHandler handler;
+    private final EventSourceHandler eventSourceHandler;
     private final ConnectionHandler connectionHandler;
     private final URI origin;
 
@@ -29,11 +31,15 @@ public class EventStreamParser {
     private String eventName = DEFAULT_EVENT;
 
     EventStreamParser(URI origin, EventSourceHandler eventSourceHandler, ConnectionHandler connectionHandler) {
-        this.handler = eventSourceHandler;
+        this.eventSourceHandler = eventSourceHandler;
         this.origin = origin;
         this.connectionHandler = connectionHandler;
     }
 
+    /**
+     * Parse a single line up until the /n character
+     * @param line
+     */
     public void line(String line) {
         logger.debug("Parsing line: " + line);
         int colonIndex;
@@ -50,6 +56,11 @@ public class EventStreamParser {
         }
     }
 
+    /**
+     * Derive the data packet headers base on SSE spec and action as required
+     * @param field
+     * @param value
+     */
     private void processField(String field, String value) {
         if (DATA.equals(field)) {
             data.append(value).append("\n");
@@ -66,6 +77,10 @@ public class EventStreamParser {
         return DIGITS_ONLY.matcher(value).matches();
     }
 
+    /**
+     * Once the SSE parser has encountered a double newline /n/n it will dispatch the payload for processing
+     *
+     */
     private void dispatchEvent() {
         if (data.length() == 0) {
             return;
@@ -77,9 +92,9 @@ public class EventStreamParser {
         MessageEvent message = new MessageEvent(dataString, lastEventId, origin);
         connectionHandler.setLastEventId(lastEventId);
         try {
-            handler.onMessage(eventName, message);
+            eventSourceHandler.onMessage(eventName, message);
         } catch (Exception e) {
-            handler.onError(e);
+            eventSourceHandler.onError(e);
         }
         data = new StringBuffer();
         eventName = DEFAULT_EVENT;
