@@ -121,8 +121,6 @@ public class FeatureControlStreamManager implements Closeable {
                             eventSource = new EventSource(config.getControlStreamUri(), 5000l, headers, handler);
 
                             eventSource.init();
-
-
                         return initFuture;
                     });
 

@@ -12,6 +12,7 @@ public class FeatureFlowConfig {
     private static final int DEFAULT_CONNECT_TIMEOUT        = 30000;
     private static final int DEFAULT_SOCKET_TIMEOUT         = 20000;
     public static final String DEFAULT_BASE_URI             = "https://app.featureflow.io";
+    public static final String DEFAULT_STREAM_URI             = "https://rtm.featureflow.io";
     //private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/stream";
     private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/controls/stream";
     static final String FEATURE_CONTROL_REST_PATH           = "/api/sdk/v1/feature-controls";
@@ -25,10 +26,11 @@ public class FeatureFlowConfig {
     int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
     int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
     String baseURI = DEFAULT_BASE_URI;
+    String streamUri = DEFAULT_STREAM_URI;
     String controlStreamPath = DEFAULT_CONTROL_STREAM_PATH;
 
 
-    FeatureFlowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI) {
+    FeatureFlowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI, String streamUri) {
         this.offline = offline;
         this.proxyHost = proxyHost;
         this.proxyScheme = proxyScheme;
@@ -36,6 +38,7 @@ public class FeatureFlowConfig {
         this.connectTimeout = connectTimeout;
         this.socketTimeout = socketTimeout;
         this.baseURI = baseURI==null?DEFAULT_BASE_URI:baseURI;
+        this.streamUri = streamUri==null?DEFAULT_STREAM_URI:streamUri;
     }
 
     HttpHost getHttpProxyHost() {
@@ -100,8 +103,12 @@ public class FeatureFlowConfig {
         return baseURI==null?DEFAULT_BASE_URI:baseURI;
     }
 
+    String getStreamUri() {
+        return streamUri==null?DEFAULT_STREAM_URI:streamUri;
+    }
+
     URI getControlStreamUri() {
-        return controlStreamPath==null?URI.create(getBaseURI() + DEFAULT_CONTROL_STREAM_PATH):URI.create(baseURI+controlStreamPath);
+        return controlStreamPath==null?URI.create(getStreamUri() + DEFAULT_CONTROL_STREAM_PATH):URI.create(streamUri+controlStreamPath);
     }
 
     class Event {
@@ -120,6 +127,7 @@ public class FeatureFlowConfig {
         private int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
         private int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
         private String baseURI = DEFAULT_BASE_URI;
+        private String streamUri = DEFAULT_STREAM_URI;
 
         public Builder withOffline(boolean offline) {
             this.offline = offline;
@@ -156,9 +164,15 @@ public class FeatureFlowConfig {
             return this;
         }
 
+
+        public Builder withStreamURI(String streamUri) {
+            this.streamUri = streamUri;
+            return this;
+        }
+
         public FeatureFlowConfig build() {
 
-            return new FeatureFlowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI);
+            return new FeatureFlowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI, streamUri);
         }
 
     }

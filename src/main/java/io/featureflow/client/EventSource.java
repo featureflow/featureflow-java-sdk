@@ -182,9 +182,7 @@ public class EventSource implements ConnectionHandler, Closeable {
      * file that gets bundled with the application.
      */
     private InputStream trustedCertificatesInputStream() {
-        // PEM files for root certificates of Comodo and Entrust. These two CAs are sufficient to view
-        // https://publicobject.com (Comodo) and https://squareup.com (Entrust). But they aren't
-        // sufficient to connect to most HTTPS sites including https://godaddy.com and https://visa.com.
+        // PEM files for root certificates of LetsEncrypt Intermediary and Root.
         // Typically developers will need to get a PEM file from their organization's TLS administrator.
         String letsEncryptRootCa =
                 "-----BEGIN CERTIFICATE-----\n" +
