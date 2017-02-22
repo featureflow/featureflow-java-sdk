@@ -99,7 +99,7 @@ public class FeatureControlStreamManager implements Closeable {
 
 
                                     for(Map.Entry<String, FeatureControl> entry : controls.entrySet()) {
-                                        logger.info("Received Message to update feature {} with {}.", entry.getKey(), entry.getValue().enabled);
+                                        if(logger.isDebugEnabled())logger.debug("Received Message to update feature {} with {}.", entry.getKey(), entry.getValue().enabled);
                                         repository.update(entry.getKey(), entry.getValue());
                                         //invoking callbacks
                                         if(callback!=null)callback.onUpdate(entry.getValue());

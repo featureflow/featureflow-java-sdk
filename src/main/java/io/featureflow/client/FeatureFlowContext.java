@@ -44,10 +44,6 @@ public class FeatureFlowContext{
             this.key = key;
         }
 
-        public Builder withValue(String key, JsonElement value){
-            this.values.put(key, value);
-            return this;
-        }
         public Builder withValue(String key, String value){
             JsonPrimitive jsonValue = new JsonPrimitive(value);
             this.values.put(key, jsonValue);

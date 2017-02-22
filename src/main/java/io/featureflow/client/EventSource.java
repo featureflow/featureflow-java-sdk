@@ -110,9 +110,7 @@ public class EventSource implements ConnectionHandler, Closeable {
 
                         String line;
                         while(!Thread.currentThread().isInterrupted() && (line = bs.readUtf8LineStrict()) != null) {
-
                             parser.line(line);
-                            log.info(line);
                         }
                     } else {
                         log.debug("Failed Response: " + response);
