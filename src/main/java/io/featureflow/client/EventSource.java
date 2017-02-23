@@ -175,13 +175,11 @@ public class EventSource implements ConnectionHandler, Closeable {
 
 
     /**
-     * Returns an input stream containing one or more certificate PEM files. This implementation just
-     * embeds the PEM files in Java strings; most applications will instead read this from a resource
-     * file that gets bundled with the application.
+     * These trusted certificates are for letsenrypt certificates. We want to ensure that all users regardless of java version have a matching truststore.
+     *
      */
     private InputStream trustedCertificatesInputStream() {
         // PEM files for root certificates of LetsEncrypt Intermediary and Root.
-        // Typically developers will need to get a PEM file from their organization's TLS administrator.
         String letsEncryptRootCa =
                 "-----BEGIN CERTIFICATE-----\n" +
                 "MIIFCDCCA/CgAwIBAgISA7R03EyEk4Q9cB6bXqBQ3pe+MA0GCSqGSIb3DQEBCwUA\n" +
@@ -246,27 +244,6 @@ public class EventSource implements ConnectionHandler, Closeable {
                 .writeUtf8(letsEncryptIntermediaryCa)
                 .inputStream();
     }
-
-    /**
-     * Returns a trust manager that trusts {@code certificates} and none other. HTTPS services whose
-     * certificates have not been signed by these certificates will fail with a {@code
-     * SSLHandshakeException}.
-     *
-     * <p>This can be used to replace the host platform's built-in trusted certificates with a custom
-     * set. This is useful in development where certificate authority-trusted certificates aren't
-     * available. Or in production, to avoid reliance on third-party certificate authorities.
-     *
-     * <p>See also {@link CertificatePinner}, which can limit trusted certificates while still using
-     * the host platform's built-in trust store.
-     *
-     * <h3>Warning: Customizing Trusted Certificates is Dangerous!</h3>
-     *
-     * <p>Relying on your own trusted certificates limits your server team's ability to update their
-     * TLS certificates. By installing a specific set of trusted certificates, you take on additional
-     * operational complexity and limit your ability to migrate between certificate authorities. Do
-     * not use custom trusted certificates in production without the blessing of your server's TLS
-     * administrator.
-     */
     private X509TrustManager trustManagerForCertificates(InputStream in)
             throws GeneralSecurityException {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
