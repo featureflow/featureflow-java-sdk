@@ -12,7 +12,7 @@ public class FeatureFlowConfig {
     private static final int DEFAULT_CONNECT_TIMEOUT        = 30000;
     private static final int DEFAULT_SOCKET_TIMEOUT         = 20000;
     public static final String DEFAULT_BASE_URI             = "https://app.featureflow.io";
-    public static final String DEFAULT_STREAM_URI             = "https://rtm.featureflow.io";
+    public static final String DEFAULT_STREAM_BASE_URI             = "https://rtm.featureflow.io";
     //private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/stream";
     private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/controls/stream";
     static final String FEATURE_CONTROL_REST_PATH           = "/api/sdk/v1/feature-controls";
@@ -25,20 +25,20 @@ public class FeatureFlowConfig {
     int proxyPort = -1;
     int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
     int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
-    String baseURI = DEFAULT_BASE_URI;
-    String streamUri = DEFAULT_STREAM_URI;
+    String baseUri = DEFAULT_BASE_URI;
+    String streamBaseUri = DEFAULT_STREAM_BASE_URI;
     String controlStreamPath = DEFAULT_CONTROL_STREAM_PATH;
+    long waitForStartup = 10000l;
 
-
-    FeatureFlowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI, String streamUri) {
+    FeatureFlowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI, String streamBaseUri) {
         this.offline = offline;
         this.proxyHost = proxyHost;
         this.proxyScheme = proxyScheme;
         this.proxyPort = proxyPort;
         this.connectTimeout = connectTimeout;
         this.socketTimeout = socketTimeout;
-        this.baseURI = baseURI==null?DEFAULT_BASE_URI:baseURI;
-        this.streamUri = streamUri==null?DEFAULT_STREAM_URI:streamUri;
+        this.baseUri = baseURI==null?DEFAULT_BASE_URI:baseURI;
+        this.streamBaseUri = streamBaseUri ==null?DEFAULT_STREAM_BASE_URI: streamBaseUri;
     }
 
     HttpHost getHttpProxyHost() {
@@ -99,16 +99,20 @@ public class FeatureFlowConfig {
         this.socketTimeout = socketTimeout;
     }
 
-    String getBaseURI() {
-        return baseURI==null?DEFAULT_BASE_URI:baseURI;
+    String getBaseUri() {
+        return baseUri ==null?DEFAULT_BASE_URI: baseUri;
     }
 
-    String getStreamUri() {
-        return streamUri==null?DEFAULT_STREAM_URI:streamUri;
+    String getStreamBaseUri() {
+        return streamBaseUri ==null?DEFAULT_STREAM_BASE_URI: streamBaseUri;
     }
 
     URI getControlStreamUri() {
-        return controlStreamPath==null?URI.create(getStreamUri() + DEFAULT_CONTROL_STREAM_PATH):URI.create(streamUri+controlStreamPath);
+        return controlStreamPath==null?URI.create(getStreamBaseUri() + DEFAULT_CONTROL_STREAM_PATH):URI.create(getStreamBaseUri()+controlStreamPath);
+    }
+
+    long getWaitForStartup(){
+        return waitForStartup;
     }
 
     class Event {
@@ -127,7 +131,7 @@ public class FeatureFlowConfig {
         private int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
         private int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
         private String baseURI = DEFAULT_BASE_URI;
-        private String streamUri = DEFAULT_STREAM_URI;
+        private String streamBaseUri = DEFAULT_STREAM_BASE_URI;
 
         public Builder withOffline(boolean offline) {
             this.offline = offline;
@@ -159,20 +163,20 @@ public class FeatureFlowConfig {
             return this;
         }
 
-        public Builder withBaseURI(String baseURI) {
-            this.baseURI = baseURI;
+        public Builder withBaseUri(String baseUri) {
+            this.baseURI = baseUri;
             return this;
         }
 
 
-        public Builder withStreamURI(String streamUri) {
-            this.streamUri = streamUri;
+        public Builder withStreamBaseUri(String streamBaseUri) {
+            this.streamBaseUri = streamBaseUri;
             return this;
         }
 
         public FeatureFlowConfig build() {
 
-            return new FeatureFlowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI, streamUri);
+            return new FeatureFlowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI, streamBaseUri);
         }
 
     }

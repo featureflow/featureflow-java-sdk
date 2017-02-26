@@ -11,6 +11,14 @@ import java.util.List;
  *
  */
 public class Variant {
+    public Variant() {
+    }
+
+    public Variant(String key, String name) {
+        this.key = key;
+        this.name = name;
+    }
+
     public static final String off = "off";
     public static final String on = "on";
     String key; //unique key - true/false/blue/green or another feature

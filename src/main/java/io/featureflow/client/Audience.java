@@ -10,6 +10,14 @@ public class Audience {
     String name;
     List<Condition> conditions;
 
+    public Audience() {}
+
+    public Audience(String id, String name, List<Condition> conditions) {
+        this.id = id;
+        this.name = name;
+        this.conditions = conditions;
+    }
+
     public boolean matches(FeatureFlowContext context) {
         if(conditions==null||conditions.size()==0)return true;
         for (Condition condition : conditions) {

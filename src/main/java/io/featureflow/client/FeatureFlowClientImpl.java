@@ -2,6 +2,8 @@ package io.featureflow.client;
 
 
 
+import com.google.gson.JsonPrimitive;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +15,8 @@ import java.util.Queue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static io.featureflow.client.FeatureFlowContext.Builder.toIso;
 
 
 /**
@@ -30,6 +34,7 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     private final FeatureControlStreamManager featureControlStreamManager; // manages pubsub events to update a feature control
     private final FeatureControlRepository featureControlRepository; //holds the featureControls
     private final FeatureControlRestClient featureControlRestClient; //manages retrieving features and pushing updates
+    private final FeatureControlEventHandler featureControlEventHandler;
 
     private final Map<String, FeatureRegistration> featureRegistrationsMap = new HashMap<>();
     private Queue<FeatureControlUpdateHandler> handlers;
@@ -48,10 +53,11 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
         }
         featureControlRepository = new SimpleMemoryFeatureRepository();
         featureControlRestClient = new FeatureControlRestClient(apiKey, config);
-        featureControlStreamManager = new FeatureControlStreamManager(apiKey, config, featureControlRepository, featureControlRestClient, callback);
+        featureControlStreamManager = new FeatureControlStreamManager(apiKey, config, featureControlRepository, callback);
+        featureControlEventHandler = new FeatureControlEventHandler(featureControlRestClient);
 
         Future<Void> startFuture = featureControlStreamManager.start();
-        //if (config.startWaitMillis > 0L) {
+        if (config.waitForStartup > 0L) {
             logger.info("Waiting for Featureflow to inititalise");
             try {
                 startFuture.get(20000, TimeUnit.MILLISECONDS);
@@ -60,7 +66,7 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
             } catch (Exception e) {
                 logger.error("Exception encountered waiting for Featureflow client to initialise", e);
             }
-        //}
+        }
     }
 
     @Override
@@ -77,10 +83,21 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
         }
 
 
+        //add featureflow.context
+        addAdditionalContext(featureFlowContext);
 
-        return control.evaluate(featureFlowContext);
+        String variant = control.evaluate(featureFlowContext);
+
+        featureControlEventHandler.saveEvent(featureKey, variant, featureFlowContext);
+
+        return variant;
 
 
+
+    }
+
+    private void addAdditionalContext(FeatureFlowContext featureFlowContext) {
+        featureFlowContext.values.put(FeatureFlowContext.FEATUREFLOW_DATE, new JsonPrimitive(toIso(new DateTime())));
     }
 
     @Override

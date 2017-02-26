@@ -1,5 +1,6 @@
 package io.featureflow.client;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class RuleMatchesTest {
         rule.setAudience(a);
 
         FeatureFlowContext context = new FeatureFlowContext("oliver");
-        Map<String, JsonPrimitive> contextValues = new HashMap<>();
+        Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         context.values = contextValues;
 
@@ -49,7 +50,7 @@ public class RuleMatchesTest {
         rule.setAudience(a);
 
         FeatureFlowContext context = new FeatureFlowContext("oliver");
-        Map<String, JsonPrimitive> contextValues = new HashMap<>();
+        Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("age", new JsonPrimitive(26l));
 

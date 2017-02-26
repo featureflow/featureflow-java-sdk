@@ -5,6 +5,14 @@ package io.featureflow.client;
  */
 public class VariantSplit {
 
+    public VariantSplit() {
+    }
+
+    public VariantSplit(String variantKey, Long split) {
+        this.variantKey = variantKey;
+        this.split = split;
+    }
+
     private String variantKey; //the variant id
     private Long split;//the split value
 

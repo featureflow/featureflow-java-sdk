@@ -37,12 +37,14 @@ public class FeatureFlowClientImplTestInt {
         //String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4MzFiZThhZmQxODgzZDg4ZTQzMWEiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.1EvoDmtqOaAfYTtB3B1q7kSMp_Y27kQAa8GKM3fdHZcr1s6BQXHPW88U1j1K3Gwd4f0pHfZnSEJyZL0bd8kriA";
         //String baseUri = "http://featureflow.dev";
 
-        //String baseUri = "http://localhost:8081";
+        String baseUri = "http://localhost:7999";
 
-        String baseUri = "http://rtm.featureflow.io";
-        String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODJhNzljNTFmOTBjYjAwMDcwOTA5NjQiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.mpWsZOsfhMaqTkpd-CJsSpa0RWbV6Xt090J4VQitC2_zRMDveFQW7ZVO6xbCbg0RwMpzjb6ANaCMvCmKzHXi3A";
+        //String baseUri = "http://rtm.featureflow.io";
+        //ff.io local: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4Mjk2ZjNjNDUwZTAwMGFiODExNDIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.x5_E2vGz17PjuTH20bV5VD4iuJqHFU1RFgaZl8ZX8xxktN9YOiCZDP4_jU5WeQDywTuw0fZWEygM-SejCQCh2A
+        String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4Mjk2ZjNjNDUwZTAwMGFiODExNDIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.x5_E2vGz17PjuTH20bV5VD4iuJqHFU1RFgaZl8ZX8xxktN9YOiCZDP4_jU5WeQDywTuw0fZWEygM-SejCQCh2A";
+        //String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODJhNzljNTFmOTBjYjAwMDcwOTA5NjQiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.mpWsZOsfhMaqTkpd-CJsSpa0RWbV6Xt090J4VQitC2_zRMDveFQW7ZVO6xbCbg0RwMpzjb6ANaCMvCmKzHXi3A";
         FeatureFlowConfig config = new FeatureFlowConfig.Builder()
-                .withBaseURI(baseUri).build();
+                .withBaseUri(baseUri).build();
 
         featureFlowClient = FeatureFlowClient.builder(apiKey)
                 .withConfig(config)
@@ -77,8 +79,11 @@ public class FeatureFlowClientImplTestInt {
 
     @Test
     public void testEvaluate() throws Exception {
-        FeatureFlowConfig config = FeatureFlowConfig.builder().withBaseURI("http://featureflow.dev").build();
+        FeatureFlowConfig config = FeatureFlowConfig.builder()
+                .withBaseUri("http://featureflow.dev")
+                .withStreamBaseUri("http://localhost:7999").build();
         //FeatureFlowContext context = FeatureFlowContext.builder().withValue("tier", "gold").build();
+
         FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODE2YjE3M2EzNzc2NDAwMDdhODk1NWIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.nt4j7v5x8TOqtAscFtF8mMwT9GF6jpEivG0dk-dANVT-EoKUY7g4jApgRQL-J_WcF2Rz3BmeqSYj2QUm-p4DRA")
                 .withConfig(config).build();
 

@@ -1,9 +1,12 @@
 package io.featureflow.client;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -11,6 +14,17 @@ import static org.junit.Assert.*;
  * Created by oliver on 15/08/2016.
  */
 public class FeatureControlTest {
+
+    public static final String RED = "red";
+    public static final String BLUE = "blue";
+    public static final String JOHN = "john";
+    public static final String NAME = "name";
+    public static final String USER_KEY = "userKey";
+    public static final String ROLE = "role";
+    public static final String TESTER = "tester";
+    public static final String END_USER = "endUser";
+    public static final String TESTER1 = "tester";
+
     @Test
     public void getKey() throws Exception {
         FeatureControl control = new FeatureControl();
@@ -20,37 +34,54 @@ public class FeatureControlTest {
     }
 
 
-   /* @Test
+    @Test
     public void evaluate() throws Exception {
 
-
+        //create feature and variant
         FeatureControl featureControl = new FeatureControl();
         featureControl.key = "FF-01";
         featureControl.enabled = true;
 
-        Variant variant1 = new Variant();
-        variant1.value = "red";
-        VariantRule rule1 = new VariantRule();
-        rule1.target = "role";
-        rule1.values = Arrays.asList(new JsonPrimitive("admin"), new JsonPrimitive("manager"));
-        rule1.operator = Operator.EQUALS;
-        variant1.variantRules.add(rule1);
+        Variant red = new Variant(RED, RED);
+        Variant blue = new Variant(BLUE, BLUE);
+        featureControl.variants = Arrays.asList(red,blue);
 
-        Variant variant2 = new Variant();
-        variant2.value = "blue";
-        VariantRule rule2 = new VariantRule();
 
-        //variant2.variantRule = new VariantRule();
-        rule2.target = "role";
-        rule2.values = Arrays.asList(new JsonPrimitive("user"), new JsonPrimitive("freemium"));
-        rule2.operator = Operator.EQUALS;
-        variant2.variantRules.add(rule2);
-        featureControl.variants = Arrays.asList(variant1, variant2);
+        //create one rule with an audience
+        Rule rule1 = new Rule();
+        Audience audience = new Audience(null, null,
+                Arrays.asList(
+                        new Condition(ROLE, Operator.equals,
+                                Arrays.asList(new JsonPrimitive(TESTER)))));
+        rule1.setAudience(audience);
+        rule1.setPriority(2);
+        rule1.setVariantSplits(Arrays.asList(new VariantSplit(RED, 0l), new VariantSplit(BLUE, 100l)));
 
-        FeatureFlowContext context = new FeatureFlowContext("key1");
-        context.getValues().put("role", new JsonPrimitive("admin"));
-        FeatureStatus status = featureControl.evaluate(context, false, "black");
-        assertTrue(status.isEnabled()==true);
+        //create default rule
+        Rule rule2 = new Rule();
+        rule2.setPriority(1);
+        rule2.setVariantSplits(Arrays.asList(new VariantSplit(RED, 100l), new VariantSplit(BLUE, 0l)));
+
+        featureControl.rules = Arrays.asList(rule1,rule2);
+        FeatureFlowContext context = new FeatureFlowContext(USER_KEY);
+
+        Map<String, JsonElement> contextValues = new HashMap<>();
+        contextValues.put(ROLE, new JsonPrimitive(TESTER));
+        context.values =contextValues;
+        String status = featureControl.evaluate(context);
+        assertEquals(BLUE, status); //Blue as we are ROLE TSETER
+
+        context = new FeatureFlowContext(USER_KEY);
+        contextValues = new HashMap<>();
+        contextValues.put(ROLE, new JsonPrimitive(END_USER));
+        //contextValues.put("age", new JsonPrimitive(26l));
+        context.values =contextValues;
+
+        status = featureControl.evaluate(context);
+        assertTrue(status.equals(RED)); //Red sa default rule
+/*
+
+        assertTrue(status()==true);
         assertTrue(status.evaluate().equals("red"));
 
         //Check non matching variants return defaults
@@ -64,12 +95,12 @@ public class FeatureControlTest {
         context.getValues().put("role", new JsonPrimitive("anonymous"));
         status = featureControl.evaluate(context, false, "black");
         assertTrue(status.isEnabled()==false);
-        assertTrue(status.evaluate().equals("black"));
+        assertTrue(status.evaluate().equals("black"));*/
 
 
 
     }
-    @Test
+  /*  @Test
     public void testIsWithinRollout(){
         FeatureControl featureControl = new FeatureControl();
         featureControl.key = "FF-01";

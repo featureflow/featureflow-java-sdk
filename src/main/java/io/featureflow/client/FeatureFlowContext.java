@@ -16,9 +16,12 @@ import java.util.Map;
  * Created by oliver on 23/05/2016.
  */
 public class FeatureFlowContext{
+    public static final String FEATUREFLOW_DATE = "featureflow.date";
 
     String key;
-    Map<String, ? extends JsonElement> values = new HashMap<>();
+    Map<String, JsonElement> values = new HashMap<>();
+
+    public FeatureFlowContext() {}
 
     public FeatureFlowContext(String key) {
         this.key = key;
@@ -31,7 +34,7 @@ public class FeatureFlowContext{
         return new Builder();
     }
 
-    public Map<String,? extends JsonElement> getValues() {
+    public Map<String, JsonElement> getValues() {
         return values;
     }
 

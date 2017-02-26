@@ -13,6 +13,13 @@ public class Condition {
     Operator operator; // = < > like in out
     List<JsonPrimitive> values = new ArrayList<>(); //some value 1,2,dave,timestamp,2016-01-11-10:10:10:0000UTC
 
+    public Condition() {}
+    public Condition(String target, Operator operator, List<JsonPrimitive> values) {
+        this.target = target;
+        this.operator = operator;
+        this.values = values;
+    }
+
     public boolean matches(FeatureFlowContext context) {
         //see if context contains target
         if(context.values==null)return false;

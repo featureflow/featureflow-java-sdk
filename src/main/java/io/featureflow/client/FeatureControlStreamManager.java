@@ -24,8 +24,6 @@ public class FeatureControlStreamManager implements Closeable {
     private final FeatureControlUpdateHandler callback;
     private EventSource eventSource; //   from https://github.com/aslakhellesoy/eventsource-java/blob/master/src/main/java/com/github/eventsource/client/EventSource.java
 
-    private final FeatureControlRestClient featureControlRestClient;
-
     private AtomicBoolean initialized = new AtomicBoolean(false);
     private String apiKey;
 
@@ -33,17 +31,14 @@ public class FeatureControlStreamManager implements Closeable {
      * @param apiKey                   The featureflow api key (channel id)
      * @param config                   Some config
      * @param repository               The feature Control Repository
-     * @param featureControlRestClient The rest client
      */
     public FeatureControlStreamManager(String apiKey,
                                        FeatureFlowConfig config,
                                        FeatureControlRepository repository,
-                                       FeatureControlRestClient featureControlRestClient,
                                        FeatureControlUpdateHandler callback) {
         this.apiKey = apiKey;
         this.config = config;
         this.repository = repository;
-        this.featureControlRestClient = featureControlRestClient;
         this.callback = callback;
     }
 
@@ -51,21 +46,10 @@ public class FeatureControlStreamManager implements Closeable {
     //@Override
     public Future<Void> start() {
         final NoOpFuture initFuture = new NoOpFuture();
-
-
-        //inititalise the repository
-        //1. check if there is a cluster and join
-
-
             //2.else load all feature controls from ff
             //We do this in a separate thread - the app will continue to start up - in featureflow this allows featureflow to start so it can serve itself its features :S
-            CompletableFuture initF = CompletableFuture.supplyAsync(
-                    () -> {
-                           // Map<String, FeatureControl> featureControlMap = featureControlRestClient.getFeatureControls();
-                            //3. init repo
-                            //repository.init(featureControlMap);
-                            //4. Subscribe to feature events feed
-                            //subscribeToEvents();
+           /* CompletableFuture initF = CompletableFuture.supplyAsync(
+                    () -> {*/
                             Headers headers = new Headers.Builder()
                                     .add("Authorization", "Bearer " + this.apiKey)
                                     .add("User-Agent", "FeatureflowClient-Java/" + "1.0")
@@ -122,9 +106,9 @@ public class FeatureControlStreamManager implements Closeable {
 
                             eventSource.init();
                         return initFuture;
-                    });
+           /*         });
 
-            return  initF;
+            return  initF;*/
 
     }
 

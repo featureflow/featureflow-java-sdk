@@ -43,40 +43,26 @@ import java.util.stream.Collectors;
  * Created by oliver on 26/05/2016.
  */
 public class FeatureControlRestClient {
+
     public static final String VERSION = "0.0.1";
+    public static final String APPLICATION_JSON = "application/json";
+    public static final String UTF_8 = "UTF-8";
+    public static final String API_V1_EVENTS = "/api/v1/events";
+    public static final String HTTPS = "https";
+    public static final int PORT = 443;
+
     private final String apiKey;
     private final FeatureFlowConfig config;
     private CloseableHttpClient client = null;
+    Gson gson = new Gson();
+
     private static final Logger logger = LoggerFactory.getLogger(FeatureControlRestClient.class);
 
     public FeatureControlRestClient(String apiKey, FeatureFlowConfig config) {
         this.apiKey = apiKey;
         this.config = config;
-
+        client = createHttpClient();
     }
-
-
-   /* public String registerFeatures(Map<String, FeatureRegistration> featureRegistrationMap){
-        if (client==null)client = createHttpClient();
-        logger.info("Loading feature controls");
-        Gson gson = new Gson();
-        HttpCacheContext context = HttpCacheContext.create();
-
-        String resource = FeatureFlowConfig.DEFAULT_FEATURE_CONTROL_REST_PATH;
-
-        HttpGet request = getRequest(apiKey, resource);
-
-        CloseableHttpResponse response = null;
-        try {
-           ///..... REGISTER
-        }
-        finally {
-            try {
-                if (response != null) response.close();
-            } catch (IOException e) {
-            }
-        }
-    }*/
 
     /**
      * Register any code defined feature controls as available and retrieve a list of features form the server
@@ -85,7 +71,6 @@ public class FeatureControlRestClient {
      */
     public Map<String, FeatureControl> registerFeatureControls(Map<String, FeatureRegistration> featureRegistrationMap) throws IOException{
         logger.info("Registering feature controls");
-        Gson gson = new Gson();
         HttpCacheContext context = HttpCacheContext.create();
         String resource = FeatureFlowConfig.REGISTER_REST_PATH;
         HttpPut request = putRequest(apiKey, resource, gson.toJson(featureRegistrationMap));
@@ -110,15 +95,10 @@ public class FeatureControlRestClient {
     }
 
     public Map<String, FeatureControl> getFeatureControls() throws IOException{
-        if (client==null)client = createHttpClient();
         logger.info("Loading feature controls");
-        Gson gson = new Gson();
         HttpCacheContext context = HttpCacheContext.create();
-
         String resource = FeatureFlowConfig.FEATURE_CONTROL_REST_PATH ;
-
         HttpGet request = getRequest(apiKey, resource);
-
         CloseableHttpResponse response = null;
         try {
             logger.debug("Requesting: " + request);
@@ -127,7 +107,6 @@ public class FeatureControlRestClient {
             logCacheResponseStatus(context.getCacheResponseStatus());
             handleStatusCode(response.getStatusLine().getStatusCode(), null);
 
-            //Type type = new TypeToken<Map<String, FeatureControl>>() {}.getType();
             Type type = new TypeToken<List<FeatureControl>>() {}.getType();
             String json = EntityUtils.toString(response.getEntity());
             logger.debug("Response: " + response.toString());
@@ -142,6 +121,32 @@ public class FeatureControlRestClient {
             }
         }
     }
+
+    public void postFeatureEvalEvents(List<FeatureEvalEvent> featureEvalEvents) {
+        CloseableHttpResponse response = null;
+        String eventsPath = FeatureFlowConfig.EVENTS_REST_PATH;
+        Type type = new TypeToken<List<FeatureEvalEvent>>() {}.getType();
+        String json = gson.toJson(featureEvalEvents, type);
+        HttpPost request = postRequest(apiKey, eventsPath, json);
+        StringEntity entity = new StringEntity(json, UTF_8);
+        entity.setContentType(APPLICATION_JSON);
+        request.setEntity(entity);
+        try {
+            client = createHttpClient();
+            response = client.execute(request);
+        } catch (IOException e) {
+            logger.error("Network exception posting events", e);
+        } finally {
+            try {
+                if (response != null) response.close();
+            } catch (IOException e) {
+                logger.error("Cannot close stream", e);
+            }
+        }
+    }
+
+
+
 
     private void logCacheResponseStatus(CacheResponseStatus status) {
         switch (status) {
@@ -217,23 +222,31 @@ public class FeatureControlRestClient {
             return null;
         }
     }
-    /*private HttpPost postRequest(String apiKey, String path) {
-        URIBuilder builder = this.getBuilder().setPath(path);
 
+    private HttpPost postRequest(String apiKey, String path, String data) {
+        URIBuilder builder = this.getBuilder().setPath(path);
         try {
             HttpPost request = new HttpPost(builder.build());
+            StringEntity params =new StringEntity(data,"UTF-8");
+            params.setContentType("application/json");
+            request.addHeader("content-type", "application/json");
+            request.addHeader("Accept", "*/*");
+            request.addHeader("Accept-Encoding", "gzip,deflate,sdch");
+            request.addHeader("Accept-Language", "en-US,en;q=0.8");
+            request.setEntity(params);
+
             request.addHeader("Authorization", "Bearer " + apiKey);
-            request.addHeader("User-Agent", "JavaClient/" + "0.0.1");
+            request.addHeader("User-Agent", "JavaClient/" + VERSION);
 
             return request;
         } catch (Exception e) {
             logger.error("Problem in POST request ", e);
             return null;
         }
-    }*/
+    }
 
     private URIBuilder getBuilder() {
-        URI base = URI.create(config.baseURI);
+        URI base = URI.create(config.getBaseUri());
         return new URIBuilder()
                 .setScheme(base.getScheme())
                 .setHost(base.getHost())
@@ -310,4 +323,6 @@ public class FeatureControlRestClient {
                 .build();
         return client;
     }
+
+
 }
