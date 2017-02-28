@@ -79,19 +79,24 @@ public class FeatureFlowClientImplTestInt {
 
     @Test
     public void testEvaluate() throws Exception {
-        FeatureFlowConfig config = FeatureFlowConfig.builder()
-                .withBaseUri("http://featureflow.dev")
-                .withStreamBaseUri("http://localhost:7999").build();
-        //FeatureFlowContext context = FeatureFlowContext.builder().withValue("tier", "gold").build();
 
-        FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODE2YjE3M2EzNzc2NDAwMDdhODk1NWIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.nt4j7v5x8TOqtAscFtF8mMwT9GF6jpEivG0dk-dANVT-EoKUY7g4jApgRQL-J_WcF2Rz3BmeqSYj2QUm-p4DRA")
+
+        FeatureFlowConfig config = FeatureFlowConfig.builder()
+                .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
+                .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL).build();
+
+        FeatureFlowContext context = FeatureFlowContext.keyedContext("uniqueuserkey1")
+                .withValue("tier", "gold")
+                .build();
+
+        FeatureFlowClient client = new FeatureFlowClient.Builder(TestConfiguration.API_KEY_LOCAL_LOCAL)
                 .withConfig(config).build();
 
 
-        String evaluatedVariant = client.evaluate("social-login", Variant.off);
+        String evaluatedVariant = client.evaluate("alpha", context, Variant.off);
         System.out.println(evaluatedVariant);
 
-        System.out.println(client.evaluate("social-login", Variant.on));
+        System.out.println(client.evaluate("alpha", context, Variant.on));
     }
 
 

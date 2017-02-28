@@ -10,6 +10,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,6 +63,14 @@ public class FeatureFlowContext{
             this.values.put(key, jsonValue);
             return this;
         }
+        /*
+        TBC Lists of values
+        public Builder withValue(String key, List<String> values){
+            JsonPrimitive jsonValue = new JsonPrimitive(values);
+            this.values.put(key, jsonValue);
+            return this;
+        }*/
+
         public FeatureFlowContext build(){
             if(key==null)key = "anonymous";
             FeatureFlowContext context = new FeatureFlowContext(key);
