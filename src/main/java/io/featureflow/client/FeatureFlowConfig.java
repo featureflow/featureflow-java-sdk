@@ -30,7 +30,7 @@ public class FeatureFlowConfig {
     String controlStreamPath = DEFAULT_CONTROL_STREAM_PATH;
     long waitForStartup = 10000l;
 
-    FeatureFlowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI, String streamBaseUri) {
+    FeatureFlowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI, String streamBaseUri, long waitForStartup) {
         this.offline = offline;
         this.proxyHost = proxyHost;
         this.proxyScheme = proxyScheme;
@@ -39,6 +39,7 @@ public class FeatureFlowConfig {
         this.socketTimeout = socketTimeout;
         this.baseUri = baseURI==null?DEFAULT_BASE_URI:baseURI;
         this.streamBaseUri = streamBaseUri ==null?DEFAULT_STREAM_BASE_URI: streamBaseUri;
+        this.waitForStartup = waitForStartup;
     }
 
     HttpHost getHttpProxyHost() {
@@ -132,6 +133,7 @@ public class FeatureFlowConfig {
         private int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
         private String baseURI = DEFAULT_BASE_URI;
         private String streamBaseUri = DEFAULT_STREAM_BASE_URI;
+        long waitForStartup = 10000;
 
         public Builder withOffline(boolean offline) {
             this.offline = offline;
@@ -174,9 +176,14 @@ public class FeatureFlowConfig {
             return this;
         }
 
+        public Builder withWaitForStartup(long waitTimeMilliseconds){
+            this.waitForStartup = waitTimeMilliseconds;
+            return this;
+        }
+
         public FeatureFlowConfig build() {
 
-            return new FeatureFlowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI, streamBaseUri);
+            return new FeatureFlowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI, streamBaseUri, waitForStartup);
         }
 
     }

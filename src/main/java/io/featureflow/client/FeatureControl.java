@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class FeatureControl {//<V> {
     String id;
+    String featureId;
     String key; //the key which is unique per project and used as the human-readable unique key
     String environmentId; //the environmentId
     //String salt; //The salt is used to hash context details (this is in the environment config)  TBC
