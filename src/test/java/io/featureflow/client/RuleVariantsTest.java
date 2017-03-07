@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -86,6 +87,31 @@ public class RuleVariantsTest {
         Assert.assertEquals(id2, rule.getEvaluatedVariantKey("alan", 1));
 
         Assert.assertEquals(id1, rule.getEvaluatedVariantKey("sarah", 1));
+    }
+
+
+
+    @Test
+    public void testGetHash(){
+        List<String> values = Arrays.asList(
+                "alice",
+                "bob",
+                "charlie",
+                "daniel",
+                "emma",
+                "frank",
+                "george");
+
+        int[] seeds = {1,2,3};
+
+        for (int seed : seeds) {
+            System.out.println("SEED is " + seed);
+            for (String value : values) {
+                Rule rule = new Rule();
+                System.out.println(value + " equals " + rule.getVariantValue(rule.getHash(value, seed)));
+            }
+        }
+
     }
 
 

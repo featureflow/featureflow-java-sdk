@@ -25,7 +25,6 @@ public class FeatureFlowClientImplTestInt {
 
         @Override
         public void onUpdate(FeatureControl control) {
-
             System.out.println(control.getKey() + " set to " + control.toString());
             this.latch.countDown();
         }
@@ -35,15 +34,13 @@ public class FeatureFlowClientImplTestInt {
     @Test
     public void isEnabled() throws Exception {
         final CountDownLatch latch = new CountDownLatch(10); //set the coundown latch to however many calls you want to test with
-        //String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4MzFiZThhZmQxODgzZDg4ZTQzMWEiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.1EvoDmtqOaAfYTtB3B1q7kSMp_Y27kQAa8GKM3fdHZcr1s6BQXHPW88U1j1K3Gwd4f0pHfZnSEJyZL0bd8kriA";
-        //String baseUri = "http://featureflow.dev";
-
         String baseUri = "http://localhost:7999";
-
         //String baseUri = "http://rtm.featureflow.io";
-        //ff.io local: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4Mjk2ZjNjNDUwZTAwMGFiODExNDIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.x5_E2vGz17PjuTH20bV5VD4iuJqHFU1RFgaZl8ZX8xxktN9YOiCZDP4_jU5WeQDywTuw0fZWEygM-SejCQCh2A
+
         String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4Mjk2ZjNjNDUwZTAwMGFiODExNDIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.x5_E2vGz17PjuTH20bV5VD4iuJqHFU1RFgaZl8ZX8xxktN9YOiCZDP4_jU5WeQDywTuw0fZWEygM-SejCQCh2A";
+        //ff.io local: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4Mjk2ZjNjNDUwZTAwMGFiODExNDIiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.x5_E2vGz17PjuTH20bV5VD4iuJqHFU1RFgaZl8ZX8xxktN9YOiCZDP4_jU5WeQDywTuw0fZWEygM-SejCQCh2A
         //String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODJhNzljNTFmOTBjYjAwMDcwOTA5NjQiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.mpWsZOsfhMaqTkpd-CJsSpa0RWbV6Xt090J4VQitC2_zRMDveFQW7ZVO6xbCbg0RwMpzjb6ANaCMvCmKzHXi3A";
+
         FeatureFlowConfig config = new FeatureFlowConfig.Builder()
                 .withBaseUri(baseUri).build();
 
@@ -105,7 +102,7 @@ public class FeatureFlowClientImplTestInt {
                 .withConfig(config).build();
 
 
-        String evaluatedVariant = client.evaluate("example-feature", context, Variant.off);
+        String evaluatedVariant = client.evaluate("example-feature", context, Variant.off).value();
         System.out.println(evaluatedVariant);
         lock.await(500000, TimeUnit.MILLISECONDS);
 

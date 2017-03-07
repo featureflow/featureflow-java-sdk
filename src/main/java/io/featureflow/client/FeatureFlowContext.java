@@ -22,9 +22,13 @@ public class FeatureFlowContext{
     String key;
     Map<String, JsonElement> values = new HashMap<>();
 
+    public static final String FEATUREFLOW_IP = "featureflow.ip";
+    public static final String FEATUREFLOW_KEY = "featureflow.key";
+
     public FeatureFlowContext() {}
 
     public FeatureFlowContext(String key) {
+        this.values.put(FEATUREFLOW_KEY, new JsonPrimitive(key));
         this.key = key;
     }
 

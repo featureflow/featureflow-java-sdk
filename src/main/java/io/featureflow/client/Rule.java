@@ -1,5 +1,7 @@
 package io.featureflow.client;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -60,10 +62,10 @@ public class Rule {
         }
         return null;
     }
-    private int getVariantValue(int hash) {
+    int getVariantValue(int hash) {
         return Math.abs(hash % 100) + 1;
     }
-    private int getHash(String key, int seed) {
+    int getHash(String key, int seed) {
         int h = 0;
         for(int i = 0; i < key.length(); ++i) {
             h = 31 * h + key.charAt(i);

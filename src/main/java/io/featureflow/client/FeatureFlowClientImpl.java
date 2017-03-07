@@ -70,44 +70,41 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     }
 
     @Override
-    public String evaluate(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant) {
+    public Evaluate evaluate(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant) {
+        Evaluate e = new Evaluate(this, featureKey, featureFlowContext, failoverVariant);
+        return e;
+
+    }
+
+    @Override
+    public Evaluate evaluate(String featureKey, String defaultVariant) {
+        //create and empty context
+        FeatureFlowContext featureFlowContext = FeatureFlowContext.context().build();
+        return evaluate(featureKey, featureFlowContext, defaultVariant);
+    }
+
+    protected String eval(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant) {
         if(!featureControlStreamManager.initialized()){
             logger.warn("FeatureFlow is not initialized yet, returning default value");
             return failoverVariant;
         }
-
         FeatureControl control = featureControlRepository.get(featureKey);
         if(control==null){
             logger.error("Unknown Feature {}, returning failoverVariant value of {}", featureKey, failoverVariant);
             featureControlEventHandler.saveEvent(null, featureKey, failoverVariant, featureFlowContext);
             return failoverVariant;
         }
-
-
         //add featureflow.context
         addAdditionalContext(featureFlowContext);
-
         String variant = control.evaluate(featureFlowContext);
-
         featureControlEventHandler.saveEvent(control.featureId, featureKey, variant, featureFlowContext);
-
         return variant;
-
-
 
     }
 
     private void addAdditionalContext(FeatureFlowContext featureFlowContext) {
         featureFlowContext.values.put(FeatureFlowContext.FEATUREFLOW_DATE, new JsonPrimitive(toIso(new DateTime())));
     }
-
-    @Override
-    public String evaluate(String featureKey, String defaultVariant) {
-        //create and empty context
-        FeatureFlowContext featureFlowContext = FeatureFlowContext.context().build();
-        return evaluate(featureKey, featureFlowContext, defaultVariant);
-    }
-
     public void close() throws IOException {
     /*    this.eventProcessor.close();
         if (this.updateProcessor != null) {

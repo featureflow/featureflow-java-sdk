@@ -10,13 +10,14 @@ public interface FeatureFlowClient extends Closeable {
 
 
 
-    String evaluate(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant);
+    Evaluate evaluate(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant);
 
-    String evaluate(String featureKey, String failoverVariant);
+    Evaluate evaluate(String featureKey, String failoverVariant);
 
     static Builder builder(String apiKey){
         return new Builder(apiKey);
     }
+
 
     class Builder {
         private FeatureFlowConfig config = null;
@@ -50,4 +51,32 @@ public interface FeatureFlowClient extends Closeable {
         }
     }
 
+    class Evaluate {
+        private final String failoverVariant;
+        private final FeatureFlowClientImpl featureflowClient;
+        private final String featureKey;
+        private final FeatureFlowContext featureflowContext;
+
+        Evaluate(FeatureFlowClientImpl featureFlowClient, String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant) {
+            this.featureflowClient = featureFlowClient;
+            this.featureKey = featureKey;
+            this.featureflowContext = featureFlowContext;
+            this.failoverVariant = failoverVariant;
+
+        }
+        public boolean isOn(){
+            return is(Variant.on);
+        }
+        public boolean isOff(){
+            return is(Variant.off);
+        }
+        public boolean is(String variant){
+            String result = featureflowClient.eval(featureKey, featureflowContext, failoverVariant);
+            return variant.equals(result);
+        }
+        public String value(){
+            String result = featureflowClient.eval(featureKey, featureflowContext, failoverVariant);
+            return result;
+        }
+    }
 }

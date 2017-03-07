@@ -81,6 +81,7 @@ public enum Operator {
     in{
         @Override
         public boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues){
+            if(targetValues==null)return false;
             for (JsonPrimitive targetValue : targetValues) {
                 if(contextValue.equals(targetValue))return true;
                 if (contextValue.isString() && targetValue.isString()
@@ -100,6 +101,7 @@ public enum Operator {
     notIn{
         @Override
         public boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues){
+            if(targetValues==null)return true;
             for (JsonPrimitive targetValue : targetValues) {
                 if(contextValue.equals(targetValue))return false;
                 if (contextValue.isString() && targetValue.isString()
