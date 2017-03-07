@@ -78,6 +78,43 @@ public enum Operator {
                     && Pattern.matches(targetValues.get(0).getAsString(),contextValue.getAsString());
         }
     },
+    in{
+        @Override
+        public boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues){
+            for (JsonPrimitive targetValue : targetValues) {
+                if(contextValue.equals(targetValue))return true;
+                if (contextValue.isString() && targetValue.isString()
+                        && contextValue.getAsString().equals(targetValue.getAsString()))
+                    return true;
+
+                if (contextValue.isNumber() && targetValue.isNumber()) {
+                    if(contextValue.getAsDouble() == targetValue.getAsDouble()){
+                        return true;
+                    }
+                }
+
+            }
+            return false;
+        }
+    },
+    notIn{
+        @Override
+        public boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues){
+            for (JsonPrimitive targetValue : targetValues) {
+                if(contextValue.equals(targetValue))return false;
+                if (contextValue.isString() && targetValue.isString()
+                        && contextValue.getAsString().equals(targetValue.getAsString()))
+                    return false;
+                if (contextValue.isNumber() && targetValue.isNumber()) {
+                    if(contextValue.getAsDouble() == targetValue.getAsDouble()){
+                        return false;
+                    }
+                }
+
+            }
+            return true;
+        }
+    },
     /*  IN{
           @Override
           public boolean evaluate(JsonPrimitive contextValue, JsonPrimitive targetValue){
