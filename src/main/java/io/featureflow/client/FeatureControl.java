@@ -1,25 +1,20 @@
 package io.featureflow.client;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by oliver on 25/05/2016.
- * A feature control
- * Variants may be
- *
- * A feature control is set per environment
- * A feature control is matched by evaluating a list of Rules
- * Rules use an Audience to target audiences
- * An audience is a list of Conditions containing Target - Operator - Value
- * The rules then identify a variant split which is a distribution of variation for the audience
- * The VariantSplit uses an equally distributed has function to distribute the required split %ages
- * A seed value is used to generate the split and is set on the feature control. This can be changed to redistribute the splits.
- *
+ * A feature control hold the configuration for a feature for a given environment. <br/>
+ * A feature control is matched by evaluating a List<Rule> <br/>
+ * A Rule contains an {@link Audience } and a List<VariantSplit> - for a given audience we apply the given splits <br/>
+ * A {@link VariantSplit} defines which variant is shown to a proportion of users. If a rule is for one Variant only then the split will be 100% for that variant. <br/>
+ * An Audience is a list of Conditions containing a Target - Operator - Value* <br/>
+ * A seed value is used to generate the split and is set on the feature control. This can be changed to redistribute the splits. <br/>
  */
 public class FeatureControl {//<V> {
+    /**
+     * The internal unique identifier for this feature control
+     */
     String id;
     String featureId;
     String key; //the key which is unique per project and used as the human-readable unique key
@@ -50,7 +45,7 @@ public class FeatureControl {//<V> {
             if(rule.matches(context)){
                 //if the rule matches then pass back the variant based on the split evaluation
                 //return //getVariantByKey(rule.getEvaluatedVariantKey(context.key, variationsSeed)).key;
-                return rule.getEvaluatedVariantKey(context.key, variationsSeed);
+                return rule.getEvaluatedVariantKey(context.key, this.key, variationsSeed);
             }
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule

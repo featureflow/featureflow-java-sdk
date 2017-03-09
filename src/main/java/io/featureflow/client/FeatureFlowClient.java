@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by oliver on 15/08/2016.
  */
-public interface FeatureFlowClient extends Closeable {
+public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
 
 
 
@@ -19,11 +19,13 @@ public interface FeatureFlowClient extends Closeable {
     }
 
 
+
     class Builder {
         private FeatureFlowConfig config = null;
         private String apiKey;
         private FeatureControlUpdateHandler featureControlUpdateHandler;
-        private List<FeatureRegistration> featureRegistrations;
+        private List<Feature> features;
+
 
 
         public Builder (String apiKey){
@@ -40,14 +42,15 @@ public interface FeatureFlowClient extends Closeable {
             return this;
         }
 
-        public Builder withFeatureRegistrations(List<FeatureRegistration> featureRegistrations){
-            this.featureRegistrations = featureRegistrations;
+
+        public Builder withFeatures(List<Feature> features){
+            this.features = features;
             return this;
         }
 
         public FeatureFlowClient build(){
             if(config==null){ config = new FeatureFlowConfig.Builder().build();}
-            return new FeatureFlowClientImpl(apiKey, featureRegistrations, config, featureControlUpdateHandler);
+            return new FeatureFlowClientImpl(apiKey, features, config, featureControlUpdateHandler);
         }
     }
 

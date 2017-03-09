@@ -5,7 +5,7 @@ import java.util.Map;
  * Created by oliver.oldfieldhodge on 25/07/2015.
  * This is the repository that will hold the runtime state for features, it gets the feature from the server or local dev file
  */
-public interface FeatureControlRepository extends Closeable{
+public interface FeatureControlCache extends Closeable{
 
     void init(Map<String, FeatureControl> featureControls);
     FeatureControl get(String key);
@@ -17,7 +17,7 @@ public interface FeatureControlRepository extends Closeable{
     AsyncRestTemplate restTemplate = new AsyncRestTemplate();
     private String apiKey;
 
-    public FeatureControlRepository(String apiKey) {
+    public FeatureControlCache(String apiKey) {
             this.apiKey = apiKey;
     }
 

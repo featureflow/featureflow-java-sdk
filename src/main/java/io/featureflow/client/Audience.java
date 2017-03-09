@@ -17,14 +17,14 @@ public class Audience {
         this.name = name;
         this.conditions = conditions;
     }
-
+    //check that all conditions match (it is an AND - to do an OR you would effectively use the 'is in' operator)
     public boolean matches(FeatureFlowContext context) {
         if(conditions==null||conditions.size()==0)return true;
         for (Condition condition : conditions) {
-            if(condition.matches(context)){
-                return true;
+            if(!condition.matches(context)){
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }

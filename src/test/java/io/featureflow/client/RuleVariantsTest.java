@@ -6,8 +6,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by oliver on 21/11/16.
  */
@@ -32,7 +30,7 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(onId, rule.getEvaluatedVariantKey("oliver", 1));
+        Assert.assertEquals(onId, rule.getEvaluatedVariantKey("oliver", "f1", 1));
     }
 
     @Test
@@ -54,7 +52,7 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(offId, rule.getEvaluatedVariantKey("oliver", 1));
+        Assert.assertEquals(offId, rule.getEvaluatedVariantKey("oliver", "f1", 1));
     }
 
     @Test
@@ -82,17 +80,17 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(redSplit, blueSplit, greenSplit));
 
-        Assert.assertEquals(id3, rule.getEvaluatedVariantKey("oliver", 1));
+        Assert.assertEquals(id3, rule.getEvaluatedVariantKey("oliver", "f1", 1));
 
-        Assert.assertEquals(id2, rule.getEvaluatedVariantKey("alan", 1));
+        Assert.assertEquals(id2, rule.getEvaluatedVariantKey("alan", "f1",1));
 
-        Assert.assertEquals(id1, rule.getEvaluatedVariantKey("sarah", 1));
+        Assert.assertEquals(id1, rule.getEvaluatedVariantKey("sarah", "f1",1));
     }
 
 
 
     @Test
-    public void testGetHash(){
+    public void testGetVariantValue(){
         List<String> values = Arrays.asList(
                 "alice",
                 "bob",
@@ -108,7 +106,7 @@ public class RuleVariantsTest {
             System.out.println("SEED is " + seed);
             for (String value : values) {
                 Rule rule = new Rule();
-                System.out.println(value + " equals " + rule.getVariantValue(rule.getHash(value, seed)));
+                System.out.println(value + " equals " + rule.getVariantValue(rule.getHash(value, "f1", seed)));
             }
         }
 

@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * Created by oliver on 25/05/2016.
  */
-public class SimpleMemoryFeatureRepository implements FeatureControlRepository {
+public class SimpleMemoryFeatureCache implements FeatureControlCache {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<String, FeatureControl> featureControls = new HashMap<String, FeatureControl>();
     private volatile boolean initialized = false;

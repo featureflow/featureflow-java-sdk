@@ -16,11 +16,11 @@ import java.util.concurrent.Future;
  */
 public class FeatureStreamManager implements StreamClient{
     private final FeatureFlowConfig config;
-    private final FeatureControlRepository featureControlRepository;
+    private final FeatureControlCache featureControlCache;
     private final String apiKey;
 
     public FeatureStreamManager(String apiKey, FeatureFlowConfig config) {
-        featureControlRepository = new SimpleMemoryFeatureRepository();
+        featureControlCache = new SimpleMemoryFeatureCache();
         this.apiKey = apiKey;
         this.config = config;
     }

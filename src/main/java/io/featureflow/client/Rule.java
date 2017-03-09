@@ -2,8 +2,6 @@ package io.featureflow.client;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -51,10 +49,10 @@ public class Rule {
         return audience==null?true:audience.matches(context);
     }
 
-    public String getEvaluatedVariantKey(String key, int seed){
+    public String getEvaluatedVariantKey(String contextKey, String featureKey, int salt){
       //  if(variant!=null)return variant;
-        if(key==null)key="anonymous";
-        int variantValue = getVariantValue(getHash(key, seed));
+        if(contextKey==null)contextKey="anonymous";
+        long variantValue = getVariantValue(getHash(contextKey, featureKey, salt));
         int percent = 0;
         for (VariantSplit variantSplit : variantSplits) {
             percent += variantSplit.getSplit();
@@ -62,14 +60,21 @@ public class Rule {
         }
         return null;
     }
-    int getVariantValue(int hash) {
-        return Math.abs(hash % 100) + 1;
+
+    /**
+     * Generate the Variant value by
+     * @param contextKey - the contexts unique identifier key
+     * @param featureKey - The feature key we are testing
+     * @param salt - A salt value
+     * @return
+     */
+    public String getHash(String contextKey, String featureKey, int salt){
+        String hash = DigestUtils.sha1Hex(salt + ":" + featureKey + ":" + contextKey).substring(0, 15);
+        return hash;
     }
-    int getHash(String key, int seed) {
-        int h = 0;
-        for(int i = 0; i < key.length(); ++i) {
-            h = 31 * h + key.charAt(i);
-        }
-        return h ^ seed;
+
+    public long getVariantValue(String hash) {
+        long longVal = Long.parseLong(hash, 16);
+        return (longVal % 100) + 1;
     }
 }

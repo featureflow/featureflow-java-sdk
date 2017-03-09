@@ -10,17 +10,16 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by oliver on 26/05/2016.
  */
-public class FeatureControlStreamManager implements Closeable {
-    private static final Logger logger = LoggerFactory.getLogger(FeatureControlStreamManager.class);
+public class FeatureControlSseClient implements Closeable {
+    private static final Logger logger = LoggerFactory.getLogger(FeatureControlSseClient.class);
     private final FeatureFlowConfig config;
-    private final FeatureControlRepository repository;
+    private final FeatureControlCache repository;
     private final FeatureControlUpdateHandler callback;
     private EventSource eventSource; //   from https://github.com/aslakhellesoy/eventsource-java/blob/master/src/main/java/com/github/eventsource/client/EventSource.java
 
@@ -32,10 +31,10 @@ public class FeatureControlStreamManager implements Closeable {
      * @param config                   Some config
      * @param repository               The feature Control Repository
      */
-    public FeatureControlStreamManager(String apiKey,
-                                       FeatureFlowConfig config,
-                                       FeatureControlRepository repository,
-                                       FeatureControlUpdateHandler callback) {
+    public FeatureControlSseClient(String apiKey,
+                                   FeatureFlowConfig config,
+                                   FeatureControlCache repository,
+                                   FeatureControlUpdateHandler callback) {
         this.apiKey = apiKey;
         this.config = config;
         this.repository = repository;
@@ -88,8 +87,6 @@ public class FeatureControlStreamManager implements Closeable {
                                         //invoking callbacks
                                         if(callback!=null)callback.onUpdate(entry.getValue());
                                     }
-
-                                    //repository.get()update(controls.get());
                                     if (!initialized.getAndSet(true)) {
                                         initFuture.completed(null);
                                         logger.info("Featureflow client initialised.");
