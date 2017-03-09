@@ -80,11 +80,11 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(redSplit, blueSplit, greenSplit));
 
-        Assert.assertEquals(id3, rule.getEvaluatedVariantKey("oliver", "f1", 1));
+        Assert.assertEquals(id1, rule.getEvaluatedVariantKey("oliver", "f1", 1));
 
         Assert.assertEquals(id2, rule.getEvaluatedVariantKey("alan", "f1",1));
 
-        Assert.assertEquals(id1, rule.getEvaluatedVariantKey("sarah", "f1",1));
+        Assert.assertEquals(id2, rule.getEvaluatedVariantKey("sarah", "f1",1));
     }
 
 
