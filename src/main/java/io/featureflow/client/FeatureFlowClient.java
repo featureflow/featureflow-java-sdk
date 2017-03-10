@@ -10,9 +10,9 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
 
 
 
-    Evaluate evaluate(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant);
+    Evaluate evaluate(String featureKey, FeatureFlowContext featureFlowContext);
 
-    Evaluate evaluate(String featureKey, String failoverVariant);
+    Evaluate evaluate(String featureKey);
 
     static Builder builder(String apiKey){
         return new Builder(apiKey);
@@ -55,16 +55,14 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
     }
 
     class Evaluate {
-        private final String failoverVariant;
         private final FeatureFlowClientImpl featureflowClient;
         private final String featureKey;
         private final FeatureFlowContext featureflowContext;
 
-        Evaluate(FeatureFlowClientImpl featureFlowClient, String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant) {
+        Evaluate(FeatureFlowClientImpl featureFlowClient, String featureKey, FeatureFlowContext featureFlowContext) {
             this.featureflowClient = featureFlowClient;
             this.featureKey = featureKey;
             this.featureflowContext = featureFlowContext;
-            this.failoverVariant = failoverVariant;
 
         }
         public boolean isOn(){
@@ -74,11 +72,11 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
             return is(Variant.off);
         }
         public boolean is(String variant){
-            String result = featureflowClient.eval(featureKey, featureflowContext, failoverVariant);
+            String result = featureflowClient.eval(featureKey, featureflowContext);
             return variant.equals(result);
         }
         public String value(){
-            String result = featureflowClient.eval(featureKey, featureflowContext, failoverVariant);
+            String result = featureflowClient.eval(featureKey, featureflowContext);
             return result;
         }
     }

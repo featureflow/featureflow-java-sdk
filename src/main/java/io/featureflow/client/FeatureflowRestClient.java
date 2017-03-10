@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 /**
  * Created by oliver on 26/05/2016.
  */
-public class FeatureControlRestClient {
+public class FeatureflowRestClient {
 
     public static final String VERSION = "0.0.1";
     public static final String APPLICATION_JSON = "application/json";
@@ -54,9 +54,9 @@ public class FeatureControlRestClient {
     private CloseableHttpClient client = null;
     Gson gson = new Gson();
 
-    private static final Logger logger = LoggerFactory.getLogger(FeatureControlRestClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(FeatureflowRestClient.class);
 
-    public FeatureControlRestClient(String apiKey, FeatureFlowConfig config) {
+    public FeatureflowRestClient(String apiKey, FeatureFlowConfig config) {
         this.apiKey = apiKey;
         this.config = config;
         client = createHttpClient();
@@ -67,23 +67,19 @@ public class FeatureControlRestClient {
      * @return
      * @throws IOException
      */
-    public Map<String, FeatureControl> registerFeatureControls(Map<String, Feature> featureRegistrationMap) throws IOException{
-        logger.info("Registering feature controls");
+    public void registerFeatureControls(Map<String, Feature> featureRegistrationMap) throws IOException{
+        logger.info("Registering features with featureflow");
         HttpCacheContext context = HttpCacheContext.create();
         String resource = FeatureFlowConfig.REGISTER_REST_PATH;
         HttpPut request = putRequest(apiKey, resource, gson.toJson(featureRegistrationMap));
         CloseableHttpResponse response = null;
         try {
-            logger.debug("Requesting: " + request);
+            logger.debug("Putting: " + request);
             response = client.execute(request, context);
-            handleStatusCode(response.getStatusLine().getStatusCode(), null);
-            //Type type = new TypeToken<Map<String, FeatureControl>>() {}.getType();
-            Type type = new TypeToken<List<FeatureControl>>() {}.getType();
-            String json = EntityUtils.toString(response.getEntity());
-            logger.debug("Response: " + response.toString());
-            logger.debug("Response JSON: " + json);
-            List<FeatureControl> result = gson.fromJson(json, type);
-            return result.stream().collect(Collectors.toMap(FeatureControl::getKey, Function.identity()));
+            if(response.getStatusLine().getStatusCode()!= HttpStatus.SC_OK){
+                logger.error("Problem registering controls: " + response.getStatusLine());
+                throw new IOException("Problem registering controls " + response.getStatusLine());
+            }
         }
         finally {
             try {
@@ -114,7 +110,7 @@ public class FeatureControlRestClient {
             }
         }
     }
-    private void handleStatusCode(int status, String featureKey) throws IOException {
+   /* private void handleStatusCode(int status, String featureKey) throws IOException {
 
         if (status != HttpStatus.SC_OK) {
             if (status == HttpStatus.SC_UNAUTHORIZED) {
@@ -133,7 +129,7 @@ public class FeatureControlRestClient {
             throw new IOException("Failed to fetch feature control " + status);
         }
 
-    }
+    }*/
     private HttpPut putRequest(String apiKey, String path, String data) {
         URIBuilder builder = this.getBuilder().setPath(path);
 

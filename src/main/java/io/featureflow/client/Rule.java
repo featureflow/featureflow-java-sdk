@@ -49,18 +49,21 @@ public class Rule {
         return audience==null?true:audience.matches(context);
     }
 
-    public String getEvaluatedVariantKey(String contextKey, String featureKey, int salt){
+    public String getVariantSplitKey(String contextKey, String featureKey, int salt){
       //  if(variant!=null)return variant;
         if(contextKey==null)contextKey="anonymous";
         long variantValue = getVariantValue(getHash(contextKey, featureKey, salt));
+        return getSplitKey(variantValue);
+    }
+
+    public String getSplitKey(long variantValue){
         int percent = 0;
         for (VariantSplit variantSplit : variantSplits) {
             percent += variantSplit.getSplit();
-            if(percent > variantValue)return variantSplit.getVariantKey();
+            if(percent >= variantValue)return variantSplit.getVariantKey();
         }
         return null;
     }
-
     /**
      * Generate the Variant value by
      * @param contextKey - the contexts unique identifier key

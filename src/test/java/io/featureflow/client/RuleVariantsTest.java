@@ -30,7 +30,7 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(onId, rule.getEvaluatedVariantKey("oliver", "f1", 1));
+        Assert.assertEquals(onId, rule.getVariantSplitKey("oliver", "f1", 1));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(offId, rule.getEvaluatedVariantKey("oliver", "f1", 1));
+        Assert.assertEquals(offId, rule.getVariantSplitKey("oliver", "f1", 1));
     }
 
     @Test
@@ -80,11 +80,11 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(redSplit, blueSplit, greenSplit));
 
-        Assert.assertEquals(id1, rule.getEvaluatedVariantKey("oliver", "f1", 1));
+        Assert.assertEquals(id1, rule.getVariantSplitKey("oliver", "f1", 1));
 
-        Assert.assertEquals(id2, rule.getEvaluatedVariantKey("alan", "f1",1));
+        Assert.assertEquals(id2, rule.getVariantSplitKey("alan", "f1",1));
 
-        Assert.assertEquals(id2, rule.getEvaluatedVariantKey("sarah", "f1",1));
+        Assert.assertEquals(id2, rule.getVariantSplitKey("sarah", "f1",1));
     }
 
 

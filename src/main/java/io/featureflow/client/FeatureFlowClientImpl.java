@@ -29,37 +29,33 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
 
     private static final Logger logger = LoggerFactory.getLogger(FeatureFlowClientImpl.class);
     private final FeatureFlowConfig config;
-    private final FeatureControlSseClient featureControlSseClient; // manages pubsub events to update a feature control
+    private final FeatureControlStreamClient featureControlStreamClient; // manages pubsub events to update a feature control
     private final FeatureControlCache featureControlCache; //holds the featureControls
-    private final FeatureControlRestClient featureControlRestClient; //manages retrieving features and pushing updates
+    private final FeatureflowRestClient featureflowRestClient; //manages retrieving features and pushing updates
     private final FeatureControlEventHandler featureControlEventHandler;
-
-    private final Map<String, Feature> featureRegistrationsMap = new HashMap<>();
+    private final Map<String, Feature> featuresMap = new HashMap<>();
     private Queue<FeatureControlUpdateHandler> handlers;
 
-    public FeatureFlowClientImpl(String apiKey){
-        this(apiKey, null, new FeatureFlowConfig.Builder().build(), null);
-    }
     FeatureFlowClientImpl(String apiKey, List<Feature> features, FeatureFlowConfig config, FeatureControlUpdateHandler callback) {
         //set config, use a builder
         this.config = config;
         //Actively defining registrations helps alert if features are available in an environment
         if(features !=null&& features.size()>0){
             for (Feature feature : features) {
-                featureRegistrationsMap.put(feature.key, feature);
+                featuresMap.put(feature.key, feature);
             }
         }
         featureControlCache = new SimpleMemoryFeatureCache();
-        featureControlRestClient = new FeatureControlRestClient(apiKey, config);
-        featureControlSseClient = new FeatureControlSseClient(apiKey, config, featureControlCache, callback);
-        featureControlEventHandler = new FeatureControlEventHandler(featureControlRestClient);
+        featureflowRestClient = new FeatureflowRestClient(apiKey, config);
+        featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callback);
+        featureControlEventHandler = new FeatureControlEventHandler(featureflowRestClient);
 
         try {
-            featureControlRestClient.registerFeatureControls(featureRegistrationsMap);
+            featureflowRestClient.registerFeatureControls(featuresMap);
         } catch (IOException e) {
             logger.error("Problem registering reature controls", e);
         }
-        Future<Void> startFuture = featureControlSseClient.start();
+        Future<Void> startFuture = featureControlStreamClient.start();
         if (config.waitForStartup > 0L) {
             logger.info("Waiting for Featureflow to inititalise");
             try {
@@ -73,21 +69,23 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     }
 
     @Override
-    public Evaluate evaluate(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant) {
-        Evaluate e = new Evaluate(this, featureKey, featureFlowContext, failoverVariant);
+    public Evaluate evaluate(String featureKey, FeatureFlowContext featureFlowContext) {
+        Evaluate e = new Evaluate(this, featureKey, featureFlowContext);
         return e;
 
     }
 
     @Override
-    public Evaluate evaluate(String featureKey, String failoverVariant) {
+    public Evaluate evaluate(String featureKey) {
         //create and empty context
         FeatureFlowContext featureFlowContext = FeatureFlowContext.context().build();
-        return evaluate(featureKey, featureFlowContext, failoverVariant);
+        return evaluate(featureKey, featureFlowContext);
     }
 
-    protected String eval(String featureKey, FeatureFlowContext featureFlowContext, String failoverVariant) {
-        if(!featureControlSseClient.initialized()){
+    protected String eval(String featureKey, FeatureFlowContext featureFlowContext) {
+        String failoverVariant = featuresMap.get(featureKey)!=null?featuresMap.get(featureKey).failoverVariant:Variant.off;
+
+        if(!featureControlStreamClient.initialized()){
             logger.warn("FeatureFlow is not initialized yet, returning default value");
             return failoverVariant;
         }
@@ -100,6 +98,7 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
         //add featureflow.context
         addAdditionalContext(featureFlowContext);
         String variant = control.evaluate(featureFlowContext);
+
         featureControlEventHandler.saveEvent(control.featureId, featureKey, variant, featureFlowContext);
         return variant;
 

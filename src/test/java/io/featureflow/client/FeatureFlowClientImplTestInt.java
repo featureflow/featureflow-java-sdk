@@ -17,8 +17,6 @@ public class FeatureFlowClientImplTestInt {
     FeatureFlowClient featureFlowClient;
 
 
-
-
     class FctestUpdateHandler implements FeatureControlUpdateHandler {
         private final CountDownLatch latch;
 
@@ -78,20 +76,18 @@ public class FeatureFlowClientImplTestInt {
 */
 
     }
+
     private CountDownLatch lock = new CountDownLatch(100);
+
     @Test
     public void testEvaluate() throws Exception {
-
 
 
         FeatureFlowConfig config = FeatureFlowConfig.builder()
                 .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
                 .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
-         .build();
-
-
-
-
+                .withWaitForStartup(5000l)
+                .build();
 
         FeatureFlowContext context = FeatureFlowContext.keyedContext("uniqueuserkey1")
                 .withValue("tier", "gold")
@@ -105,23 +101,29 @@ public class FeatureFlowClientImplTestInt {
 
         FeatureFlowClient client = new FeatureFlowClient.Builder(TestConfiguration.API_KEY_LOCAL_TEST)
                 .withFeatures(
-                            Arrays.asList(
-                                    new Feature("feature-one", "failover-variant"),
-                                    new Feature("feature-one", "failover-variant")
-                            ))
+                        Arrays.asList(
+                                new Feature("feature-one", "failover-variant"),
+                                new Feature("feature-two", "failover-variant"),
+                                new Feature("feature-three"),
+                                new Feature("feature-four"),
+                                new Feature("feature-five"),
+                                new Feature("feature-six"),
+                                new Feature("feature-seven"),
+                                new Feature("feature-eight"),
+                                new Feature("feature-nine"),
+                                new Feature("feature-ten"),
+                                new Feature("feature-new 1")
 
-                //.withFeatures(Feature())
-                /*.withCallback(control -> {
+                        ))
+                .withCallback(control -> {
                     System.out.println("Received a control update event: " + control.getKey() + " variant: " + control.evaluate(context));
                     lock.countDown();
-                })*/
+                })
                 .withConfig(config).build();
-
-
-        String evaluatedVariant = client.evaluate("example-feature", context, "failover-red").value();
+        String evaluatedVariant = client.evaluate("example-feature", context).value();
         System.out.println(evaluatedVariant);
         lock.await(500000, TimeUnit.MILLISECONDS);
 
-        System.out.println(client.evaluate("alpha", context, Variant.on));
+        System.out.println(client.evaluate("alpha", context));
     }
 }
