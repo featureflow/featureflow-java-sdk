@@ -2,7 +2,7 @@
 
 [![][dependency-img]][dependency-url]
 
-> Featureflow Javascript Client SDK
+> Featureflow Java Client SDK
 
 Get your Featureflow account at [featureflow.io](http://www.featureflow.io)
 
@@ -29,17 +29,17 @@ Using Maven
 
 ### Quick start
 
-Get your 'Server Environment Api Key' frmo the environment page in featureslow and instansiate a singleton clinet:
+Get your 'Server Environment Api Key' from the environment page in featureflow and instantiate a singleton client:
 
 ```java
 String apiKey = "<Your Server Environment Api Key goes here>";
 FeatureFlowClient featureFlowClient = FeatureFlowClient.builder(apiKey).build();
 ```
-This is a singleton so if you're using spring for example you might want to mate is a @Bean in an @Configuration class.
+This is a singleton, so if you're using spring you should make it a @Bean in a @Configuration class.
 
 In your code, you can test the value of your feature where the value of `my-feature-key` is equal to `'on'` 
 ```java
-  if (featureflow.evaluate('my-feature-key').is('on')){
+  if (featureflow.evaluate('my-feature-key', context).is('on')){
     // this feature code will be run because 'my-feature-key' is set to 'on'
   }
 ```
@@ -48,11 +48,11 @@ Because the default variants for any feature are `'on'` and `'off'`, we have pro
 
 ```java
 
-if(featureflow.evaluate('my-feature-key').isOn()){
+if(featureflow.evaluate('my-feature-key', context).isOn()){
   // this feature code will be run because 'my-feature-key' is set to 'on'
 }
 
-if(featureflow.evaluate('my-feature-key').isOff()){
+if(featureflow.evaluate('my-feature-key', context).isOff()){
   // this feature code won't be run because 'my-feature-key' is not set to 'off'
 }
 ```
