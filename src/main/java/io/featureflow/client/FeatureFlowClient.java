@@ -1,6 +1,7 @@
 package io.featureflow.client;
 
 import java.io.Closeable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
         private FeatureFlowConfig config = null;
         private String apiKey;
         private FeatureControlUpdateHandler featureControlUpdateHandler;
-        private List<Feature> features;
+        private List<Feature> features = new ArrayList<>();
 
 
 
@@ -42,7 +43,10 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
             return this;
         }
 
-
+        public Builder withFeature(Feature feature){
+            this.features.add(feature);
+            return this;
+        }
         public Builder withFeatures(List<Feature> features){
             this.features = features;
             return this;

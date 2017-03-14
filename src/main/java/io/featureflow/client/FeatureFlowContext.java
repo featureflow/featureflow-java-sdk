@@ -1,12 +1,15 @@
 package io.featureflow.client;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,13 +66,33 @@ public class FeatureFlowContext{
             this.values.put(key, jsonValue);
             return this;
         }
-        /*
-        TBC Lists of values
-        public Builder withValue(String key, List<String> values){
-            JsonPrimitive jsonValue = new JsonPrimitive(values);
-            this.values.put(key, jsonValue);
+
+        public Builder withDateValues(String key, List<DateTime> values){
+            JsonArray vals = new JsonArray();
+            for (DateTime value : values) {
+                vals.add(new JsonPrimitive(toIso(value)));
+            }
+            this.values.put(key, vals);
             return this;
-        }*/
+
+        }
+        public Builder withNumberValues(String key, List<Number> values) {
+            JsonArray vals = new JsonArray();
+            for (Number value : values) {
+                vals.add(new JsonPrimitive(value));
+            }
+            this.values.put(key, vals);
+            return this;
+        }
+
+        public Builder withValues(String key, List<String> values){
+            JsonArray vals = new JsonArray();
+            for (String value : values) {
+                vals.add(new JsonPrimitive(value));
+            }
+            this.values.put(key, vals);
+            return this;
+        }
 
         public FeatureFlowContext build(){
             if(key==null)key = "anonymous";

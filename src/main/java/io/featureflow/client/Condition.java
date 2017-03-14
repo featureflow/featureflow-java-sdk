@@ -1,5 +1,7 @@
 package io.featureflow.client;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
@@ -26,7 +28,16 @@ public class Condition {
         for(String key : context.values.keySet()){
             if(key.equals(target)){
                 //compare the value using the comparator
-                return operator.evaluate(context.values.get(key).getAsJsonPrimitive(), values);
+                JsonElement contextValue = context.values.get(key);
+                if(contextValue.isJsonArray()){ //if the context value is an array of values
+                    JsonArray ar = contextValue.getAsJsonArray();
+                    for (JsonElement jsonElement : ar) {//return true if any of the list of context values for the key matches
+                        if (operator.evaluate(jsonElement.getAsJsonPrimitive(), values))return true;
+                    }
+                    return false; //else return false
+                }
+                return operator.evaluate(context.values.get(key).getAsJsonPrimitive(), values); //if its a single value then just return the eval
+
             }
         }
         return false;
