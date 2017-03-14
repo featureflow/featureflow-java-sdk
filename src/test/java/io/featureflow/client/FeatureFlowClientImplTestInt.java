@@ -21,8 +21,8 @@ public class FeatureFlowClientImplTestInt {
 
 
         FeatureFlowConfig config = FeatureFlowConfig.builder()
-                /*.withBaseUri(TestConfiguration.LOCAL_BASE_URL)
-                .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)*/
+                .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
+                .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
                 .withWaitForStartup(5000l)
                 .build();
 
@@ -35,13 +35,12 @@ public class FeatureFlowClientImplTestInt {
                 .build();
 
 
-        FeatureFlowClient client = new FeatureFlowClient.Builder(TestConfiguration.API_KEY_PROD_EXAMPLES_TEST)
-
+        FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1OGM3Nzk0OTczOTdiM2Y1OTlhODI5ZTciLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.JvxNDkwdWTsMRXHWzt7K6GkpTGsf2LuLM-sRlcgt4fIZIemSoxahniAuhWPVkBesW0SaodCsXdrdMHrRTBqDsg")
+                .withFeature(new Feature("f1", Variant.off))
                 .withFeatures(
                         Arrays.asList(
-                                new Feature("example-server-feature-1", "failover-variant")
-
-
+                            new Feature("example-server-feature-3", Variant.off),
+                            new Feature("example-feature-2", Variant.off)
                         ))
                 .withCallback(control -> {
                     System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(context) + "\n");

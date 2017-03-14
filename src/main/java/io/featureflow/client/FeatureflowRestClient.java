@@ -67,11 +67,11 @@ public class FeatureflowRestClient {
      * @return
      * @throws IOException
      */
-    public void registerFeatureControls(Map<String, Feature> featureRegistrationMap) throws IOException{
+    public void registerFeatureControls(List<Feature> featureRegistrations) throws IOException{
         logger.info("Registering features with featureflow");
         HttpCacheContext context = HttpCacheContext.create();
         String resource = FeatureFlowConfig.REGISTER_REST_PATH;
-        HttpPut request = putRequest(apiKey, resource, gson.toJson(featureRegistrationMap));
+        HttpPut request = putRequest(apiKey, resource, gson.toJson(featureRegistrations));
         CloseableHttpResponse response = null;
         try {
             logger.debug("Putting: " + request);

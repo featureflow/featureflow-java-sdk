@@ -39,22 +39,25 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     FeatureFlowClientImpl(String apiKey, List<Feature> features, FeatureFlowConfig config, FeatureControlUpdateHandler callback) {
         //set config, use a builder
         this.config = config;
-        //Actively defining registrations helps alert if features are available in an environment
-        if(features !=null&& features.size()>0){
-            for (Feature feature : features) {
-                featuresMap.put(feature.key, feature);
-            }
-        }
+
         featureControlCache = new SimpleMemoryFeatureCache();
         featureflowRestClient = new FeatureflowRestClient(apiKey, config);
         featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callback);
         featureControlEventHandler = new FeatureControlEventHandler(featureflowRestClient);
 
-        try {
-            featureflowRestClient.registerFeatureControls(featuresMap);
-        } catch (IOException e) {
-            logger.error("Problem registering reature controls", e);
+        //Actively defining registrations helps alert if features are available in an environment
+        if(features !=null&& features.size()>0){
+            for (Feature feature : features) {
+                featuresMap.put(feature.key, feature);
+            }
+            try {
+                featureflowRestClient.registerFeatureControls(features);
+            } catch (IOException e) {
+                logger.error("Problem registering reature controls", e);
+            }
         }
+
+
         Future<Void> startFuture = featureControlStreamClient.start();
         if (config.waitForStartup > 0L) {
             logger.info("Waiting for Featureflow to inititalise");
