@@ -59,15 +59,10 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
     }
 
     class Evaluate {
-        private final FeatureFlowClientImpl featureflowClient;
-        private final String featureKey;
-        private final FeatureFlowContext featureflowContext;
+        private String evaluateResult;
 
-        Evaluate(FeatureFlowClientImpl featureFlowClient, String featureKey, FeatureFlowContext featureFlowContext) {
-            this.featureflowClient = featureFlowClient;
-            this.featureKey = featureKey;
-            this.featureflowContext = featureFlowContext;
-
+        Evaluate(FeatureFlowClientImpl featureflowClient, String featureKey, FeatureFlowContext featureflowContext) {
+            evaluateResult = featureflowClient.eval(featureKey, featureflowContext);
         }
         public boolean isOn(){
             return is(Variant.on);
@@ -76,12 +71,10 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
             return is(Variant.off);
         }
         public boolean is(String variant){
-            String result = featureflowClient.eval(featureKey, featureflowContext);
-            return variant.equals(result);
+            return variant.equals(evaluateResult);
         }
         public String value(){
-            String result = featureflowClient.eval(featureKey, featureflowContext);
-            return result;
+            return evaluateResult;
         }
     }
 }

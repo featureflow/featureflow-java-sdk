@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
  * Created by oliver.oldfieldhodge on 9/3/17.
  */
 public class HashingAlgorithmStepDefs {
-    int salt;
+    String salt;
     String featureKey;
     String contextKey;
     String hash;
@@ -20,7 +20,7 @@ public class HashingAlgorithmStepDefs {
     @Given("^the salt is \"([^\"]*)\", the feature is \"([^\"]*)\" and the key is \"([^\"]*)\"$")
     public void the_salt_is_the_feature_is_and_the_key_is(String salt, String featureKey, String contextKey) throws Throwable {
         // Write code here that turns the phrase above into concrete actions
-        this.salt = new Integer(salt);
+        this.salt = salt;
         this.featureKey = featureKey;
         this.contextKey = contextKey;
     }

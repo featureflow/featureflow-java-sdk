@@ -19,8 +19,7 @@ public class FeatureControl {//<V> {
     String featureId;
     String key; //the key which is unique per project and used as the human-readable unique key
     String environmentId; //the environmentId
-    //String salt; //The salt is used to hash context details (this is in the environment config)  TBC
-    int variationsSeed; //The variations seed is a fixed random number that is used in the hashing algorythm
+    String salt = "1"; //The salt is used to hash context details (this is in the environment config)  TBC
 
     boolean enabled; //is this feature enabled? If not then we show the offVariant
     boolean available; //is the feature available in the environment?
@@ -45,7 +44,7 @@ public class FeatureControl {//<V> {
             if(rule.matches(context)){
                 //if the rule matches then pass back the variant based on the split evaluation
                 //return //getVariantByKey(rule.getVariantSplitKey(context.key, variationsSeed)).key;
-                return rule.getVariantSplitKey(context.key, this.key, variationsSeed);
+                return rule.getVariantSplitKey(context.key, this.key, salt);
             }
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule
@@ -69,7 +68,6 @@ public class FeatureControl {//<V> {
         return "FeatureControl{" + "\n" +
                 "  key='" + key + '\'' + "\n" +
                 "  environmentId='" + environmentId + '\'' + "\n" +
-                "  variationsSeed=" + variationsSeed + "\n" +
                 "  enabled=" + enabled + "\n" +
                 "  available=" + available + "\n" +
                 "  deleted=" + deleted + "\n" +

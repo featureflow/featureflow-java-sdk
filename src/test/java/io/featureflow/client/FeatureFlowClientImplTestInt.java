@@ -21,8 +21,8 @@ public class FeatureFlowClientImplTestInt {
 
 
         FeatureFlowConfig config = FeatureFlowConfig.builder()
-                .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
-                .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
+              //  .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
+              //  .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
                 .withWaitForStartup(5000l)
                 .build();
 
@@ -32,16 +32,19 @@ public class FeatureFlowClientImplTestInt {
                 .withValue("signup_date", new DateTime(2017, 1, 1, 12, 0, 0, 0))
                 .withValue("user_role", "pvt_tester")
                 .withValue("name", "Oliver Oldfield-Hodge")
+                .withValue("email", "oliver@featureflow.io")
                 .build();
 
 
-        FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1OGM3Nzk0OTczOTdiM2Y1OTlhODI5ZTciLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.JvxNDkwdWTsMRXHWzt7K6GkpTGsf2LuLM-sRlcgt4fIZIemSoxahniAuhWPVkBesW0SaodCsXdrdMHrRTBqDsg")
-                .withFeature(new Feature("f1", Variant.off))
-                .withFeatures(
-                        Arrays.asList(
-                            new Feature("example-server-feature-3", Variant.off),
-                            new Feature("example-feature-2", Variant.off)
-                        ))
+        FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODNjZGQ0NWFkNDE0NDAwMDhhZWY3NzUiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.leo9BlSeycUaPSQ9iVNDpz22OVOvagQ1pI573jahfcK1xEuBEyD4C8TEmIDdxXaSQmPMXSCac7ib5_UTS3qrzw")
+                .withFeatures(Arrays.asList(
+                    new Feature("example-server-feature-q"),
+                    new Feature("example-feature-2", Variant.off),
+                    new Feature("example-feature-3", Arrays.asList(
+                            new Variant("red", "Red Variant"),
+                            new Variant("blue", "Blue Variant")
+                    ),Variant.off)
+                ))
                 .withCallback(control -> {
                     System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(context) + "\n");
                     lock.countDown();

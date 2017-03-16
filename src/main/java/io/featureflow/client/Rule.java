@@ -49,7 +49,7 @@ public class Rule {
         return audience==null?true:audience.matches(context);
     }
 
-    public String getVariantSplitKey(String contextKey, String featureKey, int salt){
+    public String getVariantSplitKey(String contextKey, String featureKey, String salt){
       //  if(variant!=null)return variant;
         if(contextKey==null)contextKey="anonymous";
         long variantValue = getVariantValue(getHash(contextKey, featureKey, salt));
@@ -71,7 +71,7 @@ public class Rule {
      * @param salt - A salt value
      * @return
      */
-    public String getHash(String contextKey, String featureKey, int salt){
+    public String getHash(String contextKey, String featureKey, String salt){
         String hash = DigestUtils.sha1Hex(salt + ":" + featureKey + ":" + contextKey).substring(0, 15);
         return hash;
     }

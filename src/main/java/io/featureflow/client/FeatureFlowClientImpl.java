@@ -93,13 +93,16 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
             return failoverVariant;
         }
         FeatureControl control = featureControlCache.get(featureKey);
+
+        //add featureflow.context
+        addAdditionalContext(featureFlowContext);
+
         if(control==null){
             logger.error("Unknown Feature {}, returning failoverVariant value of {}", featureKey, failoverVariant);
             featureControlEventHandler.saveEvent(null, featureKey, failoverVariant, featureFlowContext);
             return failoverVariant;
         }
-        //add featureflow.context
-        addAdditionalContext(featureFlowContext);
+
         String variant = control.evaluate(featureFlowContext);
 
         featureControlEventHandler.saveEvent(control.featureId, featureKey, variant, featureFlowContext);
