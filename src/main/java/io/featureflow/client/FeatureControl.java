@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A feature control hold the configuration for a feature for a given environment. <br/>
- * A feature control is matched by evaluating a List<Rule> <br/>
- * A Rule contains an {@link Audience } and a List<VariantSplit> - for a given audience we apply the given splits <br/>
- * A {@link VariantSplit} defines which variant is shown to a proportion of users. If a rule is for one Variant only then the split will be 100% for that variant. <br/>
- * An Audience is a list of Conditions containing a Target - Operator - Value* <br/>
- * A seed value is used to generate the split and is set on the feature control. This can be changed to redistribute the splits. <br/>
+ * A feature control hold the configuration for a feature for a given environment. 
+ * A feature control is matched by evaluating a List of type Rule
+ * A Rule contains an {@link io.featureflow.client.Audience } and a List of io.featureflow.client.VariantSplit - for a given audience we apply the given splits
+ * A {@link io.featureflow.client.VariantSplit} defines which variant is shown to a proportion of users. If a rule is for one Variant only then the split will be 100% for that variant.
+ * An Audience is a list of Conditions containing a Target - Operator - Value* 
+ * A seed value is used to generate the split and is set on the feature control. This can be changed to redistribute the splits. 
  */
 public class FeatureControl {//<V> {
     /**

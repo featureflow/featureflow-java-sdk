@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.featureflow</groupId>
     <artifactId>featureflow-java-sdk</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.7-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Featureflow Java SDK</name>
@@ -20,7 +19,20 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
+    <developers>
+        <developer>
+            <name>Oliver Oldfield-Hodge</name>
+            <email>oliver@featureflow.io</email>
+            <organization>Featureflow</organization>
+            <organizationUrl>https://www.featureflow.io</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https://github.com/featureflow/featureflow-java-sdk.git</connection>
+        <developerConnection>scm:git:https://github.com/featureflow/featureflow-java-sdk.git</developerConnection>
+        <url>https://github.com/featureflow/featureflow-java-sdk</url>
+      <tag>HEAD</tag>
+  </scm>
     <build>
         <plugins>
             <plugin>
@@ -29,6 +41,14 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <!--<version>${maven-deploy-plugin.version}</version>-->
+                <configuration>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
             <plugin>
@@ -47,12 +67,12 @@
     <profiles>
         <profile>
             <id>release-sign-artifacts</id>
-            <activation>
+           <!-- <activation>
                 <property>
                     <name>performRelease</name>
                     <value>true</value>
                 </property>
-            </activation>
+            </activation>-->
             <build>
                 <plugins>
                     <plugin>
@@ -71,6 +91,16 @@
                 </plugins>
             </build>
         </profile>
+      <!--  <profile>
+            <id>release</id>
+            <build>
+                ...
+                javadoc, source and gpg plugin from above
+                ...
+            </build>
+        </profile>-->
+
+
     </profiles>
     <!-- <parent>
 		<groupId>io.featureflow</groupId>
@@ -165,5 +195,9 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 </project>

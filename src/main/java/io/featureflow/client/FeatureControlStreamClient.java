@@ -30,6 +30,7 @@ public class FeatureControlStreamClient implements Closeable {
      * @param apiKey     The featureflow api key (channel id)
      * @param config     Some config
      * @param repository The feature Control Repository
+     * @param callback A callback implementation for feature control events
      */
     public FeatureControlStreamClient(String apiKey,
                                       FeatureFlowConfig config,

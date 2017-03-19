@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-# eg ./mvn-deploy-to-cenral.sh 0.0.2-SNAPSHOT 0.0.3-SNAPSHOT
-#-DgenerateBackupPoms=false
-mvn versions:set -DnewVersion=$1
-mvn versions:commit
-mvn deploy
-mvn versions:set -DnewVersion=$2
-mvn versions:commit
-
+#mvn verify -Prelease-sign-artifacts -Dgpg.passphrase=Smiles-01 -s settings.xml
+#mvn deploy
+# Deploy maven artefact in current directory into Maven central repository
+# using maven-release-plugin goals
+read -p "Really deploy to maven central repository  (yes/no)? "
+if ( [ "$REPLY" == "yes" ] ) then
+  ssh-add ~/.ssh/lubos.krnac
+  ssh-add -l
+  mvn release:clean release:prepare release:perform -B -e | tee maven-central-deploy.log
+  ssh-add -D
+else
+  echo 'Exit without deploy'
+fi

@@ -57,6 +57,32 @@ if(featureflow.evaluate('my-feature-key', context).isOff()){
 }
 ```
 
+### Adding Context
+You can pass context information in to allow features to be targeted.
+At the point in time of evaluation (e.g. on a rest call or other call) you can create and pass in context information by builsing a `FeatureflowContext` object. We have a builder to help:
+
+```aidl
+FeatureFlowContext context = FeatureFlowContext.keyedContext("uniqueuserkey1")
+    .withValue("tier", "silver")
+    .withValue("age", 32)
+    .withValue("signup_date", new DateTime(2017, 1, 1, 12, 0, 0, 0))
+    .withValue("user_role", "standard_user")
+    .withValue("name", "Joe User")
+    .withValue("email", "user@featureflow.io")
+    .build();
+
+```
+Context values can be of type `DateTime`, `Number`, `String` or `List<DateTime>`, `List<Number>`, `List<String>`
+
+When a list of context values is passed in each rule may match any of the values, additionally each value is stored individually in featureflow for subsequent lookup in rule creation.
+
+Evaluate by passing the context into the evaluate method:
+
+```
+featureFlowClient.evaluate("example-feature", context).value());
+```
+
+
 Further documentation can be found [here](http://docs.featureflow.io/docs)
 
 ## Roadmap
@@ -67,9 +93,6 @@ Further documentation can be found [here](http://docs.featureflow.io/docs)
 ## License
 
 Apache-2.0
-
-[npm-url]: https://nodei.co/npm/featureflow-client
-[npm-img]: https://nodei.co/npm/featureflow-client.png
 
 [dependency-url]: https://www.featureflow.io
 [dependency-img]: https://www.featureflow.io/wp-content/uploads/2016/12/featureflow-web.png

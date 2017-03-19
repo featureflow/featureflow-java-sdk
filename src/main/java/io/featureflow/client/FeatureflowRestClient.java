@@ -64,8 +64,8 @@ public class FeatureflowRestClient {
 
     /**
      * Register any code defined feature controls as available and retrieve a list of features form the server
-     * @return
-     * @throws IOException
+     * @param featureRegistrations list of features to register
+     * @throws IOException cannot connect to register
      */
     public void registerFeatureControls(List<Feature> featureRegistrations) throws IOException{
         logger.info("Registering features with featureflow");

@@ -69,7 +69,7 @@ public class Rule {
      * @param contextKey - the contexts unique identifier key
      * @param featureKey - The feature key we are testing
      * @param salt - A salt value
-     * @return
+     * @return hash - the hashed value
      */
     public String getHash(String contextKey, String featureKey, String salt){
         String hash = DigestUtils.sha1Hex(salt + ":" + featureKey + ":" + contextKey).substring(0, 15);
