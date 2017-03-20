@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.featureflow</groupId>
     <artifactId>featureflow-java-sdk</artifactId>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.9</version>
     <packaging>jar</packaging>
 
     <name>Featureflow Java SDK</name>
@@ -11,7 +11,22 @@
 
     <properties>
         <cucumber.version>1.2.5</cucumber.version>
+        <junit.version>4.12</junit.version>
+        <slf4j-simple.version>1.7.22</slf4j-simple.version>
+        <httpclient.version>4.5.2</httpclient.version>
+        <joda-time.version>2.9.3</joda-time.version>
+        <gson.version>2.3.1</gson.version>
+        <okhttp.version>3.2.0</okhttp.version>
+        <pubcontrol.version>1.0.7</pubcontrol.version>
+        <fanout.version>1.0.0</fanout.version>
+        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
+        <java.version>1.8</java.version>
+        <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
     </properties>
+
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -21,8 +36,8 @@
     </licenses>
     <developers>
         <developer>
-            <name>Oliver Oldfield-Hodge</name>
-            <email>oliver@featureflow.io</email>
+            <name>Featureflow.io</name>
+            <email>admin@featureflow.io</email>
             <organization>Featureflow</organization>
             <organizationUrl>https://www.featureflow.io</organizationUrl>
         </developer>
@@ -37,16 +52,55 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven-gpg-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <!--<version>${maven-deploy-plugin.version}</version>-->
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -54,7 +108,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
+                <version>${nexus-staging-maven-plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -65,104 +119,62 @@
         </plugins>
     </build>
     <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-           <!-- <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>-->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-      <!--  <profile>
-            <id>release</id>
-            <build>
-                ...
-                javadoc, source and gpg plugin from above
-                ...
-            </build>
-        </profile>-->
-
-
     </profiles>
-    <!-- <parent>
-		<groupId>io.featureflow</groupId>
-		<artifactId>featureflow-parent</artifactId>
-	    <version>0.0.1-SNAPSHOT</version>
-    </parent> -->
-
     <dependencies>
 
         <dependency>
             <groupId>org.fanout</groupId>
             <artifactId>fanout</artifactId>
-            <version>1.0.0</version>
+            <version>${fanout.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fanout</groupId>
             <artifactId>pubcontrol</artifactId>
-            <version>1.0.7</version>
+            <version>${pubcontrol.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>3.2.0</version>
+            <version>${okhttp.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.3.1</version>
+            <version>${gson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <version>${httpclient.version}</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.9.3</version>
+            <version>${joda-time.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient-cache</artifactId>
-            <version>4.5.2</version>
+            <version>${httpclient.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.22</version>
+            <version>${slf4j-simple.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.22</version>
+            <version>${slf4j-simple.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- cucumber -->
@@ -177,18 +189,6 @@
             <artifactId>cucumber-java</artifactId>
             <version>${cucumber.version}</version>
         </dependency>
-      <!--  <dependency>
-            <groupId>info.cukes</groupId>
-            <artifactId>cucumber-spring</artifactId>
-            <version>${cucumber.version}</version>
-            <scope>test</scope>
-        </dependency>-->
-      <!--  <dependency>
-            <groupId>info.cukes</groupId>
-            <artifactId>cucumber-java8</artifactId>
-            <version>${cucumber.version}</version>
-            <scope>test</scope>
-        </dependency>-->
     </dependencies>
     <distributionManagement>
         <snapshotRepository>
