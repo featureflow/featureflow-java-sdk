@@ -23,6 +23,7 @@ public class FeatureFlowClientImplTestInt {
         FeatureFlowConfig config = FeatureFlowConfig.builder()
               //  .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
               //  .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
+                .withOffline(true)
                 .withWaitForStartup(5000l)
                 .build();
 
