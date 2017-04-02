@@ -31,13 +31,13 @@ public class FeatureFlowClientImplTestInt {
                 .withValue("tier", "silver")
                 .withValue("age", 32)
                 .withValue("signup_date", new DateTime(2017, 1, 1, 12, 0, 0, 0))
-                .withValue("user_role", "pvt_tester")
                 .withValue("name", "Oliver Oldfield-Hodge")
                 .withValue("email", "oliver@featureflow.io")
+                .withValues("user_role", Arrays.asList("pvt_tester", "administrator"))
                 .build();
 
 
-        FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODNjZGQ0NWFkNDE0NDAwMDhhZWY3NzUiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.leo9BlSeycUaPSQ9iVNDpz22OVOvagQ1pI573jahfcK1xEuBEyD4C8TEmIDdxXaSQmPMXSCac7ib5_UTS3qrzw")
+        FeatureFlowClient client = new FeatureFlowClient.Builder("api-key")
                 .withFeatures(Arrays.asList(
                     new Feature("example-server-feature-q"),
                     new Feature("example-feature-2", Variant.off),
