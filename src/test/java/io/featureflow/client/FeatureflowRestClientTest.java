@@ -21,7 +21,7 @@ public class FeatureflowRestClientTest {
         context.values.put("user_role", new JsonPrimitive("admin"));
         FeatureflowRestClient client = new FeatureflowRestClient(apiKey, config);
 
-        FeatureEvalEvent event = new FeatureEvalEvent("featureId1", "feature-key1", "pink", context);
+        FeatureEvalEvent event = new FeatureEvalEvent("feature-key1", "pink", context);
         client.postFeatureEvalEvents(Arrays.asList(event));
     }
 

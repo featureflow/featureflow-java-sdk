@@ -99,13 +99,13 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
 
         if(control==null){
             logger.error("Unknown Feature {}, returning failoverVariant value of {}", featureKey, failoverVariant);
-            featureControlEventHandler.saveEvent(null, featureKey, failoverVariant, featureFlowContext);
+            featureControlEventHandler.saveEvent(featureKey, failoverVariant, featureFlowContext);
             return failoverVariant;
         }
 
         String variant = control.evaluate(featureFlowContext);
 
-        featureControlEventHandler.saveEvent(control.featureId, featureKey, variant, featureFlowContext);
+        featureControlEventHandler.saveEvent(featureKey, variant, featureFlowContext);
         return variant;
 
     }

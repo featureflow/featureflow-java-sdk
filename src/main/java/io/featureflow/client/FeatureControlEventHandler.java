@@ -13,8 +13,8 @@ public class FeatureControlEventHandler {
         this.featureflowRestClient = featureflowRestClient;
     }
 
-    public void saveEvent(String featureId, String featureKey, String evaluatedVariant, FeatureFlowContext context){
-        FeatureEvalEvent event = new FeatureEvalEvent(featureId, featureKey, evaluatedVariant, context);
+    public void saveEvent(String featureKey, String evaluatedVariant, FeatureFlowContext context){
+        FeatureEvalEvent event = new FeatureEvalEvent(featureKey, evaluatedVariant, context);
         featureflowRestClient.postFeatureEvalEvents(Arrays.asList(event));
     }
 }
