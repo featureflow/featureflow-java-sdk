@@ -9,6 +9,7 @@ public class FeatureEvalEvent {
     protected FeatureFlowContext context;
 
     public FeatureEvalEvent(){}
+    
     public FeatureEvalEvent(String featureKey, String evaluatedVariant, FeatureFlowContext context) {
         this.featureKey = featureKey;
         this.evaluatedVariant = evaluatedVariant;
