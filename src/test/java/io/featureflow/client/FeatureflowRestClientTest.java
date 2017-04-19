@@ -1,6 +1,8 @@
 package io.featureflow.client;
 
 import com.google.gson.JsonPrimitive;
+import io.featureflow.client.core.FeatureEvalEvent;
+import io.featureflow.client.core.FeatureflowRestClient;
 import org.junit.Test;
 
 import java.util.Arrays;

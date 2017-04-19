@@ -1,7 +1,9 @@
-package io.featureflow.client;
+package io.featureflow.client.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.featureflow.client.FeatureFlowConfig;
+import io.featureflow.client.model.Feature;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -22,7 +24,6 @@ import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +34,6 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Created by oliver on 26/05/2016.

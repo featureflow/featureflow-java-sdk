@@ -2,6 +2,10 @@ package io.featureflow.client;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.featureflow.client.core.EventSource;
+import io.featureflow.client.core.EventSourceHandler;
+import io.featureflow.client.core.MessageEvent;
+import io.featureflow.client.model.FeatureControl;
 import okhttp3.Headers;
 import org.apache.http.concurrent.BasicFuture;
 import org.junit.Test;

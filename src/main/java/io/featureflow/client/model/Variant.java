@@ -1,4 +1,4 @@
-package io.featureflow.client;
+package io.featureflow.client.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,7 @@ import java.util.List;
  *
  */
 public class Variant {
-    public Variant() {
-    }
+    public Variant() {}
 
     public Variant(String key, String name) {
         this.key = key;
@@ -21,7 +20,7 @@ public class Variant {
 
     public static final String off = "off";
     public static final String on = "on";
-    String key; //unique key - true/false/blue/green or another feature
-    String name; //the value of the variant
+    public String key; //unique key - true/false/blue/green or another feature
+    public String name; //the value of the variant
 
 }

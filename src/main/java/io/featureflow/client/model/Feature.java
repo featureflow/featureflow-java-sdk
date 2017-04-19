@@ -1,4 +1,4 @@
-package io.featureflow.client;
+package io.featureflow.client.model;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import java.util.List;
  * If a feature does match then the variants will be merged and the feature will be shown as available in the clients configured environment
  */
 public class Feature {
-    final List<Variant> variants;
-    final String key;
-    final String failoverVariant;
+    public final List<Variant> variants;
+    public final String key;
+    public final String failoverVariant;
 
     public Feature(String key) {
         this.key = key;

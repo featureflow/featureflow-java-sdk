@@ -18,8 +18,8 @@ import java.util.Map;
 public class FeatureFlowContext{
     public static final String FEATUREFLOW_DATE = "featureflow.date";
 
-    String key;
-    Map<String, JsonElement> values = new HashMap<>();
+    public String key;
+    public Map<String, JsonElement> values = new HashMap<>();
 
     public static final String FEATUREFLOW_IP = "featureflow.ip";
     public static final String FEATUREFLOW_KEY = "featureflow.key";

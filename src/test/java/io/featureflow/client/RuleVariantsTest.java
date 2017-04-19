@@ -1,5 +1,7 @@
 package io.featureflow.client;
 
+import io.featureflow.client.model.Rule;
+import io.featureflow.client.model.VariantSplit;
 import org.junit.Assert;
 import org.junit.Test;
 

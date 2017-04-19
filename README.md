@@ -85,10 +85,33 @@ featureFlowClient.evaluate("example-feature", context).value());
 
 Further documentation can be found [here](http://docs.featureflow.io/docs)
 
+
+## About featureflow
+* Featureflow is an application feature management tool that allows you to safely and effectively release, manage and evaluate your applications features across multiple applications, platforms and languages.
+    * Dark / Silent Release with features turned off
+    * Gradual rollout to a percent of users
+    * Virtual Rollout and Rollback of features
+    * Environment and Component feature itinerary
+    * Target features to specific audiences
+    * A/B and Multivariant test new feature variants - migrate to the winner
+    All without devops, engineering or downtime.
+* We have SDKs in the following languages
+    * [Javascript] (https://github.com/featureflow/featureflow-javascript-sdk)
+    * [Java] (https://github.com/featureflow/featureflow-java-sdk)
+    * [NodeJS] (https://github.com/featureflow/featureflow-node-sdk)
+    * [ReactJS] (https://github.com/featureflow/react-featureflow-client)
+    * [angular] (https://github.com/featureflow/featureflow-ng)
+    * [PHP] (https://github.com/featureflow/featureflow-php-sdk)
+    * [.net] (https://github.com/featureflow/featureflow-dotnet-client)
+* Find out more
+    * [Docs] http://docs.featureflow.io/docs
+    * [Web] https://www.featureflow.io/     
+
+
 ## Roadmap
-- [x] Write documentation
-- [x] Release to sonatype snapshot
-- [ ] Release to sonatype releases
+- [x] Multiple callbacks
+- [ ] Offline mode
+- [ ] Read only mode
 
 ## License
 

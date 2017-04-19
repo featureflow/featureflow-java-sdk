@@ -1,7 +1,10 @@
-package io.featureflow.client;
+package io.featureflow.client.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.featureflow.client.FeatureControlCallbackHandler;
+import io.featureflow.client.FeatureFlowConfig;
+import io.featureflow.client.model.FeatureControl;
 import okhttp3.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -18,10 +22,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class FeatureControlStreamClient implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(FeatureControlStreamClient.class);
+    public static final String FEATURES_UPDATED = "features.updated";
+    public static final String FEATURES_DELETED = "features.deleted";
     private final FeatureFlowConfig config;
     private final FeatureControlCache repository;
-    private final FeatureControlUpdateHandler callback;
+    private final Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks;
     private EventSource eventSource; //   from https://github.com/aslakhellesoy/eventsource-java/blob/master/src/main/java/com/github/eventsource/client/EventSource.java
+    Type mapOfFeatureControlsType = new TypeToken<Map<String, FeatureControl>>() {}.getType();
+    Type listOfStringType  = new TypeToken<List<String>>() {}.getType();
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
     private String apiKey;
@@ -30,16 +38,16 @@ public class FeatureControlStreamClient implements Closeable {
      * @param apiKey     The featureflow api key (channel id)
      * @param config     Some config
      * @param repository The feature Control Repository
-     * @param callback A callback implementation for feature control events
+     * @param callbacks A Map of event, List of  callback implementation for feature control events
      */
     public FeatureControlStreamClient(String apiKey,
                                       FeatureFlowConfig config,
                                       FeatureControlCache repository,
-                                      FeatureControlUpdateHandler callback) {
+                                      Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks) {
         this.apiKey = apiKey;
         this.config = config;
         this.repository = repository;
-        this.callback = callback;
+        this.callbacks = callbacks;
     }
     //GET Controls form /api/sdk/v1/controls/stream
     public Future<Void> start() {
@@ -73,15 +81,35 @@ public class FeatureControlStreamClient implements Closeable {
                     }
                     return;
                 }
-                Type type = new TypeToken<Map<String, FeatureControl>>() {}.getType();
-                Map<String, FeatureControl> controls = gson.fromJson(event.getData(), type);
-                for (Map.Entry<String, FeatureControl> entry : controls.entrySet()) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Received Message to update feature {} with {}.", entry.getKey(), entry.getValue().enabled);
-                    repository.update(entry.getKey(), entry.getValue());
-                    //invoking callbacks
-                    if (callback != null) callback.onUpdate(entry.getValue());
+                if(FEATURES_DELETED.equals(name)){
+                    List<String> featureKeys = gson.fromJson(event.getData(), listOfStringType);
+                    for (String featureKey : featureKeys) {
+                        FeatureControl deletedControl = repository.get(featureKey);
+                        if (logger.isDebugEnabled())
+                            logger.debug("Received Message to delete feature {}.", featureKey);
+                        repository.delete(featureKey);
+                        //invoking callbacks
+                        if (callbacks != null && callbacks.get(CallbackEvent.DELETED_FEATURE)!=null){
+                            for (FeatureControlCallbackHandler callback: callbacks.get(CallbackEvent.DELETED_FEATURE)) {
+                                callback.onUpdate(deletedControl);
+                            }
+                        }
+                    }
                 }
+                if(FEATURES_UPDATED.equals(name)){
+                    Map<String, FeatureControl> controls = gson.fromJson(event.getData(), mapOfFeatureControlsType);
+                    for (Map.Entry<String, FeatureControl> entry : controls.entrySet()) {
+                        if (logger.isDebugEnabled())
+                            logger.debug("Received Message to update feature {} with {}.", entry.getKey(), entry.getValue().enabled);
+                        repository.update(entry.getKey(), entry.getValue());
+                        if (callbacks != null && callbacks.get(CallbackEvent.DELETED_FEATURE)!=null){
+                            for (FeatureControlCallbackHandler callback: callbacks.get(CallbackEvent.DELETED_FEATURE)) {
+                                callback.onUpdate(entry.getValue());
+                            }
+                        }
+                    }
+                }
+
                 if (!initialized.getAndSet(true)) {
                     initFuture.completed(null);
                     logger.info("Featureflow client initialised.");

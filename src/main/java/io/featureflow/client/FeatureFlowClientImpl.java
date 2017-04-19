@@ -3,6 +3,10 @@ package io.featureflow.client;
 
 
 import com.google.gson.JsonPrimitive;
+import io.featureflow.client.core.*;
+import io.featureflow.client.model.Feature;
+import io.featureflow.client.model.FeatureControl;
+import io.featureflow.client.model.Variant;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,15 +38,15 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     private final FeatureflowRestClient featureflowRestClient; //manages retrieving features and pushing updates
     private final FeatureControlEventHandler featureControlEventHandler;
     private final Map<String, Feature> featuresMap = new HashMap<>();
-    private Queue<FeatureControlUpdateHandler> handlers;
+    private Queue<FeatureControlCallbackHandler> handlers;
 
-    FeatureFlowClientImpl(String apiKey, List<Feature> features, FeatureFlowConfig config, FeatureControlUpdateHandler callback) {
+    FeatureFlowClientImpl(String apiKey, List<Feature> features, FeatureFlowConfig config, Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks) {
         //set config, use a builder
         this.config = config;
 
         featureControlCache = new SimpleMemoryFeatureCache();
         featureflowRestClient = new FeatureflowRestClient(apiKey, config);
-        featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callback);
+        featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callbacks);
         featureControlEventHandler = new FeatureControlEventHandler(featureflowRestClient);
 
         //Actively defining registrations helps alert if features are available in an environment
@@ -86,13 +90,16 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     }
 
     protected String eval(String featureKey, FeatureFlowContext featureFlowContext) {
-        String failoverVariant = featuresMap.get(featureKey)!=null?featuresMap.get(featureKey).failoverVariant:Variant.off;
-
+        String failoverVariant = featuresMap.get(featureKey)!=null?featuresMap.get(featureKey).failoverVariant: Variant.off;
+        FeatureControl control;
         if(!featureControlStreamClient.initialized()){
-            logger.warn("FeatureFlow is not initialized yet, returning default value");
-            return failoverVariant;
+            logger.warn("FeatureFlow is not initialized yet.");
+            control = featureControlCache.get(featureKey);
+            if(control == null){
+                return failoverVariant;
+            }
         }
-        FeatureControl control = featureControlCache.get(featureKey);
+        control = featureControlCache.get(featureKey);
 
         //add featureflow.context
         addAdditionalContext(featureFlowContext);

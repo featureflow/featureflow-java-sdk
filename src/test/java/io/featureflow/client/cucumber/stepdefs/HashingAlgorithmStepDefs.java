@@ -3,7 +3,7 @@ package io.featureflow.client.cucumber.stepdefs;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import io.featureflow.client.Rule;
+import io.featureflow.client.model.Rule;
 
 import static org.junit.Assert.assertEquals;
 

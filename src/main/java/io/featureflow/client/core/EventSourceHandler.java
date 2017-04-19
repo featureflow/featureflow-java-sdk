@@ -1,4 +1,4 @@
-package io.featureflow.client;
+package io.featureflow.client.core;
 
 /**
  * Created by oliver on 6/06/2016.

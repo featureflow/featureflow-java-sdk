@@ -3,12 +3,12 @@ package io.featureflow.client.cucumber.stepdefs;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import cucumber.api.DataTable;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import gherkin.formatter.model.DataTableRow;
 import io.featureflow.client.*;
+import io.featureflow.client.model.*;
 import org.junit.Assert;
 
 import java.util.ArrayList;

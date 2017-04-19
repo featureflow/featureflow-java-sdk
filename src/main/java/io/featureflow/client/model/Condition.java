@@ -1,8 +1,9 @@
-package io.featureflow.client;
+package io.featureflow.client.model;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import io.featureflow.client.FeatureFlowContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +12,9 @@ import java.util.List;
  * Created by oliver on 18/11/16.
  */
 public class Condition {
-    String target;    //name, age, date
-    Operator operator; // = < > like in out
-    List<JsonPrimitive> values = new ArrayList<>(); //some value 1,2,dave,timestamp,2016-01-11-10:10:10:0000UTC
+    public String target;    //name, age, date
+    public Operator operator; // = < > like in out
+    public List<JsonPrimitive> values = new ArrayList<>(); //some value 1,2,dave,timestamp,2016-01-11-10:10:10:0000UTC
 
     public Condition() {}
     public Condition(String target, Operator operator, List<JsonPrimitive> values) {
@@ -24,7 +25,7 @@ public class Condition {
 
     public boolean matches(FeatureFlowContext context) {
         //see if context contains target
-        if(context.values==null)return false;
+        if(context == null || context.values==null)return false;
         for(String key : context.values.keySet()){
             if(key.equals(target)){
                 //compare the value using the comparator

@@ -1,4 +1,6 @@
-package io.featureflow.client;
+package io.featureflow.client.model;
+
+import io.featureflow.client.FeatureFlowContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +8,8 @@ import java.util.List;
 /**
  * A feature control hold the configuration for a feature for a given environment. 
  * A feature control is matched by evaluating a List of type Rule
- * A Rule contains an {@link io.featureflow.client.Audience } and a List of io.featureflow.client.VariantSplit - for a given audience we apply the given splits
- * A {@link io.featureflow.client.VariantSplit} defines which variant is shown to a proportion of users. If a rule is for one Variant only then the split will be 100% for that variant.
+ * A Rule contains an {@link Audience } and a List of io.featureflow.client.model.VariantSplit - for a given audience we apply the given splits
+ * A {@link VariantSplit} defines which variant is shown to a proportion of users. If a rule is for one Variant only then the split will be 100% for that variant.
  * An Audience is a list of Conditions containing a Target - Operator - Value* 
  * A seed value is used to generate the split and is set on the feature control. This can be changed to redistribute the splits. 
  */
@@ -15,20 +17,20 @@ public class FeatureControl {//<V> {
     /**
      * The internal unique identifier for this feature control
      */
-    String id;
-    String featureId;
-    String key; //the key which is unique per project and used as the human-readable unique key
-    String environmentId; //the environmentId
-    String salt = "1"; //The salt is used to hash context details (this is in the environment config)  TBC
+    public String id;
+    public String featureId;
+    public String key; //the key which is unique per project and used as the human-readable unique key
+    public String environmentId; //the environmentId
+    public String salt = "1"; //The salt is used to hash context details (this is in the environment config)  TBC
 
-    boolean enabled; //is this feature enabled? If not then we show the offVariant
-    boolean available; //is the feature available in the environment?
-    boolean deleted; //has this been deleted then ignore in all evaluations
-    List<Rule> rules = new ArrayList<>(); //A list of feature rules which contain rules to target variant splits at particular audiences
-    String offVariantKey; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
-    boolean inClientApi; //is this in the JS api (for any required logic)
+    public boolean enabled; //is this feature enabled? If not then we show the offVariant
+    public boolean available; //is the feature available in the environment?
+    public boolean deleted; //has this been deleted then ignore in all evaluations
+    public List<Rule> rules = new ArrayList<>(); //A list of feature rules which contain rules to target variant splits at particular audiences
+    public String offVariantKey; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
+    public boolean inClientApi; //is this in the JS api (for any required logic)
 
-    List<Variant> variants = new ArrayList<>();  //available variants for this feature
+    public List<Variant> variants = new ArrayList<>();  //available variants for this feature
 
     public String getKey(){
         return this.key;

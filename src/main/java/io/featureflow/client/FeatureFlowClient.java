@@ -1,8 +1,14 @@
 package io.featureflow.client;
 
+import io.featureflow.client.core.CallbackEvent;
+import io.featureflow.client.model.Feature;
+import io.featureflow.client.model.Variant;
+
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oliver on 15/08/2016.
@@ -24,7 +30,7 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
     class Builder {
         private FeatureFlowConfig config = null;
         private String apiKey;
-        private FeatureControlUpdateHandler featureControlUpdateHandler;
+        private Map<CallbackEvent, List<FeatureControlCallbackHandler>> featureControlCallbackHandlers = new HashMap<>();
         private List<Feature> features = new ArrayList<>();
 
 
@@ -33,8 +39,24 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
             this.apiKey = apiKey;
         }
 
-        public Builder withCallback(FeatureControlUpdateHandler featureControlUpdateHandler){
-            this.featureControlUpdateHandler = featureControlUpdateHandler;
+        public Builder withUpdateCallback(FeatureControlCallbackHandler featureControlCallbackHandler){
+            this.withCallback(CallbackEvent.UPDATED_FEATURE, featureControlCallbackHandler);
+            return this;
+        }
+        public Builder withDeleteCallback(FeatureControlCallbackHandler featureControlCallbackHandler){
+            this.withCallback(CallbackEvent.DELETED_FEATURE, featureControlCallbackHandler);
+            return this;
+        }
+        @Deprecated //use withUpdate or withDelete callbacks e.g. .withUpdateCallback(control -> System.out.println(control.getKey()))
+        public Builder withCallback(FeatureControlCallbackHandler featureControlCallbackHandler){
+            withUpdateCallback(featureControlCallbackHandler);
+            return this;
+        }
+        public Builder withCallback(CallbackEvent event, FeatureControlCallbackHandler featureControlCallbackHandler){
+            if(featureControlCallbackHandlers.get(event)==null){
+                featureControlCallbackHandlers.put(event, new ArrayList<>());
+            }
+            this.featureControlCallbackHandlers.get(event).add(featureControlCallbackHandler);
             return this;
         }
 
@@ -54,7 +76,7 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
 
         public FeatureFlowClient build(){
             if(config==null){ config = new FeatureFlowConfig.Builder().build();}
-            return new FeatureFlowClientImpl(apiKey, features, config, featureControlUpdateHandler);
+            return new FeatureFlowClientImpl(apiKey, features, config, featureControlCallbackHandlers);
         }
     }
 

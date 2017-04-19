@@ -2,6 +2,7 @@ package io.featureflow.client;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import io.featureflow.client.model.*;
 import org.junit.Test;
 
 import java.util.Arrays;

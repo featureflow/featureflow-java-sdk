@@ -1,4 +1,6 @@
-package io.featureflow.client;
+package io.featureflow.client.core;
+
+import io.featureflow.client.FeatureFlowContext;
 
 /**
  * Created by oliver.oldfieldhodge on 25/2/17.

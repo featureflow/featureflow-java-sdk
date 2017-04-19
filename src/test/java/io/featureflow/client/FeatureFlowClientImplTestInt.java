@@ -1,5 +1,7 @@
 package io.featureflow.client;
 
+import io.featureflow.client.model.Feature;
+import io.featureflow.client.model.Variant;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -21,9 +23,9 @@ public class FeatureFlowClientImplTestInt {
 
 
         FeatureFlowConfig config = FeatureFlowConfig.builder()
-              //  .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
-              //  .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
-                .withOffline(true)
+                .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
+                .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
+                //.withOffline(true)
                 .withWaitForStartup(5000l)
                 .build();
 
@@ -37,16 +39,16 @@ public class FeatureFlowClientImplTestInt {
                 .build();
 
 
-        FeatureFlowClient client = new FeatureFlowClient.Builder("api-key")
+        FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1OGU3Mjk2OWE5ZDhkM2I4Zjk5MGJjMDMiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.iBxNrI1ZJZfrtBACuzGEOzbIePSRDg50zN45e6vBHPEt_N6HaLmqYcfavvAY91alkCdNvhARMnTXLdADm1bj9w")
                 .withFeatures(Arrays.asList(
-                    new Feature("example-server-feature-q"),
+                    new Feature("feature-1"),
                     new Feature("example-feature-2", Variant.off),
                     new Feature("example-feature-3", Arrays.asList(
                             new Variant("red", "Red Variant"),
                             new Variant("blue", "Blue Variant")
                     ),Variant.off)
                 ))
-                .withCallback(control -> {
+                .withUpdateCallback(control -> {
                     System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(context) + "\n");
                     lock.countDown();
                 })

@@ -1,6 +1,7 @@
 package io.featureflow.client;
 
 import com.google.gson.JsonPrimitive;
+import io.featureflow.client.model.Operator;
 import org.junit.Test;
 
 import java.util.Arrays;

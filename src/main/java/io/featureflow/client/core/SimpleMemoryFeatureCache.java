@@ -1,4 +1,6 @@
-package io.featureflow.client;
+package io.featureflow.client.core;
+
+import io.featureflow.client.model.FeatureControl;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -6,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Created by oliver on 25/05/2016.
+ * Simple in Map implementation for local feature caching
  */
 public class SimpleMemoryFeatureCache implements FeatureControlCache {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -61,6 +63,15 @@ public class SimpleMemoryFeatureCache implements FeatureControlCache {
             //if (old == null || old.version < featureControl.version) {
                 featureControls.put(key, featureControl);
             //}
+        }
+        finally {
+            lock.writeLock().unlock();
+        }
+    }
+    public void delete(String key) {
+        try {
+            lock.writeLock().lock();
+            featureControls.remove(key);
         }
         finally {
             lock.writeLock().unlock();

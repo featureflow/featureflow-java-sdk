@@ -1,5 +1,8 @@
 package io.featureflow.client;
 
+        import io.featureflow.client.core.EventSource;
+        import io.featureflow.client.core.EventSourceHandler;
+        import io.featureflow.client.core.MessageEvent;
         import okhttp3.Headers;
 
         import java.net.URI;

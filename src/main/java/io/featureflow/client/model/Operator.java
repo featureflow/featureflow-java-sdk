@@ -1,4 +1,4 @@
-package io.featureflow.client;
+package io.featureflow.client.model;
 
 import com.google.gson.JsonPrimitive;
 import org.joda.time.DateTime;
@@ -162,7 +162,7 @@ public enum Operator {
         }
     }; //date after
 
-    abstract boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues);
+    public abstract boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues);
 
     protected static DateTime getDateTime(JsonPrimitive date) {
         if (date.isNumber()) {

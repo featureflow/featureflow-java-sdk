@@ -1,4 +1,6 @@
-package io.featureflow.client;
+package io.featureflow.client.model;
+
+import io.featureflow.client.FeatureFlowContext;
 
 import java.util.List;
 
@@ -6,9 +8,9 @@ import java.util.List;
  * Created by oliver on 18/11/16.
  */
 public class Audience {
-    String id;   //the audience has an id if it has been saved
-    String name;
-    List<Condition> conditions;
+    public String id;   //the audience has an id if it has been saved
+    public String name;
+    public List<Condition> conditions;
 
     public Audience() {}
 

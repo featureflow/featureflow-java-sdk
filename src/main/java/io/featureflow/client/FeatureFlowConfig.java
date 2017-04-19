@@ -15,20 +15,20 @@ public class FeatureFlowConfig {
     public static final String DEFAULT_STREAM_BASE_URI             = "https://rtm.featureflow.io";
     //private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/stream";
     private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/controls/stream";
-    static final String FEATURE_CONTROL_REST_PATH           = "/api/sdk/v1/feature-controls";
-    static final String REGISTER_REST_PATH                  = "/api/sdk/v1/register";
-    static final String EVENTS_REST_PATH                    = "/api/sdk/v1/events";
+    public static final String FEATURE_CONTROL_REST_PATH           = "/api/sdk/v1/feature-controls";
+    public static final String REGISTER_REST_PATH                  = "/api/sdk/v1/register";
+    public static final String EVENTS_REST_PATH                    = "/api/sdk/v1/events";
 
-    private boolean offline = false;
-    String proxyHost = null;
-    String proxyScheme = null;
-    int proxyPort = -1;
-    int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-    int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
-    String baseUri = DEFAULT_BASE_URI;
-    String streamBaseUri = DEFAULT_STREAM_BASE_URI;
-    String controlStreamPath = DEFAULT_CONTROL_STREAM_PATH;
-    long waitForStartup = 10000l;
+    public boolean offline = false;
+    public String proxyHost = null;
+    public String proxyScheme = null;
+    public int proxyPort = -1;
+    public int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+    public int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
+    public String baseUri = DEFAULT_BASE_URI;
+    public String streamBaseUri = DEFAULT_STREAM_BASE_URI;
+    public String controlStreamPath = DEFAULT_CONTROL_STREAM_PATH;
+    public long waitForStartup = 10000l;
 
     FeatureFlowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI, String streamBaseUri, long waitForStartup) {
         this.offline = offline;
@@ -41,8 +41,11 @@ public class FeatureFlowConfig {
         this.streamBaseUri = streamBaseUri ==null?DEFAULT_STREAM_BASE_URI: streamBaseUri;
         this.waitForStartup = waitForStartup;
     }
+    public static Builder builder(){
+        return new Builder();
+    }
 
-    HttpHost getHttpProxyHost() {
+    public HttpHost getHttpProxyHost() {
         if (this.proxyHost == null && this.proxyPort == -1 && this.proxyScheme == null) {
             return null;
         } else {
@@ -52,77 +55,36 @@ public class FeatureFlowConfig {
         }
     }
 
-    boolean isOffline() {
+    public boolean isOffline() {
         return offline;
     }
-
-    void setOffline(boolean offline) {
-        this.offline = offline;
-    }
-
-    String getProxyHost() {
+    public String getProxyHost() {
         return proxyHost;
     }
-
-    void setProxyHost(String proxyHost) {
-        this.proxyHost = proxyHost;
-    }
-
-    String getProxyScheme() {
+    public String getProxyScheme() {
         return proxyScheme;
     }
-
-    void setProxyScheme(String proxyScheme) {
-        this.proxyScheme = proxyScheme;
-    }
-
-    int getProxyPort() {
+    public int getProxyPort() {
         return proxyPort;
     }
-
-    void setProxyPort(int proxyPort) {
-        this.proxyPort = proxyPort;
-    }
-
-    int getConnectTimeout() {
+    public int getConnectTimeout() {
         return connectTimeout;
     }
-
-    void setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
-    int getSocketTimeout() {
+    public int getSocketTimeout() {
         return socketTimeout;
     }
-
-    void setSocketTimeout(int socketTimeout) {
-        this.socketTimeout = socketTimeout;
-    }
-
-    String getBaseUri() {
-        return baseUri ==null?DEFAULT_BASE_URI: baseUri;
-    }
-
-    String getStreamBaseUri() {
+    public String getBaseUri() {return baseUri ==null?DEFAULT_BASE_URI: baseUri;}
+    public String getStreamBaseUri() {
         return streamBaseUri ==null?DEFAULT_STREAM_BASE_URI: streamBaseUri;
     }
-
-    URI getControlStreamUri() {
-        return controlStreamPath==null?URI.create(getStreamBaseUri() + DEFAULT_CONTROL_STREAM_PATH):URI.create(getStreamBaseUri()+controlStreamPath);
-    }
-
-    long getWaitForStartup(){
+    public URI getControlStreamUri() {return controlStreamPath==null?URI.create(getStreamBaseUri() + DEFAULT_CONTROL_STREAM_PATH):URI.create(getStreamBaseUri()+controlStreamPath);}
+    public long getWaitForStartup(){
         return waitForStartup;
     }
-
-    class Event {
-        int queueSize = 10000;
+    public class Event {
+        public int queueSize = 10000;
     }
 
-    public static Builder builder(){
-        return new Builder();
-    }
 
     public static class Builder {
         private boolean offline = false;
@@ -169,20 +131,15 @@ public class FeatureFlowConfig {
             this.baseURI = baseUri;
             return this;
         }
-
-
         public Builder withStreamBaseUri(String streamBaseUri) {
             this.streamBaseUri = streamBaseUri;
             return this;
         }
-
         public Builder withWaitForStartup(long waitTimeMilliseconds){
             this.waitForStartup = waitTimeMilliseconds;
             return this;
         }
-
         public FeatureFlowConfig build() {
-
             return new FeatureFlowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI, streamBaseUri, waitForStartup);
         }
 

@@ -1,5 +1,7 @@
 package io.featureflow.client;
 
+import io.featureflow.client.model.Feature;
+import io.featureflow.client.model.Variant;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -31,7 +33,7 @@ public class FeatureFlowClientExample {
                 .withValue("age", 32)
                 .withValue("signup_date", new DateTime(2017, 1, 1, 12, 0, 0, 0))
                 .withValue("user_role", "standard_user")
-                .withValue("name", "Rudi Simic")
+                .withValue("name", "John Smith")
                 .withValue("email", "oliver@featureflow.io")
                 .build();
 
@@ -45,7 +47,7 @@ public class FeatureFlowClientExample {
                         new Feature("my-new-feature", Variant.off)
                 ))
                 //An optional callback can be registered when a control is updated (in this example we'll show the evaluated change using the context above)
-                .withCallback(control -> {
+                .withUpdateCallback(control -> {
                     System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(context) + "\n");
                     lock.countDown();
                 })

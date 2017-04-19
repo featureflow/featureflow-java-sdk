@@ -1,4 +1,4 @@
-package io.featureflow.client;
+package io.featureflow.client.core;
 
 import okhttp3.Call;
 import okhttp3.Headers;

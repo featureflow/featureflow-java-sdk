@@ -2,6 +2,10 @@ package io.featureflow.client;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import io.featureflow.client.model.Audience;
+import io.featureflow.client.model.Condition;
+import io.featureflow.client.model.Operator;
+import io.featureflow.client.model.Rule;
 import org.junit.Assert;
 import org.junit.Test;
 
