@@ -2,7 +2,7 @@ package io.featureflow.client.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.featureflow.client.FeatureFlowConfig;
+import io.featureflow.client.FeatureflowConfig;
 import io.featureflow.client.model.Feature;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
@@ -48,13 +48,13 @@ public class FeatureflowRestClient {
     public static final int PORT = 443;
 
     private final String apiKey;
-    private final FeatureFlowConfig config;
+    private final FeatureflowConfig config;
     private CloseableHttpClient client = null;
     Gson gson = new Gson();
 
     private static final Logger logger = LoggerFactory.getLogger(FeatureflowRestClient.class);
 
-    public FeatureflowRestClient(String apiKey, FeatureFlowConfig config) {
+    public FeatureflowRestClient(String apiKey, FeatureflowConfig config) {
         this.apiKey = apiKey;
         this.config = config;
         client = createHttpClient();
@@ -68,7 +68,7 @@ public class FeatureflowRestClient {
     public void registerFeatureControls(List<Feature> featureRegistrations) throws IOException{
         logger.info("Registering features with featureflow");
         HttpCacheContext context = HttpCacheContext.create();
-        String resource = FeatureFlowConfig.REGISTER_REST_PATH;
+        String resource = FeatureflowConfig.REGISTER_REST_PATH;
         HttpPut request = putRequest(apiKey, resource, gson.toJson(featureRegistrations));
         CloseableHttpResponse response = null;
         try {
@@ -88,7 +88,7 @@ public class FeatureflowRestClient {
 
     public void postFeatureEvalEvents(List<FeatureEvalEvent> featureEvalEvents) {
         CloseableHttpResponse response = null;
-        String eventsPath = FeatureFlowConfig.EVENTS_REST_PATH;
+        String eventsPath = FeatureflowConfig.EVENTS_REST_PATH;
         Type type = new TypeToken<List<FeatureEvalEvent>>() {}.getType();
         String json = gson.toJson(featureEvalEvents, type);
         HttpPost request = postRequest(apiKey, eventsPath, json);

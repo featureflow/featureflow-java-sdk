@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class RulesStepDefs {
     Rule rule = new Rule();
-    FeatureFlowContext context;
+    FeatureflowContext context;
     boolean ruleToContextMatch;
     List<Condition> conditions;
     Audience audience;
@@ -54,7 +54,7 @@ public class RulesStepDefs {
 
     @Given("^the context values are$")
     public void the_context_values_are(DataTable contextValues) throws Throwable {
-        context = new FeatureFlowContext("uniquecontextkey");
+        context = new FeatureflowContext("uniquecontextkey");
         Map<String, JsonElement> contextVals = new HashMap<>();
         for (DataTableRow dataTableRow : contextValues.getGherkinRows()) {
             if("key".equals(dataTableRow.getCells().get(0)))continue;

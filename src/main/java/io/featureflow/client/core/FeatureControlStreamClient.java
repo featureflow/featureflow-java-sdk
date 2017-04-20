@@ -3,7 +3,7 @@ package io.featureflow.client.core;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.featureflow.client.FeatureControlCallbackHandler;
-import io.featureflow.client.FeatureFlowConfig;
+import io.featureflow.client.FeatureflowConfig;
 import io.featureflow.client.model.FeatureControl;
 import okhttp3.Headers;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ public class FeatureControlStreamClient implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(FeatureControlStreamClient.class);
     public static final String FEATURES_UPDATED = "features.updated";
     public static final String FEATURES_DELETED = "features.deleted";
-    private final FeatureFlowConfig config;
+    private final FeatureflowConfig config;
     private final FeatureControlCache repository;
     private final Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks;
     private EventSource eventSource; //   from https://github.com/aslakhellesoy/eventsource-java/blob/master/src/main/java/com/github/eventsource/client/EventSource.java
@@ -41,7 +41,7 @@ public class FeatureControlStreamClient implements Closeable {
      * @param callbacks A Map of event, List of  callback implementation for feature control events
      */
     public FeatureControlStreamClient(String apiKey,
-                                      FeatureFlowConfig config,
+                                      FeatureflowConfig config,
                                       FeatureControlCache repository,
                                       Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks) {
         this.apiKey = apiKey;
@@ -100,10 +100,10 @@ public class FeatureControlStreamClient implements Closeable {
                     Map<String, FeatureControl> controls = gson.fromJson(event.getData(), mapOfFeatureControlsType);
                     for (Map.Entry<String, FeatureControl> entry : controls.entrySet()) {
                         if (logger.isDebugEnabled())
-                            logger.debug("Received Message to update feature {} with {}.", entry.getKey(), entry.getValue().enabled);
+                            logger.debug("Received Message to update feature {} enabled: {}.", entry.getKey(), entry.getValue().enabled);
                         repository.update(entry.getKey(), entry.getValue());
-                        if (callbacks != null && callbacks.get(CallbackEvent.DELETED_FEATURE)!=null){
-                            for (FeatureControlCallbackHandler callback: callbacks.get(CallbackEvent.DELETED_FEATURE)) {
+                        if (callbacks != null && callbacks.get(CallbackEvent.UPDATED_FEATURE)!=null){
+                            for (FeatureControlCallbackHandler callback: callbacks.get(CallbackEvent.UPDATED_FEATURE)) {
                                 callback.onUpdate(entry.getValue());
                             }
                         }

@@ -10,11 +10,11 @@ import java.util.Map;
  */
 public class TestAccessor {
     //test accessor to aid package scope testing without reflection
-    public static boolean matches(Rule rule, FeatureFlowContext context){
+    public static boolean matches(Rule rule, FeatureflowContext context){
         return rule.matches(context);
     }
 
-    public static void setContextValues(FeatureFlowContext context, Map<String, JsonElement> contextVals) {
+    public static void setContextValues(FeatureflowContext context, Map<String, JsonElement> contextVals) {
         context.values = contextVals;
     }
 }

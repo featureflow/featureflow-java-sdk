@@ -7,7 +7,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,7 @@ import java.util.Map;
 /**
  * Created by oliver on 23/05/2016.
  */
-public class FeatureFlowContext{
+public class FeatureflowContext {
     public static final String FEATUREFLOW_DATE = "featureflow.date";
 
     public String key;
@@ -24,9 +23,9 @@ public class FeatureFlowContext{
     public static final String FEATUREFLOW_IP = "featureflow.ip";
     public static final String FEATUREFLOW_KEY = "featureflow.key";
 
-    public FeatureFlowContext() {}
+    public FeatureflowContext() {}
 
-    public FeatureFlowContext(String key) {
+    public FeatureflowContext(String key) {
         this.values.put(FEATUREFLOW_KEY, new JsonPrimitive(key));
         this.key = key;
     }
@@ -94,9 +93,9 @@ public class FeatureFlowContext{
             return this;
         }
 
-        public FeatureFlowContext build(){
+        public FeatureflowContext build(){
             if(key==null)key = "anonymous";
-            FeatureFlowContext context = new FeatureFlowContext(key);
+            FeatureflowContext context = new FeatureflowContext(key);
             context.values = values;
             return context;
         }

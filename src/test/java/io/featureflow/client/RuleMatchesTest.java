@@ -32,7 +32,7 @@ public class RuleMatchesTest {
         a.conditions = Arrays.asList(c1);
         rule.setAudience(a);
 
-        FeatureFlowContext context = new FeatureFlowContext("oliver");
+        FeatureflowContext context = new FeatureflowContext("oliver");
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         context.values = contextValues;
@@ -60,7 +60,7 @@ public class RuleMatchesTest {
         a.conditions = Arrays.asList(c1, c2);
         rule.setAudience(a);
 
-        FeatureFlowContext context = new FeatureFlowContext("oliver");
+        FeatureflowContext context = new FeatureflowContext("oliver");
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("tier", new JsonPrimitive("silver"));
@@ -82,7 +82,7 @@ public class RuleMatchesTest {
         a.conditions = Arrays.asList(c1);
         rule.setAudience(a);
 
-        FeatureFlowContext context = new FeatureFlowContext("oliver");
+        FeatureflowContext context = new FeatureflowContext("oliver");
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("age", new JsonPrimitive(26l));

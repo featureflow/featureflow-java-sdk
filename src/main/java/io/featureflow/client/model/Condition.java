@@ -3,7 +3,7 @@ package io.featureflow.client.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import io.featureflow.client.FeatureFlowContext;
+import io.featureflow.client.FeatureflowContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class Condition {
         this.values = values;
     }
 
-    public boolean matches(FeatureFlowContext context) {
+    public boolean matches(FeatureflowContext context) {
         //see if context contains target
         if(context == null || context.values==null)return false;
         for(String key : context.values.keySet()){

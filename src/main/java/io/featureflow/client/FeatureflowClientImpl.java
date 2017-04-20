@@ -28,11 +28,11 @@ import java.util.concurrent.TimeoutException;
  * Configuration may be provided to register feature controls and capabilitites
  * Callbacks may be assigned to proved ondemand updates to feature control changes
  */
-public class FeatureFlowClientImpl implements FeatureFlowClient {
+public class FeatureflowClientImpl implements FeatureflowClient {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(FeatureFlowClientImpl.class);
-    private final FeatureFlowConfig config;
+    private static final Logger logger = LoggerFactory.getLogger(FeatureflowClientImpl.class);
+    private final FeatureflowConfig config;
     private final FeatureControlStreamClient featureControlStreamClient; // manages pubsub events to update a feature control
     private final FeatureControlCache featureControlCache; //holds the featureControls
     private final FeatureflowRestClient featureflowRestClient; //manages retrieving features and pushing updates
@@ -40,7 +40,7 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     private final Map<String, Feature> featuresMap = new HashMap<>();
     private Queue<FeatureControlCallbackHandler> handlers;
 
-    FeatureFlowClientImpl(String apiKey, List<Feature> features, FeatureFlowConfig config, Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks) {
+    FeatureflowClientImpl(String apiKey, List<Feature> features, FeatureflowConfig config, Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks) {
         //set config, use a builder
         this.config = config;
 
@@ -57,7 +57,7 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
             try {
                 featureflowRestClient.registerFeatureControls(features);
             } catch (IOException e) {
-                logger.error("Problem registering reature controls", e);
+                logger.error("Problem registering feature controls", e);
             }
         }
 
@@ -76,8 +76,8 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     }
 
     @Override
-    public Evaluate evaluate(String featureKey, FeatureFlowContext featureFlowContext) {
-        Evaluate e = new Evaluate(this, featureKey, featureFlowContext);
+    public Evaluate evaluate(String featureKey, FeatureflowContext featureflowContext) {
+        Evaluate e = new Evaluate(this, featureKey, featureflowContext);
         return e;
 
     }
@@ -85,11 +85,20 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
     @Override
     public Evaluate evaluate(String featureKey) {
         //create and empty context
-        FeatureFlowContext featureFlowContext = FeatureFlowContext.context().build();
-        return evaluate(featureKey, featureFlowContext);
+        FeatureflowContext featureflowContext = FeatureflowContext.context().build();
+        return evaluate(featureKey, featureflowContext);
     }
 
-    protected String eval(String featureKey, FeatureFlowContext featureFlowContext) {
+    @Override
+    public Map<String, String> evaluateAll(FeatureflowContext featureflowContext){
+        Map<String, String> result = new HashMap<>();
+        for (String s : featuresMap.keySet()) {
+            result.put(s, eval(s, featureflowContext));
+        }
+        return result;
+    }
+
+    protected String eval(String featureKey, FeatureflowContext featureflowContext) {
         String failoverVariant = featuresMap.get(featureKey)!=null?featuresMap.get(featureKey).failoverVariant: Variant.off;
         FeatureControl control;
         if(!featureControlStreamClient.initialized()){
@@ -102,23 +111,23 @@ public class FeatureFlowClientImpl implements FeatureFlowClient {
         control = featureControlCache.get(featureKey);
 
         //add featureflow.context
-        addAdditionalContext(featureFlowContext);
+        addAdditionalContext(featureflowContext);
 
         if(control==null){
             logger.error("Unknown Feature {}, returning failoverVariant value of {}", featureKey, failoverVariant);
-            featureControlEventHandler.saveEvent(featureKey, failoverVariant, featureFlowContext);
+            featureControlEventHandler.saveEvent(featureKey, failoverVariant, featureflowContext);
             return failoverVariant;
         }
 
-        String variant = control.evaluate(featureFlowContext);
+        String variant = control.evaluate(featureflowContext);
 
-        featureControlEventHandler.saveEvent(featureKey, variant, featureFlowContext);
+        featureControlEventHandler.saveEvent(featureKey, variant, featureflowContext);
         return variant;
 
     }
 
-    private void addAdditionalContext(FeatureFlowContext featureFlowContext) {
-        featureFlowContext.values.put(FeatureFlowContext.FEATUREFLOW_DATE, new JsonPrimitive(FeatureFlowContext.Builder.toIso(new DateTime())));
+    private void addAdditionalContext(FeatureflowContext featureflowContext) {
+        featureflowContext.values.put(FeatureflowContext.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowContext.Builder.toIso(new DateTime())));
     }
     public void close() throws IOException {
     /*    this.eventProcessor.close();

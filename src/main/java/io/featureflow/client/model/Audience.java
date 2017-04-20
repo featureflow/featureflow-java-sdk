@@ -1,6 +1,6 @@
 package io.featureflow.client.model;
 
-import io.featureflow.client.FeatureFlowContext;
+import io.featureflow.client.FeatureflowContext;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class Audience {
         this.conditions = conditions;
     }
     //check that all conditions match (it is an AND - to do an OR you would effectively use the 'is in' operator)
-    public boolean matches(FeatureFlowContext context) {
+    public boolean matches(FeatureflowContext context) {
         if(conditions==null||conditions.size()==0)return true;
         for (Condition condition : conditions) {
             if(!condition.matches(context)){

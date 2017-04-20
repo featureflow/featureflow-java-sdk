@@ -14,22 +14,22 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by oliver on 26/05/2016.
  */
-public class FeatureFlowClientImplTestInt {
+public class FeatureflowClientImplTestInt {
 
-    FeatureFlowClient featureFlowClient;
+    FeatureflowClient featureflowClient;
     private CountDownLatch lock = new CountDownLatch(100);
     @Test
     public void testEvaluate() throws Exception {
 
 
-        FeatureFlowConfig config = FeatureFlowConfig.builder()
+        FeatureflowConfig config = FeatureflowConfig.builder()
                 .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
                 .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
                 //.withOffline(true)
                 .withWaitForStartup(5000l)
                 .build();
 
-        FeatureFlowContext context = FeatureFlowContext.keyedContext("uniqueuserkey1")
+        FeatureflowContext context = FeatureflowContext.keyedContext("uniqueuserkey1")
                 .withValue("tier", "silver")
                 .withValue("age", 32)
                 .withValue("signup_date", new DateTime(2017, 1, 1, 12, 0, 0, 0))
@@ -39,24 +39,33 @@ public class FeatureFlowClientImplTestInt {
                 .build();
 
 
-        FeatureFlowClient client = new FeatureFlowClient.Builder("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1OGU3Mjk2OWE5ZDhkM2I4Zjk5MGJjMDMiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.iBxNrI1ZJZfrtBACuzGEOzbIePSRDg50zN45e6vBHPEt_N6HaLmqYcfavvAY91alkCdNvhARMnTXLdADm1bj9w")
+        featureflowClient = new
+                //FF LOCAL OLIS LOCAL
+                FeatureflowClient.Builder("")
+                .withConfig(config)
                 .withFeatures(Arrays.asList(
-                    new Feature("feature-1"),
-                    new Feature("example-feature-2", Variant.off),
-                    new Feature("example-feature-3", Arrays.asList(
-                            new Variant("red", "Red Variant"),
-                            new Variant("blue", "Blue Variant")
-                    ),Variant.off)
+                        new Feature(FeatureKeys.alpha.name()),
+                        new Feature(FeatureKeys.beta.name()),
+                        new Feature(FeatureKeys.manage.name()),
+                        new Feature(FeatureKeys.events.name()),
+                        new Feature(FeatureKeys.analytics.name()),
+                        new Feature(FeatureKeys.experiments.name()),
+                        new Feature(FeatureKeys.billing.name()),
+                        new Feature(FeatureKeys.stripe.name())
+
                 ))
+                .withUpdateCallback(control -> System.out.println("Received a control update event: " + control.getKey()))
                 .withUpdateCallback(control -> {
                     System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(context) + "\n");
                     lock.countDown();
+                    System.out.println(featureflowClient.evaluate(FeatureKeys.billing.name()).isOff());
                 })
                 .withConfig(config).build();
-        String evaluatedVariant = client.evaluate("example-feature", context).value();
+        String evaluatedVariant = featureflowClient.evaluate("example-feature", context).value();
+        System.out.println(featureflowClient.evaluate(FeatureKeys.billing.name()).value());
         System.out.println(evaluatedVariant);
         lock.await(500000, TimeUnit.MILLISECONDS);
 
-        System.out.println(client.evaluate("alpha", context));
+        System.out.println(featureflowClient.evaluate("alpha", context));
     }
 }

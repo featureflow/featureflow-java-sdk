@@ -7,7 +7,7 @@ import java.net.URI;
 /**
  * Created by oliver on 23/05/2016.
  */
-public class FeatureFlowConfig {
+public class FeatureflowConfig {
 
     private static final int DEFAULT_CONNECT_TIMEOUT        = 30000;
     private static final int DEFAULT_SOCKET_TIMEOUT         = 20000;
@@ -30,7 +30,7 @@ public class FeatureFlowConfig {
     public String controlStreamPath = DEFAULT_CONTROL_STREAM_PATH;
     public long waitForStartup = 10000l;
 
-    FeatureFlowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI, String streamBaseUri, long waitForStartup) {
+    FeatureflowConfig(boolean offline, String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String baseURI, String streamBaseUri, long waitForStartup) {
         this.offline = offline;
         this.proxyHost = proxyHost;
         this.proxyScheme = proxyScheme;
@@ -139,8 +139,8 @@ public class FeatureFlowConfig {
             this.waitForStartup = waitTimeMilliseconds;
             return this;
         }
-        public FeatureFlowConfig build() {
-            return new FeatureFlowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI, streamBaseUri, waitForStartup);
+        public FeatureflowConfig build() {
+            return new FeatureflowConfig(offline, proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, baseURI, streamBaseUri, waitForStartup);
         }
 
     }

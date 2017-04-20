@@ -1,6 +1,6 @@
 package io.featureflow.client.core;
 
-import io.featureflow.client.FeatureFlowConfig;
+import io.featureflow.client.FeatureflowConfig;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.concurrent.BlockingQueue;
 public class EventHandler implements Closeable {
     private final BlockingQueue<Event> eventsQueue;
 
-    public EventHandler(FeatureFlowConfig config) {
+    public EventHandler(FeatureflowConfig config) {
         eventsQueue = new ArrayBlockingQueue<Event>(10000);
 
     }

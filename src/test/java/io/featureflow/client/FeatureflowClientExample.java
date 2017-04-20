@@ -14,21 +14,21 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by oliver on 26/05/2016.
  */
-public class FeatureFlowClientExample {
+public class FeatureflowClientExample {
 
-    FeatureFlowClient featureFlowClient;
+    FeatureflowClient featureflowClient;
     private CountDownLatch lock = new CountDownLatch(100);
     @Test
     public void testEvaluate() throws Exception {
 
 
         //Any Additional Config
-        FeatureFlowConfig config = FeatureFlowConfig.builder()
+        FeatureflowConfig config = FeatureflowConfig.builder()
                 .withWaitForStartup(5000l)
                 .build();
 
         //Context - You would tend to set this at a point in time - e.g. ewhen a REST call comes in or process is called
-        FeatureFlowContext context = FeatureFlowContext.keyedContext("uniqueuserkey1")
+        FeatureflowContext context = FeatureflowContext.keyedContext("uniqueuserkey1")
                 .withValue("tier", "silver")
                 .withValue("age", 32)
                 .withValue("signup_date", new DateTime(2017, 1, 1, 12, 0, 0, 0))
@@ -39,7 +39,7 @@ public class FeatureFlowClientExample {
 
 
         //Initialise the client - You would do this as a Singleton when your servers start up.
-        featureFlowClient = new FeatureFlowClient.Builder("")
+        featureflowClient = new FeatureflowClient.Builder("")
                 .withFeatures(Arrays.asList(
                         //Actively registering features helps keep track of them across environments, reduce clutter and manage technical debt
                         new Feature("login-button", "red"),
@@ -54,10 +54,10 @@ public class FeatureFlowClientExample {
                 .withConfig(config).build();
 
         //Example evaluation calls
-        System.out.println("example-feature value: " + featureFlowClient.evaluate("example-feature", context).value());
-        System.out.println("example-feature is on?: " + featureFlowClient.evaluate("example-feature", context).isOn());
-        System.out.println("example-feature is off?: " + featureFlowClient.evaluate("example-feature", context).isOff());
-        System.out.println("example-feature is red?: " + featureFlowClient.evaluate("example-feature", context).is("red"));
+        System.out.println("example-feature value: " + featureflowClient.evaluate("example-feature", context).value());
+        System.out.println("example-feature is on?: " + featureflowClient.evaluate("example-feature", context).isOn());
+        System.out.println("example-feature is off?: " + featureflowClient.evaluate("example-feature", context).isOff());
+        System.out.println("example-feature is red?: " + featureflowClient.evaluate("example-feature", context).is("red"));
 
         lock.await(500000, TimeUnit.MILLISECONDS);
     }

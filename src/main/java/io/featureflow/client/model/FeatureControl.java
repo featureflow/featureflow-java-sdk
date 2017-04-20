@@ -1,6 +1,6 @@
 package io.featureflow.client.model;
 
-import io.featureflow.client.FeatureFlowContext;
+import io.featureflow.client.FeatureflowContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class FeatureControl {//<V> {
         return this.key;
     }
 
-    public String evaluate(FeatureFlowContext context) {
+    public String evaluate(FeatureflowContext context) {
         //if off then offVariant
         if(!enabled) {
             return offVariantKey;

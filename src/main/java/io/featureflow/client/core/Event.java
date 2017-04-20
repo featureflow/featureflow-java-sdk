@@ -1,6 +1,6 @@
 package io.featureflow.client.core;
 
-import io.featureflow.client.FeatureFlowContext;
+import io.featureflow.client.FeatureflowContext;
 import org.joda.time.DateTime;
 
 /**
@@ -10,9 +10,9 @@ public class Event {
     public String key;
     public String eventId;
     public DateTime timestamp;
-    public FeatureFlowContext context;
+    public FeatureflowContext context;
 
-    public Event(String featureKey, String eventId, DateTime timestamp, FeatureFlowContext context) {
+    public Event(String featureKey, String eventId, DateTime timestamp, FeatureflowContext context) {
         this.key = featureKey;
         this.eventId = eventId;
         this.timestamp = new DateTime();

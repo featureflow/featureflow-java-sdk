@@ -13,13 +13,15 @@ import java.util.Map;
 /**
  * Created by oliver on 15/08/2016.
  */
-public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
+public interface FeatureflowClient<E extends Enum<E>> extends Closeable {
 
 
 
-    Evaluate evaluate(String featureKey, FeatureFlowContext featureFlowContext);
+    Evaluate evaluate(String featureKey, FeatureflowContext featureflowContext);
 
     Evaluate evaluate(String featureKey);
+
+    Map<String,String> evaluateAll(FeatureflowContext featureflowContext);
 
     static Builder builder(String apiKey){
         return new Builder(apiKey);
@@ -28,7 +30,7 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
 
 
     class Builder {
-        private FeatureFlowConfig config = null;
+        private FeatureflowConfig config = null;
         private String apiKey;
         private Map<CallbackEvent, List<FeatureControlCallbackHandler>> featureControlCallbackHandlers = new HashMap<>();
         private List<Feature> features = new ArrayList<>();
@@ -60,7 +62,7 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
             return this;
         }
 
-        public Builder withConfig(FeatureFlowConfig config){
+        public Builder withConfig(FeatureflowConfig config){
             this.config = config;
             return this;
         }
@@ -74,16 +76,16 @@ public interface FeatureFlowClient<E extends Enum<E>> extends Closeable {
             return this;
         }
 
-        public FeatureFlowClient build(){
-            if(config==null){ config = new FeatureFlowConfig.Builder().build();}
-            return new FeatureFlowClientImpl(apiKey, features, config, featureControlCallbackHandlers);
+        public FeatureflowClient build(){
+            if(config==null){ config = new FeatureflowConfig.Builder().build();}
+            return new FeatureflowClientImpl(apiKey, features, config, featureControlCallbackHandlers);
         }
     }
 
     class Evaluate {
         private String evaluateResult;
 
-        Evaluate(FeatureFlowClientImpl featureflowClient, String featureKey, FeatureFlowContext featureflowContext) {
+        Evaluate(FeatureflowClientImpl featureflowClient, String featureKey, FeatureflowContext featureflowContext) {
             evaluateResult = featureflowClient.eval(featureKey, featureflowContext);
         }
         public boolean isOn(){
