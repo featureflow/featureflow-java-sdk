@@ -1,7 +1,6 @@
 package io.featureflow.client;
 
 import io.featureflow.client.model.Feature;
-import io.featureflow.client.model.Variant;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -22,12 +21,12 @@ public class FeatureflowClientImplTestInt {
     public void testEvaluate() throws Exception {
 
 
-        FeatureflowConfig config = FeatureflowConfig.builder()
+       /* FeatureflowConfig config = FeatureflowConfig.builder()
                 .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
                 .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
                 //.withOffline(true)
                 .withWaitForStartup(5000l)
-                .build();
+                .build();*/
 
         FeatureflowContext context = FeatureflowContext.keyedContext("uniqueuserkey1")
                 .withValue("tier", "silver")
@@ -40,9 +39,9 @@ public class FeatureflowClientImplTestInt {
 
 
         featureflowClient = new
-                //FF LOCAL OLIS LOCAL
+
                 FeatureflowClient.Builder("")
-                .withConfig(config)
+                //.withConfig(config)
                 .withFeatures(Arrays.asList(
                         new Feature(FeatureKeys.alpha.name()),
                         new Feature(FeatureKeys.beta.name()),
@@ -59,8 +58,8 @@ public class FeatureflowClientImplTestInt {
                     System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(context) + "\n");
                     lock.countDown();
                     System.out.println(featureflowClient.evaluate(FeatureKeys.billing.name()).isOff());
-                })
-                .withConfig(config).build();
+                }).build();
+                //.withConfig(config).build();
         String evaluatedVariant = featureflowClient.evaluate("example-feature", context).value();
         System.out.println(featureflowClient.evaluate(FeatureKeys.billing.name()).value());
         System.out.println(evaluatedVariant);

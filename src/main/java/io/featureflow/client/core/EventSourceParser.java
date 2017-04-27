@@ -7,12 +7,11 @@ import java.net.URI;
 import java.util.regex.Pattern;
 
 /**
- * Created by oliver on 6/06/2016.
  * Event source handler based on netty implementation here:
  * https://github.com/michaelklishin/eventsource-netty5/blob/master/src/main/java/io/opensensors/sse/client/impl/EventStreamParser.java
  */
-public class EventStreamParser {
-    private static final Logger logger = LoggerFactory.getLogger(EventStreamParser.class);
+public class EventSourceParser {
+    private static final Logger logger = LoggerFactory.getLogger(EventSourceParser.class);
     private static final String DATA = "data";
     private static final String ID = "id";
     private static final String EVENT = "event";
@@ -30,7 +29,7 @@ public class EventStreamParser {
     private String lastEventId;
     private String eventName = DEFAULT_EVENT;
 
-    EventStreamParser(URI origin, EventSourceHandler eventSourceHandler, ConnectionHandler connectionHandler) {
+    EventSourceParser(URI origin, EventSourceHandler eventSourceHandler, ConnectionHandler connectionHandler) {
         this.eventSourceHandler = eventSourceHandler;
         this.origin = origin;
         this.connectionHandler = connectionHandler;
@@ -79,7 +78,6 @@ public class EventStreamParser {
 
     /**
      * Once the SSE parser has encountered a double newline /n/n it will dispatch the payload for processing
-     *
      */
     private void dispatchEvent() {
         if (data.length() == 0) {
@@ -89,7 +87,7 @@ public class EventStreamParser {
         if (dataString.endsWith("\n")) {
             dataString = dataString.substring(0, dataString.length() - 1);
         }
-        MessageEvent message = new MessageEvent(dataString, lastEventId, origin);
+        EventSourceMessage message = new EventSourceMessage(dataString, lastEventId, origin);
         connectionHandler.setLastEventId(lastEventId);
         try {
             eventSourceHandler.onMessage(eventName, message);

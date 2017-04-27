@@ -106,7 +106,7 @@ public class EventSource implements ConnectionHandler, Closeable {
 
                         log.info("Connected to Feature Control SSE Stream");
                         BufferedSource bs = Okio.buffer(response.body().source());
-                        EventStreamParser parser = new EventStreamParser(this.uri, this.eventSourceHandler, this);
+                        EventSourceParser parser = new EventSourceParser(this.uri, this.eventSourceHandler, this);
 
                         String line;
                         while(!Thread.currentThread().isInterrupted() && (line = bs.readUtf8LineStrict()) != null) {

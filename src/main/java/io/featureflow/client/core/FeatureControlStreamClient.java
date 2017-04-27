@@ -72,7 +72,7 @@ public class FeatureControlStreamClient implements Closeable {
             }
 
             @Override
-            public void onMessage(String name, MessageEvent event) throws Exception {
+            public void onMessage(String name, EventSourceMessage event) throws Exception {
                 Gson gson = new Gson();
                 if (event.getData().startsWith("{\"heartbeat\"")) {
                     if (!initialized.getAndSet(true)) {

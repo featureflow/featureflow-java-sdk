@@ -4,6 +4,8 @@ package io.featureflow.client;
 
 import com.google.gson.JsonPrimitive;
 import io.featureflow.client.core.*;
+import io.featureflow.client.core.CallbackEvent;
+import io.featureflow.client.model.Event;
 import io.featureflow.client.model.Feature;
 import io.featureflow.client.model.FeatureControl;
 import io.featureflow.client.model.Variant;
@@ -35,8 +37,8 @@ public class FeatureflowClientImpl implements FeatureflowClient {
     private final FeatureflowConfig config;
     private final FeatureControlStreamClient featureControlStreamClient; // manages pubsub events to update a feature control
     private final FeatureControlCache featureControlCache; //holds the featureControls
-    private final FeatureflowRestClient featureflowRestClient; //manages retrieving features and pushing updates
-    private final FeatureControlEventHandler featureControlEventHandler;
+    private final RestClient restClient; //manages retrieving features and pushing updates
+    private final FeatureEventHandler eventHandler;
     private final Map<String, Feature> featuresMap = new HashMap<>();
     private Queue<FeatureControlCallbackHandler> handlers;
 
@@ -45,9 +47,10 @@ public class FeatureflowClientImpl implements FeatureflowClient {
         this.config = config;
 
         featureControlCache = new SimpleMemoryFeatureCache();
-        featureflowRestClient = new FeatureflowRestClient(apiKey, config);
+        restClient = new RestClient(apiKey, config);
         featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callbacks);
-        featureControlEventHandler = new FeatureControlEventHandler(featureflowRestClient);
+        //featureControlEventHandler = new FeatureControlEventHandler(restClient);
+        eventHandler = new FeatureEventHandler(config, restClient);
 
         //Actively defining registrations helps alert if features are available in an environment
         if(features !=null&& features.size()>0){
@@ -55,7 +58,7 @@ public class FeatureflowClientImpl implements FeatureflowClient {
                 featuresMap.put(feature.key, feature);
             }
             try {
-                featureflowRestClient.registerFeatureControls(features);
+                restClient.registerFeatureControls(features);
             } catch (IOException e) {
                 logger.error("Problem registering feature controls", e);
             }
@@ -66,7 +69,7 @@ public class FeatureflowClientImpl implements FeatureflowClient {
         if (config.waitForStartup > 0L) {
             logger.info("Waiting for Featureflow to inititalise");
             try {
-                startFuture.get(20000, TimeUnit.MILLISECONDS);
+                startFuture.get(config.waitForStartup, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 logger.error("Timeout waiting for Featureflow client initialise");
             } catch (Exception e) {
@@ -115,13 +118,15 @@ public class FeatureflowClientImpl implements FeatureflowClient {
 
         if(control==null){
             logger.error("Unknown Feature {}, returning failoverVariant value of {}", featureKey, failoverVariant);
-            featureControlEventHandler.saveEvent(featureKey, failoverVariant, featureflowContext);
+            //featureControlEventHandler.saveEvent(featureKey, failoverVariant, featureflowContext);
+            eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, featureflowContext, failoverVariant));
             return failoverVariant;
         }
 
         String variant = control.evaluate(featureflowContext);
 
-        featureControlEventHandler.saveEvent(featureKey, variant, featureflowContext);
+        //featureControlEventHandler.saveEvent(featureKey, variant, featureflowContext);
+        eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, featureflowContext, variant));
         return variant;
 
     }

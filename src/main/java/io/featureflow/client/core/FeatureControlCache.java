@@ -4,8 +4,7 @@ import io.featureflow.client.model.FeatureControl;
 import java.io.Closeable;
 import java.util.Map;
 /**
- * Created by oliver.oldfieldhodge on 25/07/2015.
- * This is the repository that will hold the runtime state for features, it gets the feature from the server or local dev file
+ * This is the repository that will hold the runtime state for features
  */
 public interface FeatureControlCache extends Closeable{
 

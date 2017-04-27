@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.featureflow.client.core.EventSource;
 import io.featureflow.client.core.EventSourceHandler;
-import io.featureflow.client.core.MessageEvent;
+import io.featureflow.client.core.EventSourceMessage;
 import io.featureflow.client.model.FeatureControl;
 import okhttp3.Headers;
 import org.apache.http.concurrent.BasicFuture;
@@ -57,7 +57,7 @@ public class FeatureFlowControlStreamTestInt {
             }
 
             @Override
-            public void onMessage(String name, MessageEvent event) throws Exception {
+            public void onMessage(String name, EventSourceMessage event) throws Exception {
                 Gson gson = new Gson();
 
                 if(event.getData().startsWith("{\"heartbeat\"")){

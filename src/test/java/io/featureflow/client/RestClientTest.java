@@ -1,8 +1,8 @@
 package io.featureflow.client;
 
 import com.google.gson.JsonPrimitive;
-import io.featureflow.client.core.FeatureEvalEvent;
-import io.featureflow.client.core.FeatureflowRestClient;
+import io.featureflow.client.model.Event;
+import io.featureflow.client.core.RestClient;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * Created by oliver.oldfieldhodge on 25/2/17.
  */
-public class FeatureflowRestClientTest {
+public class RestClientTest {
     @Test
     public void postFeatureEvalEvent() throws Exception {
         String apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ODk4MzFiZThhZmQxODgzZDg4ZTQzMWEiLCJhdXRoIjoiUk9MRV9FTlZJUk9OTUVOVCJ9.1EvoDmtqOaAfYTtB3B1q7kSMp_Y27kQAa8GKM3fdHZcr1s6BQXHPW88U1j1K3Gwd4f0pHfZnSEJyZL0bd8kriA";
@@ -21,10 +21,9 @@ public class FeatureflowRestClientTest {
 
         FeatureflowContext context = new FeatureflowContext("mykey");
         context.values.put("user_role", new JsonPrimitive("admin"));
-        FeatureflowRestClient client = new FeatureflowRestClient(apiKey, config);
-
-        FeatureEvalEvent event = new FeatureEvalEvent("feature-key1", "pink", context);
-        client.postFeatureEvalEvents(Arrays.asList(event));
+        RestClient client = new RestClient(apiKey, config);
+        Event   event = new Event("feature-key1", "evaluate", context, "pink");
+        client.postEvents(Arrays.asList(event));
     }
 
 }

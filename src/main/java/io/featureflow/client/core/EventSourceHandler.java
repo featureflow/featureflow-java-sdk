@@ -9,7 +9,7 @@ package io.featureflow.client.core;
 public interface EventSourceHandler {
     void onConnect() throws Exception;
 
-    void onMessage(String event, MessageEvent message) throws Exception;
+    void onMessage(String event, EventSourceMessage message) throws Exception;
 
     void onError(Throwable var1);
 }

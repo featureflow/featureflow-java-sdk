@@ -5,18 +5,18 @@ import java.net.URI;
 /**
  * Created by oliver on 6/06/2016.
  */
-public class MessageEvent {
+public class EventSourceMessage {
     private final String data;
     private final String lastEventId;
     private final URI origin;
 
-    public MessageEvent(String data, String lastEventId, URI origin) {
+    public EventSourceMessage(String data, String lastEventId, URI origin) {
         this.data = data;
         this.lastEventId = lastEventId;
         this.origin = origin;
     }
 
-    public MessageEvent(String data) {
+    public EventSourceMessage(String data) {
         this(data, (String) null, (URI) null);
     }
 

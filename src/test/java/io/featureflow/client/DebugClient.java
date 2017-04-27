@@ -2,7 +2,7 @@ package io.featureflow.client;
 
         import io.featureflow.client.core.EventSource;
         import io.featureflow.client.core.EventSourceHandler;
-        import io.featureflow.client.core.MessageEvent;
+        import io.featureflow.client.core.EventSourceMessage;
         import okhttp3.Headers;
 
         import java.net.URI;
@@ -21,7 +21,7 @@ public class DebugClient {
             }
 
             @Override
-            public void onMessage(String event, MessageEvent message) {
+            public void onMessage(String event, EventSourceMessage message) {
                 System.out.println("event = " + event + ", message = " + message.getData());
             }
 

@@ -3,6 +3,7 @@ package io.featureflow.client.core;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.featureflow.client.FeatureflowConfig;
+import io.featureflow.client.model.Event;
 import io.featureflow.client.model.Feature;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
@@ -38,9 +39,9 @@ import java.util.List;
 /**
  * Created by oliver on 26/05/2016.
  */
-public class FeatureflowRestClient {
+public class RestClient {
 
-    public static final String VERSION = "0.0.1";
+    public static final String VERSION = "0.0.10-SNAPSHOT";
     public static final String APPLICATION_JSON = "application/json";
     public static final String UTF_8 = "UTF-8";
     public static final String API_V1_EVENTS = "/api/v1/events";
@@ -52,9 +53,9 @@ public class FeatureflowRestClient {
     private CloseableHttpClient client = null;
     Gson gson = new Gson();
 
-    private static final Logger logger = LoggerFactory.getLogger(FeatureflowRestClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 
-    public FeatureflowRestClient(String apiKey, FeatureflowConfig config) {
+    public RestClient(String apiKey, FeatureflowConfig config) {
         this.apiKey = apiKey;
         this.config = config;
         client = createHttpClient();
@@ -86,7 +87,30 @@ public class FeatureflowRestClient {
         }
     }
 
-    public void postFeatureEvalEvents(List<FeatureEvalEvent> featureEvalEvents) {
+    public void postEvents(List<? extends Event> events) {
+        CloseableHttpResponse response = null;
+        String eventsPath = FeatureflowConfig.EVENTS_REST_PATH;
+        Type type = new TypeToken<List<Event>>() {}.getType();
+        String json = gson.toJson(events, type);
+        HttpPost request = postRequest(apiKey, eventsPath, json);
+        StringEntity entity = new StringEntity(json, UTF_8);
+        entity.setContentType(APPLICATION_JSON);
+        request.setEntity(entity);
+        try {
+            client = createHttpClient();
+            response = client.execute(request);
+        } catch (IOException e) {
+            logger.error("Network exception posting events", e);
+        } finally {
+            try {
+                if (response != null) response.close();
+            } catch (IOException e) {
+                logger.error("Cannot close stream", e);
+            }
+        }
+    }
+
+    /*public void postFeatureEvalEvents(List<FeatureEvalEvent> featureEvalEvents) {
         CloseableHttpResponse response = null;
         String eventsPath = FeatureflowConfig.EVENTS_REST_PATH;
         Type type = new TypeToken<List<FeatureEvalEvent>>() {}.getType();
@@ -107,7 +131,7 @@ public class FeatureflowRestClient {
                 logger.error("Cannot close stream", e);
             }
         }
-    }
+    }*/
    /* private void handleStatusCode(int status, String featureKey) throws IOException {
 
         if (status != HttpStatus.SC_OK) {
