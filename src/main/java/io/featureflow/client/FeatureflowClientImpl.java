@@ -48,7 +48,6 @@ public class FeatureflowClientImpl implements FeatureflowClient {
 
         featureControlCache = new SimpleMemoryFeatureCache();
         restClient = new RestClient(apiKey, config);
-        featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callbacks);
         //featureControlEventHandler = new FeatureControlEventHandler(restClient);
         eventHandler = new FeatureEventHandler(config, restClient);
 
@@ -64,7 +63,7 @@ public class FeatureflowClientImpl implements FeatureflowClient {
             }
         }
 
-
+        featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callbacks);
         Future<Void> startFuture = featureControlStreamClient.start();
         if (config.waitForStartup > 0L) {
             logger.info("Waiting for Featureflow to inititalise");
@@ -102,7 +101,7 @@ public class FeatureflowClientImpl implements FeatureflowClient {
     }
 
     protected String eval(String featureKey, FeatureflowContext featureflowContext) {
-        String failoverVariant = featuresMap.get(featureKey)!=null?featuresMap.get(featureKey).failoverVariant: Variant.off;
+        String failoverVariant = (featuresMap.get(featureKey)!=null&&featuresMap.get(featureKey).failoverVariant!=null)?featuresMap.get(featureKey).failoverVariant: Variant.off;
         FeatureControl control;
         if(!featureControlStreamClient.initialized()){
             logger.warn("FeatureFlow is not initialized yet.");
