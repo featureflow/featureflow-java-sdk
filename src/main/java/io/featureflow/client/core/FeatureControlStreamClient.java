@@ -57,7 +57,7 @@ public class FeatureControlStreamClient implements Closeable {
                 .add("Authorization", "Bearer " + this.apiKey)
                 .add("User-Agent", "FeatureflowClient-Java/" + "1.0")
                 .add("Cache-Control", "no-cache")
-                //.add("Accept", "text/event-stream")
+                .add("Accept", "text/event-stream")
                 .build();
         eventSource = new EventSource(config.getControlStreamUri(), 5000l, headers, getHandler(initFuture));
         eventSource.init();

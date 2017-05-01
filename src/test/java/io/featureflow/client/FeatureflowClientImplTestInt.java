@@ -40,7 +40,7 @@ public class FeatureflowClientImplTestInt {
 
         featureflowClient = new
 
-                FeatureflowClient.Builder("srv-env-7dc2b88d4d4c409882c7eb4d015354af")
+                FeatureflowClient.Builder("srv-env-87c6ce934ce8407aa93a52b637948a56")
                 .withConfig(config)
                 .withFeatures(Arrays.asList(
                         new Feature(FeatureKeys.alpha.name()),
