@@ -5,4 +5,7 @@ deployment:
   production:
     branch: master
     commands:
-      - ./deploy_prod.sh
+      - openssl aes-256-cbc -d -in codesigning.asc.enc -out codesigning.asc -k $ENCKEY
+      - gpg --fast-import cd/codesigning.asc
+      - mvn deploy -P sign,build-extras --settings settings.xml
+      #- ./deploy_prod.sh
