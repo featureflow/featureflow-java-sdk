@@ -12,20 +12,14 @@
     <profiles>
         <profile>
             <id>ossrh</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <gpg.keyname>${env.GPG_KEYNAME}</gpg.keyname>
                 <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
-                <gpg.defaultKeyring>false</gpg.defaultKeyring>
-                <gpg.useagent>true</gpg.useagent>
-                <gpg.lockMode>never</gpg.lockMode>
-                <gpg.homedir>${env.GPG_HOMEDIR}</gpg.homedir>
-                <gpg.publicKeyring>${env.GPG_PUBLIC_KEYRING}</gpg.publicKeyring>
-                <gpg.secretKeyring>${env.GPG_SECRET_KEYRING}</gpg.secretKeyring>
             </properties>
         </profile>
 
     </profiles>
-    <activeProfiles>
-        <activeProfile>ossrh</activeProfile>
-    </activeProfiles>
 </settings>

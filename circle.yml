@@ -1,3 +1,8 @@
 test:
     override:
       #- mvn deploy -s settings.xml
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./deploy_prod.sh
