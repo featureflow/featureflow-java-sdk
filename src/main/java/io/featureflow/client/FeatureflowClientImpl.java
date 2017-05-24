@@ -39,7 +39,7 @@ public class FeatureflowClientImpl implements FeatureflowClient {
     private final FeatureControlCache featureControlCache; //holds the featureControls
     private final RestClient restClient; //manages retrieving features and pushing updates
     private final FeatureEventHandler eventHandler;
-    private final Map<String, Feature> featuresMap = new HashMap<>();
+    private final Map<String, Feature> featuresMap = new HashMap<>(); //this contains code registered features and failovers
     private Queue<FeatureControlCallbackHandler> handlers;
 
     FeatureflowClientImpl(String apiKey, List<Feature> features, FeatureflowConfig config, Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks) {
@@ -94,7 +94,7 @@ public class FeatureflowClientImpl implements FeatureflowClient {
     @Override
     public Map<String, String> evaluateAll(FeatureflowContext featureflowContext){
         Map<String, String> result = new HashMap<>();
-        for (String s : featuresMap.keySet()) {
+        for(String s: featureControlCache.getAll().keySet()){
             result.put(s, eval(s, featureflowContext));
         }
         return result;

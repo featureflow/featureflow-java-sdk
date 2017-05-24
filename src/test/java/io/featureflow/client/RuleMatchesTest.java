@@ -93,5 +93,24 @@ public class RuleMatchesTest {
 
     }
 
+    @Test
+    public void testRuleMatchesWithNullAudience() throws Exception {
+        Rule rule = new Rule();
+        Condition c1 = new Condition();
+        c1.target = "age";
+        c1.operator = Operator.greaterThan;
+        c1.values.add(new JsonPrimitive(25l));
+
+        FeatureflowContext context = new FeatureflowContext("oliver");
+        Map<String, JsonElement> contextValues = new HashMap<>();
+        contextValues.put("name", new JsonPrimitive("oliver"));
+        contextValues.put("age", new JsonPrimitive(26l));
+
+        context.values = contextValues;
+
+        Assert.assertTrue(rule.matches(context));
+
+    }
+
 
 }

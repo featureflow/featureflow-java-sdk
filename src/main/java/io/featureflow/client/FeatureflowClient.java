@@ -18,16 +18,11 @@ public interface FeatureflowClient<E extends Enum<E>> extends Closeable {
 
 
     Evaluate evaluate(String featureKey, FeatureflowContext featureflowContext);
-
     Evaluate evaluate(String featureKey);
-
     Map<String,String> evaluateAll(FeatureflowContext featureflowContext);
-
     static Builder builder(String apiKey){
         return new Builder(apiKey);
     }
-
-
 
     class Builder {
         private FeatureflowConfig config = null;

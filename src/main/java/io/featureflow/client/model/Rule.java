@@ -32,7 +32,7 @@ public class Rule {
         this.variantSplits = variantSplits;
     }
     public boolean matches(FeatureflowContext context){
-        return audience==null?true:audience.matches(context);
+        return audience==null || audience.matches(context);
     }
 
     public String getVariantSplitKey(String contextKey, String featureKey, String salt){
