@@ -1,6 +1,6 @@
 package io.featureflow.client.core;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import io.featureflow.client.FeatureflowConfig;
 import io.featureflow.client.model.Event;
@@ -25,6 +25,8 @@ import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,13 @@ public class RestClient {
     private final String apiKey;
     private final FeatureflowConfig config;
     private CloseableHttpClient client = null;
-    Gson gson = new Gson();
+    Gson gson =  new GsonBuilder()
+        .registerTypeAdapter(DateTime.class, new JsonSerializer<DateTime>(){
+            @Override
+            public JsonElement serialize(DateTime json, Type typeOfSrc, JsonSerializationContext context) {
+                return new JsonPrimitive(ISODateTimeFormat.dateTime().print(json));
+            }
+        }).create();
 
     private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 

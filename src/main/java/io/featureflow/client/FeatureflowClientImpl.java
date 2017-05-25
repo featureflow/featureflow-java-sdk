@@ -132,14 +132,9 @@ public class FeatureflowClientImpl implements FeatureflowClient {
     }
 
     private void addAdditionalContext(FeatureflowContext featureflowContext) {
-        /*{
-            "key" : "featureflow.hourofday",
-                "name" : "Hour of Day",
-                "type" : "number",
-                "owner" : "system"
-        }*/
         featureflowContext.values.put(FeatureflowContext.FEATUREFLOW_HOUROFDAY, new JsonPrimitive(LocalTime.now().getHour()));
         featureflowContext.values.put(FeatureflowContext.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowContext.Builder.toIso(new DateTime())));
+        
     }
     public void close() throws IOException {
     /*    this.eventProcessor.close();

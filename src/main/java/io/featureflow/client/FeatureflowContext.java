@@ -98,7 +98,7 @@ public class FeatureflowContext {
         public FeatureflowContext build(){
             if(key==null)key = "anonymous";
             FeatureflowContext context = new FeatureflowContext(key);
-            context.values = values;
+            context.values.putAll(values);
             return context;
         }
 
