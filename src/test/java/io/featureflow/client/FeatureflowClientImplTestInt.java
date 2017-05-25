@@ -40,20 +40,13 @@ public class FeatureflowClientImplTestInt {
 
         featureflowClient = new
 
-                FeatureflowClient.Builder("")
-                //.withConfig(config)
+                FeatureflowClient.Builder("srv-env-c30934ef224645368e7209cb10d6fe9c")
+                .withConfig(config)
                 .withFeatures(Arrays.asList(
-                        new Feature(FeatureKeys.alpha.name()),
-                        new Feature(FeatureKeys.beta.name()),
-                        new Feature(FeatureKeys.manage.name()),
-                        new Feature(FeatureKeys.events.name()),
-                        new Feature(FeatureKeys.analytics.name()),
-                        new Feature(FeatureKeys.experiments.name()),
-                        new Feature(FeatureKeys.billing.name()),
-                        new Feature(FeatureKeys.stripe.name()),
                         new Feature("example-feature"),
-                        new Feature("other-feature"),
-                        new Feature("completely-new")
+                        new Feature("facebook-login"),
+                        new Feature("standard-login"),
+                        new Feature("summary-dashboard")
 
                 ))
                 .withUpdateCallback(control -> System.out.println("Received a control update event: " + control.getKey()))

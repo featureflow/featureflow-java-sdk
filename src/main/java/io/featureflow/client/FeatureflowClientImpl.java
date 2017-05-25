@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +132,13 @@ public class FeatureflowClientImpl implements FeatureflowClient {
     }
 
     private void addAdditionalContext(FeatureflowContext featureflowContext) {
+        /*{
+            "key" : "featureflow.hourofday",
+                "name" : "Hour of Day",
+                "type" : "number",
+                "owner" : "system"
+        }*/
+        featureflowContext.values.put(FeatureflowContext.FEATUREFLOW_HOUROFDAY, new JsonPrimitive(LocalTime.now().getHour()));
         featureflowContext.values.put(FeatureflowContext.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowContext.Builder.toIso(new DateTime())));
     }
     public void close() throws IOException {

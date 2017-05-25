@@ -15,13 +15,15 @@ import java.util.Map;
  * Created by oliver on 23/05/2016.
  */
 public class FeatureflowContext {
-    public static final String FEATUREFLOW_DATE = "featureflow.date";
+
 
     public String key;
     public Map<String, JsonElement> values = new HashMap<>();
 
-    public static final String FEATUREFLOW_IP = "featureflow.ip";
+
     public static final String FEATUREFLOW_KEY = "featureflow.key";
+    public static final String FEATUREFLOW_DATE = "featureflow.date";
+    public static final String FEATUREFLOW_HOUROFDAY = "featureflow.hourofday";
 
     public FeatureflowContext() {}
 

@@ -5,9 +5,10 @@ import io.featureflow.client.model.Event;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * Created by oliver.oldfieldhodge on 3/1/17.
@@ -20,6 +21,34 @@ public class FeatureEventHandler implements Closeable {
         this.eventsQueue = new ArrayBlockingQueue<Event>(10000);
         this.restClient = restClient;
 
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        final Runnable sender = new Sender();
+
+        executorService.scheduleAtFixedRate(new Runnable() {
+            private final ExecutorService executor = Executors.newSingleThreadExecutor();
+            private Future<?> lastExecution;
+            @Override
+            public void run() {
+                if (lastExecution != null && !lastExecution.isDone()) {
+                    return;
+                }
+                lastExecution = executor.submit(sender);
+            }
+        }, 10, 30, TimeUnit.SECONDS);
+    }
+
+    class Sender implements Runnable {
+
+        @Override
+        public void run() {
+            sendQueue();
+        }
+    }
+    
+    private void sendQueue() {
+        List<Event> events = new ArrayList(eventsQueue.size());
+        eventsQueue.drainTo(events);
+        if(!events.isEmpty())restClient.postEvents(events);
     }
 
     public boolean sendEvent(Event event){
@@ -33,6 +62,9 @@ public class FeatureEventHandler implements Closeable {
 
     @Override
     public void close() throws IOException {
-
+        sendQueue();
     }
+
+
+
 }
