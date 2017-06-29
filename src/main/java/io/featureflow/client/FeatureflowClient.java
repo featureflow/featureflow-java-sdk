@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by oliver on 15/08/2016.
  */
-public interface FeatureflowClient<E extends Enum<E>> extends Closeable {
+public interface FeatureflowClient extends Closeable {
 
 
 
