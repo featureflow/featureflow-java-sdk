@@ -39,8 +39,7 @@ public class FeatureflowClientImplTestInt {
 
 
         featureflowClient = new
-
-                FeatureflowClient.Builder("srv-env-c30934ef224645368e7209cb10d6fe9c")
+                FeatureflowClient.Builder("API_KEY")
                 .withConfig(config)
                 .withFeatures(Arrays.asList(
                         new Feature("example-feature"),

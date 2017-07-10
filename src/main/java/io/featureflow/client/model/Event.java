@@ -16,20 +16,16 @@ public class Event {
 
     FeatureflowContext context;
     String evaluatedVariant;
+    String expectedVariant;
 
 
-    public Event(String featureKey, String type, FeatureflowContext context) {
-        this.featureKey = featureKey;
-        this.type = type;
-        this.timestamp = new DateTime();
-        this.context = context;
-    }
-    public Event(String featureKey, String type, FeatureflowContext context, String evaluatedVariant) {
+    public Event(String featureKey, String type, FeatureflowContext context, String evaluatedVariant, String expectedVariant) {
         this.featureKey = featureKey;
         this.type = type;
         this.timestamp = new DateTime();
         this.context = context;
         this.evaluatedVariant = evaluatedVariant;
+        this.expectedVariant = expectedVariant;
     }
 
 
