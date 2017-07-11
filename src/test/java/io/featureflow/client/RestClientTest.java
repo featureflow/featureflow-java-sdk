@@ -11,7 +11,7 @@ import java.util.Arrays;
  * Created by oliver.oldfieldhodge on 25/2/17.
  */
 public class RestClientTest {
-    @Test
+    //@Test
     public void postFeatureEvalEvent() throws Exception {
         String apiKey = "API_KEY";
         FeatureflowConfig config =

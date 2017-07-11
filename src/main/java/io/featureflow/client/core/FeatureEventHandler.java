@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * Created by oliver.oldfieldhodge on 3/1/17.
+ * The event handler posts events back to featureflow. We queue them up
  */
 public class FeatureEventHandler implements Closeable {
     private final BlockingQueue<Event> eventsQueue;

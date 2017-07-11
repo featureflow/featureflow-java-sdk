@@ -127,11 +127,11 @@ public class FeatureflowClient implements Closeable{
         }*/
     }
 
-    static Builder builder(String apiKey){
+    public static Builder builder(String apiKey){
         return new Builder(apiKey);
     }
 
-    static class Builder {
+    public static class Builder {
         private FeatureflowConfig config = null;
         private String apiKey;
         private Map<CallbackEvent, List<FeatureControlCallbackHandler>> featureControlCallbackHandlers = new HashMap<>();
@@ -184,7 +184,7 @@ public class FeatureflowClient implements Closeable{
         }
     }
 
-    class Evaluate {
+    public class Evaluate {
         private String evaluateResult;
         private String featureKey;
         private FeatureflowContext context;
