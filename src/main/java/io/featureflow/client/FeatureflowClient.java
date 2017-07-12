@@ -128,7 +128,7 @@ public class FeatureflowClient implements Closeable{
     }
 
     public static Builder builder(String apiKey){
-        return new Builder(apiKey);
+        return new FeatureflowClient.Builder(apiKey);
     }
 
     public static class Builder {
@@ -136,8 +136,6 @@ public class FeatureflowClient implements Closeable{
         private String apiKey;
         private Map<CallbackEvent, List<FeatureControlCallbackHandler>> featureControlCallbackHandlers = new HashMap<>();
         private List<Feature> features = new ArrayList<>();
-
-
 
         public Builder (String apiKey){
             this.apiKey = apiKey;

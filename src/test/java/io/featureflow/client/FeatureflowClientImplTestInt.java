@@ -38,8 +38,7 @@ public class FeatureflowClientImplTestInt {
                 .build();
 
 
-        featureflowClient = new
-                FeatureflowClient.Builder("API_KEY")
+        featureflowClient = FeatureflowClient.builder("API_KEY")
                 .withConfig(config)
                 .withFeatures(Arrays.asList(
                         new Feature("example-feature"),

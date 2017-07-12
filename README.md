@@ -21,7 +21,7 @@ Using Maven
 <dependency>
     <groupId>io.featureflow</groupId>
     <artifactId>featureflow-java-sdk</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.14</version>
 </dependency>
 ```
 
@@ -33,7 +33,7 @@ Get your 'Server Environment Api Key' from the environment page in featureflow a
 
 ```java
 String apiKey = "<Your Server Environment Api Key goes here>";
-FeatureFlowClient featureFlowClient = FeatureFlowClient.builder(apiKey).build();
+FeatureflowClient featureflow = FeatureflowClient.builder(apiKey).build();
 ```
 This is a singleton, so if you're using spring you should make it a @Bean in a @Configuration class.
 
@@ -62,13 +62,13 @@ You can pass context information in to allow features to be targeted.
 At the point in time of evaluation (e.g. on a rest call or other call) you can create and pass in context information by builsing a `FeatureflowContext` object. We have a builder to help:
 
 ```aidl
-FeatureFlowContext context = FeatureFlowContext.keyedContext("uniqueuserkey1")
+FeatureflowContext context = FeatureflowContext.keyedContext("uniqueuserkey1")
     .withValue("tier", "silver")
     .withValue("age", 32)
-    .withValue("signup_date", new DateTime(2017, 1, 1, 12, 0, 0, 0))
-    .withValue("user_role", "standard_user")
+    .withValue("signup_date", new DateTime(2017, 1, 1, 12, 0, 0, 0))    
     .withValue("name", "Joe User")
     .withValue("email", "user@featureflow.io")
+    .withValues("user_role", Arrays.asList("pvt_tester", "administrator"))
     .build();
 
 ```
@@ -79,7 +79,7 @@ When a list of context values is passed in each rule may match any of the values
 Evaluate by passing the context into the evaluate method:
 
 ```
-featureFlowClient.evaluate("example-feature", context).value());
+featureflow.evaluate("example-feature", context).value());
 ```
 
 
