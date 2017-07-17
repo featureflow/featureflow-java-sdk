@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * The event handler posts events back to featureflow. We queue them up
+ * The events client posts events back to featureflow. We queue them up
  */
-public class FeatureEventHandler implements Closeable {
+public class EventsClient implements Closeable {
     private final BlockingQueue<Event> eventsQueue;
     private final RestClient restClient;
 
-    public FeatureEventHandler(FeatureflowConfig config, RestClient restClient) {
+    public EventsClient(FeatureflowConfig config, RestClient restClient) {
         this.eventsQueue = new ArrayBlockingQueue<Event>(10000);
         this.restClient = restClient;
 

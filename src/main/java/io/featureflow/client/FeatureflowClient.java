@@ -30,26 +30,20 @@ import java.util.concurrent.TimeoutException;
  * Callbacks may be assigned to proved ondemand updates to feature control changes
  */
 public class FeatureflowClient implements Closeable{
-
-
     private static final Logger logger = LoggerFactory.getLogger(FeatureflowClient.class);
     private final FeatureflowConfig config;
     private final FeatureControlStreamClient featureControlStreamClient; // manages pubsub events to update a feature control
     private final FeatureControlCache featureControlCache; //holds the featureControls
     private final RestClient restClient; //manages retrieving features and pushing updates
-    private final FeatureEventHandler eventHandler;
+    private final EventsClient eventHandler;
     private final Map<String, Feature> featuresMap = new HashMap<>(); //this contains code registered features and failovers
-    private Queue<FeatureControlCallbackHandler> handlers;
-
     FeatureflowClient(String apiKey, List<Feature> features, FeatureflowConfig config, Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks) {
         //set config, use a builder
         this.config = config;
 
         featureControlCache = new SimpleMemoryFeatureCache();
         restClient = new RestClient(apiKey, config);
-        //featureControlEventHandler = new FeatureControlEventHandler(restClient);
-        eventHandler = new FeatureEventHandler(config, restClient);
-
+        eventHandler = new EventsClient(config, restClient);
         //Actively defining registrations helps alert if features are available in an environment
         if(features !=null&& features.size()>0){
             for (Feature feature : features) {
@@ -121,10 +115,7 @@ public class FeatureflowClient implements Closeable{
         
     }
     public void close() throws IOException {
-    /*    this.eventProcessor.close();
-        if (this.updateProcessor != null) {
-            this.updateProcessor.close();
-        }*/
+        this.eventHandler.close();
     }
 
     public static Builder builder(String apiKey){
@@ -149,11 +140,7 @@ public class FeatureflowClient implements Closeable{
             this.withCallback(CallbackEvent.DELETED_FEATURE, featureControlCallbackHandler);
             return this;
         }
-        @Deprecated //use withUpdate or withDelete callbacks e.g. .withUpdateCallback(control -> System.out.println(control.getKey()))
-        public Builder withCallback(FeatureControlCallbackHandler featureControlCallbackHandler){
-            withUpdateCallback(featureControlCallbackHandler);
-            return this;
-        }
+
         public Builder withCallback(CallbackEvent event, FeatureControlCallbackHandler featureControlCallbackHandler){
             if(featureControlCallbackHandlers.get(event)==null){
                 featureControlCallbackHandlers.put(event, new ArrayList<>());
