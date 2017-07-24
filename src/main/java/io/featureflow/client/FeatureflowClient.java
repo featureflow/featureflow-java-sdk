@@ -170,14 +170,14 @@ public class FeatureflowClient implements Closeable{
     }
 
     public class Evaluate {
-        private String evaluateResult;
-        private String featureKey;
-        private FeatureflowContext context;
+        private final String evaluateResult;
+        private final String featureKey;
+        private final FeatureflowContext context;
 
         Evaluate(FeatureflowClient featureflowClient, String featureKey, FeatureflowContext featureflowContext) {
             this.featureKey = featureKey;
             this.context = featureflowContext;
-            evaluateResult = featureflowClient.eval(featureKey, featureflowContext);
+            this.evaluateResult = featureflowClient.eval(featureKey, featureflowContext);
         }
         public boolean isOn(){
             return is(Variant.on);
@@ -190,7 +190,7 @@ public class FeatureflowClient implements Closeable{
             return variant.equals(evaluateResult);
         }
         public String value(){
-            eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, context, evaluateResult, null));
+            eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, this.context, evaluateResult, null));
             return evaluateResult;
         }
     }
