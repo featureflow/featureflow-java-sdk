@@ -175,6 +175,7 @@ public class RestClient {
 
             request.addHeader("Authorization", "Bearer " + apiKey);
             request.addHeader("User-Agent", "JavaClient/" + VERSION);
+            request.addHeader("X-Featureflow-Client", "JavaClient/" + VERSION); //We use this as we can pass it alongside default browser agent headers in JS
 
             return request;
         } catch (Exception e) {
