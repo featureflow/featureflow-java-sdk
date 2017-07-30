@@ -6,8 +6,8 @@ package io.featureflow.client.core;
 public class FailedResponseException extends Throwable {
     private final int responseCode;
 
-    public FailedResponseException(int responseCode) {
-        super("Failed Response (" + responseCode + ")");
+    public FailedResponseException(String responseMessage, int responseCode, String url) {
+        super("Failed Response for url " + url + " " + responseMessage + " (" + responseCode + ")");
 
         this.responseCode = responseCode;
 
