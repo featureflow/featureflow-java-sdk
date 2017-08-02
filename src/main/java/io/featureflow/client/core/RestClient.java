@@ -53,6 +53,7 @@ public class RestClient {
     private final String apiKey;
     private final FeatureflowConfig config;
     private CloseableHttpClient client = null;
+
     Gson gson =  new GsonBuilder()
         .registerTypeAdapter(DateTime.class, new JsonSerializer<DateTime>(){
             @Override
