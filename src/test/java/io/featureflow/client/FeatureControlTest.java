@@ -64,21 +64,21 @@ public class FeatureControlTest {
         rule2.setVariantSplits(Arrays.asList(new VariantSplit(RED, 100l), new VariantSplit(BLUE, 0l)));
 
         featureControl.rules = Arrays.asList(rule1,rule2);
-        FeatureflowContext context = new FeatureflowContext(USER_KEY);
+        FeatureflowUser user = new FeatureflowUser(USER_KEY);
 
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put(ROLE, new JsonPrimitive(TESTER));
-        context.values =contextValues;
-        String status = featureControl.evaluate(context);
+        user.withAttributes(contextValues);
+        String status = featureControl.evaluate(user);
         assertEquals(BLUE, status); //Blue as we are ROLE TSETER
 
-        context = new FeatureflowContext(USER_KEY);
+        user = new FeatureflowUser(USER_KEY);
         contextValues = new HashMap<>();
         contextValues.put(ROLE, new JsonPrimitive(END_USER));
         //contextValues.put("age", new JsonPrimitive(26l));
-        context.values =contextValues;
+        user.withAttributes(contextValues);
 
-        status = featureControl.evaluate(context);
+        status = featureControl.evaluate(user);
         assertTrue(status.equals(RED)); //Red sa default rule
 /*
 

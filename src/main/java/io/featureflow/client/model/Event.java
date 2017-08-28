@@ -1,6 +1,7 @@
 package io.featureflow.client.model;
 
 import io.featureflow.client.FeatureflowContext;
+import io.featureflow.client.FeatureflowUser;
 import org.joda.time.DateTime;
 
 /**
@@ -9,6 +10,7 @@ import org.joda.time.DateTime;
 public class Event {
     public static final String EVALUATE_EVENT = "evaluate";
     public static final String GOAL_EVENT = "goal";
+    private final FeatureflowUser user;
 
     String featureKey;
     String type;
@@ -19,11 +21,11 @@ public class Event {
     String expectedVariant;
 
 
-    public Event(String featureKey, String type, FeatureflowContext context, String evaluatedVariant, String expectedVariant) {
+    public Event(String featureKey, String type, FeatureflowUser user, String evaluatedVariant, String expectedVariant) {
         this.featureKey = featureKey;
         this.type = type;
         this.timestamp = new DateTime();
-        this.context = context;
+        this.user = user;
         this.evaluatedVariant = evaluatedVariant;
         this.expectedVariant = expectedVariant;
     }

@@ -4,9 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import io.featureflow.client.FeatureflowContext;
+import io.featureflow.client.FeatureflowUser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oliver on 18/11/16.
@@ -23,13 +26,16 @@ public class Condition {
         this.values = values;
     }
 
-    public boolean matches(FeatureflowContext context) {
+    public boolean matches(FeatureflowUser user) {
         //see if context contains target
-        if(context == null || context.values==null)return false;
-        for(String key : context.values.keySet()){
-            if(key.equals(target)){
+        if(user == null || (user.getAttributes()==null && user.getSessionAttributes() ==null))return false;
+        Map<String, JsonElement> combined = new HashMap<>();
+        combined.putAll(user.getAttributes());
+        combined.putAll(user.getSessionAttributes());
+        for(String attributeKey : combined.keySet()){
+            if(attributeKey.equals(target)){
                 //compare the value using the comparator
-                JsonElement contextValue = context.values.get(key);
+                JsonElement contextValue = user.getAttributes().get(attributeKey);
                 if(contextValue.isJsonArray()){ //if the context value is an array of values
                     JsonArray ar = contextValue.getAsJsonArray();
                     for (JsonElement jsonElement : ar) {//return true if any of the list of context values for the key matches
@@ -37,8 +43,7 @@ public class Condition {
                     }
                     return false; //else return false
                 }
-                return operator.evaluate(context.values.get(key).getAsJsonPrimitive(), values); //if its a single value then just return the eval
-
+                return operator.evaluate(user.getAttributes().get(attributeKey).getAsJsonPrimitive(), values); //if its a single value then just return the eval
             }
         }
         return false;

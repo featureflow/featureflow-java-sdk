@@ -19,10 +19,10 @@ public class RestClientTest {
                         1,0,0,"http://localhost:8081", "http://localhost:7999", 10000l);
 
 
-        FeatureflowContext context = new FeatureflowContext("mykey");
-        context.values.put("user_role", new JsonPrimitive("admin"));
+        FeatureflowUser user = new FeatureflowUser("mykey");
+        user.withAttribute("user_role", "admin");
         RestClient client = new RestClient(apiKey, config);
-        Event   event = new Event("feature-key1", "evaluate", context, "pink", "green");
+        Event   event = new Event("feature-key1", "evaluate", user, "pink", "green");
         client.postEvents(Arrays.asList(event));
     }
 

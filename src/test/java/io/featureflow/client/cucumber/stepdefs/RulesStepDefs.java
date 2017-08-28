@@ -25,8 +25,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class RulesStepDefs {
     Rule rule = new Rule();
-    FeatureflowContext context;
-    boolean ruleToContextMatch;
+    FeatureflowUser user;
+    boolean ruleToUserMatch;
     List<Condition> conditions;
     Audience audience;
     int variantSplitValue;
@@ -41,38 +41,38 @@ public class RulesStepDefs {
         rule = new Rule();
     }
 
-    @When("^the rule is matched against the context$")
-    public void the_rule_is_matched_against_the_context() throws Throwable {
-        ruleToContextMatch = TestAccessor.matches(rule, context);
+    @When("^the rule is matched against the user$")
+    public void the_rule_is_matched_against_the_user() throws Throwable {
+        ruleToUserMatch = TestAccessor.matches(rule, user);
     }
 
 
     @Then("^the result from the match should be true$")
     public void the_result_from_the_match_should_be_true() throws Throwable {
-        assertTrue(ruleToContextMatch);
+        assertTrue(ruleToUserMatch);
     }
 
-    @Given("^the context values are$")
-    public void the_context_values_are(DataTable contextValues) throws Throwable {
-        context = new FeatureflowContext("uniquecontextkey");
-        Map<String, JsonElement> contextVals = new HashMap<>();
-        for (DataTableRow dataTableRow : contextValues.getGherkinRows()) {
+    @Given("^the user values are$")
+    public void the_user_values_are(DataTable userAttributes) throws Throwable {
+        user = new FeatureflowUser("uniqueuserid");
+        Map<String, JsonElement> userAttrs = new HashMap<>();
+        for (DataTableRow dataTableRow : userAttributes.getGherkinRows()) {
             if("key".equals(dataTableRow.getCells().get(0)))continue;
             //JsonElement lement = gson.fromJson(dataTableRow.getCells().get(1));
             //we need to convert to an array or a primitive
-            JsonElement contextVal;
+            JsonElement userVal;
             if(dataTableRow.getCells().get(1).startsWith("[")) {
 
                 JsonElement el = parser.parse(dataTableRow.getCells().get(1));
                 JsonArray arr = el.getAsJsonArray();
-                contextVal = arr;
+                userVal = arr;
             }else{
-                contextVal = parser.parse(dataTableRow.getCells().get(1)).getAsJsonPrimitive();
+                userVal = parser.parse(dataTableRow.getCells().get(1)).getAsJsonPrimitive();
             }
 
-            contextVals.put(dataTableRow.getCells().get(0), contextVal);
+            userAttrs.put(dataTableRow.getCells().get(0), userVal);
         }
-        TestAccessor.setContextValues(context, contextVals);
+        user.withAttributes(userAttrs);
     }
 
     @Given("^the rule's audience conditions are$")
@@ -94,7 +94,7 @@ public class RulesStepDefs {
 
     @Then("^the result from the match should be false$")
     public void the_result_from_the_match_should_be_false() throws Throwable {
-        assertFalse(audience.matches(context));
+        assertFalse(audience.matches(user));
     }
 
     @Given("^the variant value of (\\d+)$")
