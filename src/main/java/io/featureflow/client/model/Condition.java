@@ -3,7 +3,6 @@ package io.featureflow.client.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import io.featureflow.client.FeatureflowContext;
 import io.featureflow.client.FeatureflowUser;
 
 import java.util.ArrayList;

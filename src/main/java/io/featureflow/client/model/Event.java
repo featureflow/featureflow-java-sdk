@@ -1,6 +1,5 @@
 package io.featureflow.client.model;
 
-import io.featureflow.client.FeatureflowContext;
 import io.featureflow.client.FeatureflowUser;
 import org.joda.time.DateTime;
 
@@ -12,15 +11,13 @@ import java.util.Map;
 public class Event {
     public static final String EVALUATE_EVENT = "evaluate";
     public static final String GOAL_EVENT = "goal";
-    private final FeatureflowUser user;
 
-
+    FeatureflowUser user;
     String featureKey;
     String goalKey;
     String type;
     DateTime timestamp;
 
-    FeatureflowContext context;
     String evaluatedVariant;
     String expectedVariant;
     Map<String, String> evaluatedVariants;
@@ -72,14 +69,6 @@ public class Event {
 
     public void setTimestamp(DateTime timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public FeatureflowContext getContext() {
-        return context;
-    }
-
-    public void setContext(FeatureflowContext context) {
-        this.context = context;
     }
 
     public String getEvaluatedVariant() {

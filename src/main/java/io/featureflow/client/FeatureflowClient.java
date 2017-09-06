@@ -37,10 +37,17 @@ public class FeatureflowClient implements Closeable{
     private final EventsClient eventHandler;
     private final Map<String, Feature> featuresMap = new HashMap<>(); //this contains code registered features and failovers
     private final FeatureflowUserProvider userProvider;
-    FeatureflowClient(String apiKey, List<Feature> features, FeatureflowConfig config, Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks, FeatureflowUserProvider userProvider) {
+    private final FeatureflowUserLookupProvider userLookupProvider;
+
+    FeatureflowClient(
+            String apiKey, List<Feature> features, FeatureflowConfig config, Map<CallbackEvent,
+            List<FeatureControlCallbackHandler>> callbacks,
+            FeatureflowUserProvider userProvider,
+            FeatureflowUserLookupProvider userLookupProvider) {
         //set config, use a builder
         this.config = config;
         this.userProvider = userProvider;
+        this.userLookupProvider = userLookupProvider;
 
         featureControlCache = new SimpleMemoryFeatureCache();
         restClient = new RestClient(apiKey, config);
@@ -82,16 +89,11 @@ public class FeatureflowClient implements Closeable{
         return e;
     }
 
-
-    /**
-     * Evaluate with a given context - use public Evaluate evaluate (String featureKey, FeatureflowUser user)  instead
-     */
-    @Deprecated
-    public Evaluate evaluate(String featureKey, FeatureflowContext featureflowContext) {
-        Evaluate e = new Evaluate(this, featureKey, featureflowContext);
+    public Evaluate evaluate (String featureKey, String userId) {
+        FeatureflowUser user = userLookupProvider==null?new FeatureflowUser(userId):userLookupProvider.getUser(userId);
+        Evaluate e = new Evaluate(this, featureKey, user);
         return e;
     }
-
 
     public Evaluate evaluate(String featureKey) {
         //create an anonymous user
@@ -99,9 +101,6 @@ public class FeatureflowClient implements Closeable{
         return evaluate(featureKey, user);
     }
 
-    public Map<String, String> evaluateAll(FeatureflowContext featureflowContext) {
-        return evaluateAll(new FeatureflowUser(featureflowContext));
-    }
     public Map<String, String> evaluateAll(FeatureflowUser user){
         Map<String, String> result = new HashMap<>();
         for(String s: featureControlCache.getAll().keySet()){
@@ -110,12 +109,6 @@ public class FeatureflowClient implements Closeable{
         return result;
     }
 
-
-
-    private String eval(String featureKey, FeatureflowContext featureflowContext) {
-        FeatureflowUser user = new FeatureflowUser(featureflowContext.getKey()).withBucketKey(featureflowContext.getBucketKey()).withAttributes(featureflowContext.getValues());
-        return eval(featureKey, user);
-    }
     private String eval(String featureKey, FeatureflowUser user) {
 
         String failoverVariant = (featuresMap.get(featureKey)!=null&&featuresMap.get(featureKey).failoverVariant!=null)?featuresMap.get(featureKey).failoverVariant: Variant.off;
@@ -140,7 +133,7 @@ public class FeatureflowClient implements Closeable{
     private void addAdditionalContext(FeatureflowUser user) {
         user.getAttributes().put(FeatureflowUser.FEATUREFLOW_USER_ID, new JsonPrimitive(user.getId()));
         user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_HOUROFDAY, new JsonPrimitive(LocalTime.now().getHour()));
-        user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowContext.toIso(new DateTime())));
+        user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowUser.toIso(new DateTime())));
     }
     public void close() throws IOException {
         this.eventHandler.close();
@@ -160,7 +153,9 @@ public class FeatureflowClient implements Closeable{
         private String apiKey;
         private Map<CallbackEvent, List<FeatureControlCallbackHandler>> featureControlCallbackHandlers = new HashMap<>();
         private FeatureflowUserProvider userProvider;
+        private FeatureflowUserLookupProvider userLookupProvider;
         private List<Feature> features = new ArrayList<>();
+
 
         public Builder (String apiKey){
             this.apiKey = apiKey;
@@ -188,6 +183,10 @@ public class FeatureflowClient implements Closeable{
             this.userProvider = userProvider;
             return this;
         }
+        public Builder withUserLookupProvider(FeatureflowUserLookupProvider userLookupProvider){
+            this.userLookupProvider = userLookupProvider;
+            return this;
+        }
         public Builder withConfig(FeatureflowConfig config){
             this.config = config;
             return this;
@@ -204,7 +203,7 @@ public class FeatureflowClient implements Closeable{
 
         public FeatureflowClient build(){
             if(config==null){ config = new FeatureflowConfig.Builder().build();}
-            return new FeatureflowClient(apiKey, features, config, featureControlCallbackHandlers, userProvider);
+            return new FeatureflowClient(apiKey, features, config, featureControlCallbackHandlers, userProvider, userLookupProvider);
         }
     }
 
@@ -213,11 +212,6 @@ public class FeatureflowClient implements Closeable{
         private final String featureKey;
         private final FeatureflowUser user;
 
-        Evaluate(FeatureflowClient featureflowClient, String featureKey, FeatureflowContext featureflowContext) {
-            this.featureKey = featureKey;
-            this.user  = new FeatureflowUser(featureflowContext);
-            this.evaluateResult = featureflowClient.eval(featureKey, user);
-        }
         Evaluate(FeatureflowClient featureflowClient, String featureKey, FeatureflowUser user) {
             this.featureKey = featureKey;
             this.user = user;
@@ -226,7 +220,10 @@ public class FeatureflowClient implements Closeable{
 
         Evaluate(FeatureflowClient featureflowClient, String featureKey, String userId) {
             this.featureKey = featureKey;
-            this.user = userProvider!=null?userProvider.getUser(userId):new FeatureflowUser(userId);
+            this.user =
+                    userProvider!=null? userProvider.getUser():
+                    userLookupProvider!=null&&userId!=null?userLookupProvider.getUser(userId):
+                    new FeatureflowUser(userId);
             this.evaluateResult = featureflowClient.eval(featureKey, user);
         }
         public boolean isOn(){

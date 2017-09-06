@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.featureflow.client.FeatureflowContext.FEATUREFLOW_KEY;
-
 /**
  * Created by oliver on 23/05/2016.
  */
@@ -38,22 +36,8 @@ public class FeatureflowUser {
 
     public FeatureflowUser(String id) {
         this.id = id;
-        this.bucketKey = id;
-        if(id.startsWith(ANONYMOUS))this.saveUser=false;
     }
 
-    public FeatureflowUser(FeatureflowContext featureflowContext) {
-        this.id = featureflowContext.getKey();
-        this.bucketKey = featureflowContext.getBucketKey();
-        this.attributes = featureflowContext.getValues();
-        if(id.startsWith(ANONYMOUS))this.saveUser=false;
-    }
-
-    //auto set anonymous
-    public void setId(String id){
-        this.id = id;
-        if(id.startsWith(ANONYMOUS))this.saveUser=false;
-    }
     /**
      * The bucket key is used specifically for percentage rollouts,
      * it is the key by default however you may wish to set it specifically to handle a consistent
@@ -203,11 +187,9 @@ public class FeatureflowUser {
     public String getId() {
         return id;
     }
-
     public String getBucketKey() {
         return bucketKey;
     }
-
     public boolean isSaveUser() {
         return saveUser;
     }

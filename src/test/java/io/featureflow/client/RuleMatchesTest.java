@@ -32,12 +32,12 @@ public class RuleMatchesTest {
         a.conditions = Arrays.asList(c1);
         rule.setAudience(a);
 
-        FeatureflowContext context = new FeatureflowContext("oliver");
+        FeatureflowUser user = new FeatureflowUser("oliver");
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
-        context.withValues(contextValues);
+        user.withAttributes(contextValues);
 
-        Assert.assertTrue(rule.matches(new FeatureflowUser(context)));
+        Assert.assertTrue(rule.matches(user));
 
     }
 
@@ -60,13 +60,13 @@ public class RuleMatchesTest {
         a.conditions = Arrays.asList(c1, c2);
         rule.setAudience(a);
 
-        FeatureflowContext context = new FeatureflowContext("oliver");
+        FeatureflowUser user = new FeatureflowUser("oliver");
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("tier", new JsonPrimitive("silver"));
-        context.withValues(contextValues);
+        user.withAttributes(contextValues);
 
-        Assert.assertTrue(!rule.matches(new FeatureflowUser(context)));
+        Assert.assertTrue(!rule.matches(user));
 
     }
 
@@ -82,14 +82,14 @@ public class RuleMatchesTest {
         a.conditions = Arrays.asList(c1);
         rule.setAudience(a);
 
-        FeatureflowContext context = new FeatureflowContext("oliver");
+        FeatureflowUser user = new FeatureflowUser("oliver");
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("age", new JsonPrimitive(26l));
 
-        context.withValues(contextValues);
+        user.withAttributes(contextValues);
 
-        Assert.assertTrue(rule.matches(new FeatureflowUser(context)));
+        Assert.assertTrue(rule.matches(user));
 
     }
 
@@ -101,14 +101,14 @@ public class RuleMatchesTest {
         c1.operator = Operator.greaterThan;
         c1.values.add(new JsonPrimitive(25l));
 
-        FeatureflowContext context = new FeatureflowContext("oliver");
+        FeatureflowUser user = new FeatureflowUser("oliver");
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("age", new JsonPrimitive(26l));
 
-        context.withValues(contextValues);
+        user.withAttributes(contextValues);
 
-        Assert.assertTrue(rule.matches(new FeatureflowUser(context)));
+        Assert.assertTrue(rule.matches(user));
 
     }
 
