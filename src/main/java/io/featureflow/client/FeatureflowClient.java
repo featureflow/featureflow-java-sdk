@@ -138,8 +138,9 @@ public class FeatureflowClient implements Closeable{
     }
 
     private void addAdditionalContext(FeatureflowUser user) {
-        user.getSessionAttributes().put(FeatureflowContext.FEATUREFLOW_HOUROFDAY, new JsonPrimitive(LocalTime.now().getHour()));
-        user.getSessionAttributes().put(FeatureflowContext.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowContext.toIso(new DateTime())));
+        user.getAttributes().put(FeatureflowUser.FEATUREFLOW_USER_ID, new JsonPrimitive(user.getId()));
+        user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_HOUROFDAY, new JsonPrimitive(LocalTime.now().getHour()));
+        user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowContext.toIso(new DateTime())));
     }
     public void close() throws IOException {
         this.eventHandler.close();
@@ -147,6 +148,11 @@ public class FeatureflowClient implements Closeable{
 
     public static Builder builder(String apiKey){
         return new FeatureflowClient.Builder(apiKey);
+    }
+
+    public void track(String goalKey, FeatureflowUser user) {
+        eventHandler.queueEvent(new Event(goalKey, user, evaluateAll(user)));
+
     }
 
     public static class Builder {

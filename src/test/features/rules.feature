@@ -4,17 +4,17 @@ Feature: Rules
     When the rule is matched against the user
     Then the result from the match should be true
 
-  Scenario Outline: Test that the rule user matching works (User {<userId>: <userAttribute>} with operator: <operator>, target: <target>, values: <values>, result: <result>)
-    Given the user values are
-      | key             | value          |
-      | <userId>    | <userAttribute> |
+  Scenario Outline: Test that the rule user matching works (User {<attribute>: <attributeValue>} with operator: <operator>, target: <target>, values: <values>, result: <result>)
+    Given the user attributes are
+      | attribute       | value            |
+      | <attribute>     | <attributeValue> |
     And the rule's audience conditions are
       | operator        | target            | values          |
       | <operator>      | <target>          | <values>        |
     When the rule is matched against the user
     Then the result from the match should be <result>
     Examples:
-      | userId          | userAttribute     | operator | target   | values            | result |
+    | attribute       | attributeValue    | operator | target   | values            | result |
       | role            | "beta"            | equals   | role     | ["beta"]          | true   |
       | role            | "alpha"           | equals   | role     | ["beta"]          | false  |
       | role            | ["beta", "alpha"] | equals   | role     | ["beta"]          | true   |
@@ -22,8 +22,8 @@ Feature: Rules
       | role            | ["beta", "alpha"] | equals   | role     | ["nope"]          | false  |
 
   Scenario: Test multiple conditions all passing will return true
-    Given the user values are
-      | key             | value            |
+    Given the user attributes are
+      | attribute       | value   |
       | role            | "beta"           |
       | account         | "premium"        |
     And the rule's audience conditions are
@@ -34,8 +34,8 @@ Feature: Rules
     Then the result from the match should be true
 
   Scenario: Test one conditions, but one failing, will return false
-    Given the user values are
-      | key             | value            |
+    Given the user attributes are
+      | attribute       | value   |
       | role            | "beta"           |
       | account         | "premium"        |
     And the rule's audience conditions are

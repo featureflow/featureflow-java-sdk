@@ -43,12 +43,9 @@ import java.util.List;
  */
 public class RestClient {
 
-    public static final String VERSION = "0.0.10-SNAPSHOT";
+
     public static final String APPLICATION_JSON = "application/json";
     public static final String UTF_8 = "UTF-8";
-    public static final String API_V1_EVENTS = "/api/v1/events";
-    public static final String HTTPS = "https";
-    public static final int PORT = 443;
 
     private final String apiKey;
     private final FeatureflowConfig config;
@@ -119,48 +116,6 @@ public class RestClient {
         }
     }
 
-    /*public void postFeatureEvalEvents(List<FeatureEvalEvent> featureEvalEvents) {
-        CloseableHttpResponse response = null;
-        String eventsPath = FeatureflowConfig.EVENTS_REST_PATH;
-        Type type = new TypeToken<List<FeatureEvalEvent>>() {}.getType();
-        String json = gson.toJson(featureEvalEvents, type);
-        HttpPost request = postRequest(apiKey, eventsPath, json);
-        StringEntity entity = new StringEntity(json, UTF_8);
-        entity.setContentType(APPLICATION_JSON);
-        request.setEntity(entity);
-        try {
-            client = createHttpClient();
-            response = client.execute(request);
-        } catch (IOException e) {
-            logger.error("Network exception posting events", e);
-        } finally {
-            try {
-                if (response != null) response.close();
-            } catch (IOException e) {
-                logger.error("Cannot close stream", e);
-            }
-        }
-    }*/
-   /* private void handleStatusCode(int status, String featureKey) throws IOException {
-
-        if (status != HttpStatus.SC_OK) {
-            if (status == HttpStatus.SC_UNAUTHORIZED) {
-                logger.error("Unauthorized. Invalid API key");
-            } else if (status == HttpStatus.SC_NOT_FOUND) {
-                if (featureKey != null) {
-                    logger.error("Unknown feature key: " + featureKey);
-                }
-                else {
-                    logger.error("Not found");
-                }
-            } else {
-                logger.error("Unexpected status code: " + status);
-            }
-            logger.error("Failed to fetch feature controls {} ", status);
-            throw new IOException("Failed to fetch feature control " + status);
-        }
-
-    }*/
     private HttpPut putRequest(String apiKey, String path, String data) {
         URIBuilder builder = this.getBuilder().setPath(path);
 
@@ -175,8 +130,7 @@ public class RestClient {
             request.setEntity(params);
 
             request.addHeader("Authorization", "Bearer " + apiKey);
-            request.addHeader("User-Agent", "JavaClient/" + VERSION);
-            request.addHeader("X-Featureflow-Client", "JavaClient/" + VERSION); //We use this as we can pass it alongside default browser agent headers in JS
+            request.addHeader("X-Featureflow-Client", "JavaClient/" + FeatureflowConfig.VERSION); //We use this as we can pass it alongside default browser agent headers in JS
 
             return request;
         } catch (Exception e) {
@@ -198,7 +152,7 @@ public class RestClient {
             request.setEntity(params);
 
             request.addHeader("Authorization", "Bearer " + apiKey);
-            request.addHeader("User-Agent", "JavaClient/" + VERSION);
+            request.addHeader("X-Featureflow-Client", "JavaClient/" + FeatureflowConfig.VERSION);
 
             return request;
         } catch (Exception e) {

@@ -21,31 +21,39 @@ public class FeatureflowUser {
 
     public static final String ANONYMOUS = "anonymous";
     private String id;
-    private String bucketKey;
+    private String bucketKey = null;
     private boolean saveUser = true;
     private Map<String, JsonElement> attributes = new HashMap<>();
     private Map<String, JsonElement> sessionAttributes = new HashMap<>(); //transient - session specific attributes
 
+    public static final String FEATUREFLOW_USER_ID = "featureflow.user.id";
     public static final String FEATUREFLOW_DATE = "featureflow.date";
     public static final String FEATUREFLOW_HOUROFDAY = "featureflow.hourofday";
 
     public FeatureflowUser() {
         this.id = ANONYMOUS;
-        this.bucketKey = ANONYMOUS;
+        this.bucketKey = null;
         this.saveUser = false; //do not save anon data by default
     }
 
     public FeatureflowUser(String id) {
         this.id = id;
         this.bucketKey = id;
+        if(id.startsWith(ANONYMOUS))this.saveUser=false;
     }
 
     public FeatureflowUser(FeatureflowContext featureflowContext) {
         this.id = featureflowContext.getKey();
-        this.bucketKey = featureflowContext.getBucketKey()==null?featureflowContext.getKey():featureflowContext.getBucketKey();
+        this.bucketKey = featureflowContext.getBucketKey();
         this.attributes = featureflowContext.getValues();
+        if(id.startsWith(ANONYMOUS))this.saveUser=false;
     }
 
+    //auto set anonymous
+    public void setId(String id){
+        this.id = id;
+        if(id.startsWith(ANONYMOUS))this.saveUser=false;
+    }
     /**
      * The bucket key is used specifically for percentage rollouts,
      * it is the key by default however you may wish to set it specifically to handle a consistent

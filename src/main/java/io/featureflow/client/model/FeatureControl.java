@@ -47,7 +47,7 @@ public class FeatureControl {//<V> {
             if(rule.matches(user)){
                 //if the rule matches then pass back the variant based on the split evaluation
                 //return //getVariantByKey(rule.getVariantSplitKey(context.key, variationsSeed)).key;
-                return rule.getVariantSplitKey(user.getBucketKey(), this.key, salt);
+                return rule.getVariantSplitKey(user.getBucketKey()==null?user.getId():user.getBucketKey(), this.key, salt);
             }
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule
