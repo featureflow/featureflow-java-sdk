@@ -1,20 +1,20 @@
 Feature: Rules
   Scenario: Test that the default rule returns a true match
     Given the rule is a default rule
-    When the rule is matched against the context
+    When the rule is matched against the user
     Then the result from the match should be true
 
-  Scenario Outline: Test that the rule context matching works (Context {<contextKey>: <contextValue>} with operator: <operator>, target: <target>, values: <values>, result: <result>)
-    Given the context values are
-      | key             | value          |
-      | <contextKey>    | <contextValue> |
+  Scenario Outline: Test that the rule user matching works (User {<attribute>: <attributeValue>} with operator: <operator>, target: <target>, values: <values>, result: <result>)
+    Given the user attributes are
+      | attribute       | value            |
+      | <attribute>     | <attributeValue> |
     And the rule's audience conditions are
       | operator        | target            | values          |
       | <operator>      | <target>          | <values>        |
-    When the rule is matched against the context
+    When the rule is matched against the user
     Then the result from the match should be <result>
     Examples:
-      | contextKey      | contextValue      | operator | target   | values            | result |
+    | attribute       | attributeValue    | operator | target   | values            | result |
       | role            | "beta"            | equals   | role     | ["beta"]          | true   |
       | role            | "alpha"           | equals   | role     | ["beta"]          | false  |
       | role            | ["beta", "alpha"] | equals   | role     | ["beta"]          | true   |
@@ -22,28 +22,28 @@ Feature: Rules
       | role            | ["beta", "alpha"] | equals   | role     | ["nope"]          | false  |
 
   Scenario: Test multiple conditions all passing will return true
-    Given the context values are
-      | key             | value            |
+    Given the user attributes are
+      | attribute       | value   |
       | role            | "beta"           |
       | account         | "premium"        |
     And the rule's audience conditions are
       | operator        | target            | values          |
       | equals          | role              | ["beta"]        |
       | equals          | account           | ["premium"]     |
-    When the rule is matched against the context
+    When the rule is matched against the user
     Then the result from the match should be true
 
   Scenario: Test one conditions, but one failing, will return false
-    Given the context values are
-      | key             | value            |
+    Given the user attributes are
+      | attribute       | value   |
       | role            | "beta"           |
       | account         | "premium"        |
     And the rule's audience conditions are
       | operator        | target            | values          |
       | equals          | role              | ["beta"]        |
       | equals          | account           | ["premium"]     |
-      | equals          | notInContext      | ["not here"]    |
-    When the rule is matched against the context
+      | equals          | notInUser      | ["not here"]    |
+    When the rule is matched against the user
     Then the result from the match should be false
 
   Scenario Outline: Get the variant split key works for a default case (value: <value>, on: <on>, off: <off>, result: <result>)

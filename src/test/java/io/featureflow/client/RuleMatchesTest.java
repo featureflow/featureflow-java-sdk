@@ -35,9 +35,9 @@ public class RuleMatchesTest {
         FeatureflowContext context = new FeatureflowContext("oliver");
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
-        context.values = contextValues;
+        context.withValues(contextValues);
 
-        Assert.assertTrue(rule.matches(context));
+        Assert.assertTrue(rule.matches(new FeatureflowUser(context)));
 
     }
 
@@ -64,9 +64,9 @@ public class RuleMatchesTest {
         Map<String, JsonElement> contextValues = new HashMap<>();
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("tier", new JsonPrimitive("silver"));
-        context.values = contextValues;
+        context.withValues(contextValues);
 
-        Assert.assertTrue(!rule.matches(context));
+        Assert.assertTrue(!rule.matches(new FeatureflowUser(context)));
 
     }
 
@@ -87,9 +87,9 @@ public class RuleMatchesTest {
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("age", new JsonPrimitive(26l));
 
-        context.values = contextValues;
+        context.withValues(contextValues);
 
-        Assert.assertTrue(rule.matches(context));
+        Assert.assertTrue(rule.matches(new FeatureflowUser(context)));
 
     }
 
@@ -106,9 +106,9 @@ public class RuleMatchesTest {
         contextValues.put("name", new JsonPrimitive("oliver"));
         contextValues.put("age", new JsonPrimitive(26l));
 
-        context.values = contextValues;
+        context.withValues(contextValues);
 
-        Assert.assertTrue(rule.matches(context));
+        Assert.assertTrue(rule.matches(new FeatureflowUser(context)));
 
     }
 

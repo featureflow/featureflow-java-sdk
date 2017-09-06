@@ -15,10 +15,11 @@ public class FeatureflowConfig {
     public static final String DEFAULT_STREAM_BASE_URI             = "https://rtm.featureflow.io";
     //private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/stream";
     ///private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/controls/stream";
-    private static final String DEFAULT_CONTROL_STREAM_PATH = "/api/sdk/v1/features";
-    public static final String FEATURE_CONTROL_REST_PATH           = "/api/sdk/v1/feature-controls";
+    private static final String DEFAULT_CONTROL_STREAM_PATH        = "/api/sdk/v1/features";
     public static final String REGISTER_REST_PATH                  = "/api/sdk/v1/register";
-    public static final String EVENTS_REST_PATH                    = "/api/sdk/v1/events";
+    public static final String EVENTS_REST_PATH                    = "/api/sdk/v2/events";
+    public static final String VERSION = "1.0.0";
+
 
     public boolean offline = false;
     public String proxyHost = null;

@@ -1,6 +1,7 @@
 package io.featureflow.client.model;
 
 import io.featureflow.client.FeatureflowContext;
+import io.featureflow.client.FeatureflowUser;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.List;
@@ -31,8 +32,8 @@ public class Rule {
     public void setVariantSplits(List<VariantSplit> variantSplits) {
         this.variantSplits = variantSplits;
     }
-    public boolean matches(FeatureflowContext context){
-        return audience==null || audience.matches(context);
+    public boolean matches(FeatureflowUser user){
+        return audience==null || audience.matches(user);
     }
 
     public String getVariantSplitKey(String contextKey, String featureKey, String salt){

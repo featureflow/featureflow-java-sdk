@@ -1,6 +1,7 @@
 package io.featureflow.client.model;
 
 import io.featureflow.client.FeatureflowContext;
+import io.featureflow.client.FeatureflowUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +37,17 @@ public class FeatureControl {//<V> {
         return this.key;
     }
 
-    public String evaluate(FeatureflowContext context) {
+    public String evaluate(FeatureflowUser user) {
         //if off then offVariant
         if(!enabled) {
             return offVariantKey;
         }
         //if we have rules (we should always have at least one - the default rule
         for (Rule rule : rules) {
-            if(rule.matches(context)){
+            if(rule.matches(user)){
                 //if the rule matches then pass back the variant based on the split evaluation
                 //return //getVariantByKey(rule.getVariantSplitKey(context.key, variationsSeed)).key;
-                return rule.getVariantSplitKey(context.key, this.key, salt);
+                return rule.getVariantSplitKey(user.getBucketKey()==null?user.getId():user.getBucketKey(), this.key, salt);
             }
         }
         return null; //at least the default rule above should have matched, if not, return null to invoke using the failover rule
