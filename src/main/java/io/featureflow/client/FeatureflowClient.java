@@ -38,20 +38,30 @@ public class FeatureflowClient implements Closeable{
     private final Map<String, Feature> featuresMap = new HashMap<>(); //this contains code registered features and failovers
     private final FeatureflowUserProvider userProvider;
     private final FeatureflowUserLookupProvider userLookupProvider;
+    private final boolean offline;
 
     FeatureflowClient(
             String apiKey, List<Feature> features, FeatureflowConfig config, Map<CallbackEvent,
             List<FeatureControlCallbackHandler>> callbacks,
             FeatureflowUserProvider userProvider,
-            FeatureflowUserLookupProvider userLookupProvider) {
+            FeatureflowUserLookupProvider userLookupProvider,
+            boolean offline ) {
         //set config, use a builder
         this.config = config;
         this.userProvider = userProvider;
         this.userLookupProvider = userLookupProvider;
-
+        this.offline = offline;
         featureControlCache = new SimpleMemoryFeatureCache();
-        restClient = new RestClient(apiKey, config);
-        eventHandler = new EventsClient(config, restClient);
+
+        if(offline){
+            restClient = new RestClientMock(apiKey, config);
+            eventHandler = new EventsClientMock(config, restClient);
+        }else{
+            restClient = new RestClientImpl(apiKey, config);
+            eventHandler = new EventsClientImpl(config, restClient);
+        }
+
+
         //Actively defining registrations helps alert if features are available in an environment
         if(features !=null&& features.size()>0){
             for (Feature feature : features) {
@@ -112,8 +122,8 @@ public class FeatureflowClient implements Closeable{
     private String eval(String featureKey, FeatureflowUser user) {
 
         String failoverVariant = (featuresMap.get(featureKey)!=null&&featuresMap.get(featureKey).failoverVariant!=null)?featuresMap.get(featureKey).failoverVariant: Variant.off;
-        FeatureControl control = featureControlCache.get(featureKey);;
-        if(!featureControlStreamClient.initialized()){
+        FeatureControl control = featureControlCache.get(featureKey);
+        if(!offline&&!featureControlStreamClient.initialized()){
             logger.warn("FeatureFlow is not initialized yet.");
         }
         if(control == null){
@@ -155,10 +165,15 @@ public class FeatureflowClient implements Closeable{
         private FeatureflowUserProvider userProvider;
         private FeatureflowUserLookupProvider userLookupProvider;
         private List<Feature> features = new ArrayList<>();
-
+        private boolean offline = false; //put there rather than configuration for convenience
 
         public Builder (String apiKey){
             this.apiKey = apiKey;
+        }
+
+        public Builder withOffline(boolean offline){
+            this.offline = offline;
+            return this;
         }
 
         public Builder withUpdateCallback(FeatureControlCallbackHandler featureControlCallbackHandler){
@@ -203,7 +218,7 @@ public class FeatureflowClient implements Closeable{
 
         public FeatureflowClient build(){
             if(config==null){ config = new FeatureflowConfig.Builder().build();}
-            return new FeatureflowClient(apiKey, features, config, featureControlCallbackHandlers, userProvider, userLookupProvider);
+            return new FeatureflowClient(apiKey, features, config, featureControlCallbackHandlers, userProvider, userLookupProvider, offline);
         }
     }
 
@@ -211,11 +226,13 @@ public class FeatureflowClient implements Closeable{
         private final String evaluateResult;
         private final String featureKey;
         private final FeatureflowUser user;
+        private final FeatureflowClient client;
 
         Evaluate(FeatureflowClient featureflowClient, String featureKey, FeatureflowUser user) {
             this.featureKey = featureKey;
             this.user = user;
             this.evaluateResult = featureflowClient.eval(featureKey, user);
+            this.client = featureflowClient;
         }
 
         Evaluate(FeatureflowClient featureflowClient, String featureKey, String userId) {
@@ -224,6 +241,7 @@ public class FeatureflowClient implements Closeable{
                     userProvider!=null? userProvider.getUser():
                     userLookupProvider!=null&&userId!=null?userLookupProvider.getUser(userId):
                     new FeatureflowUser(userId);
+            this.client = featureflowClient;
             this.evaluateResult = featureflowClient.eval(featureKey, user);
         }
         public boolean isOn(){
@@ -233,11 +251,11 @@ public class FeatureflowClient implements Closeable{
             return is(Variant.off);
         }
         public boolean is(String variant){
-            eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, user, evaluateResult, variant));
+            if(!client.offline)eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, user, evaluateResult, variant));
             return variant.equals(evaluateResult);
         }
         public String value(){
-            eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, user, evaluateResult, null));
+            if(!client.offline)eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, user, evaluateResult, null));
             return evaluateResult;
         }
     }

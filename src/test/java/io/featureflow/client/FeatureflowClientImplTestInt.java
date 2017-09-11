@@ -27,7 +27,32 @@ public class FeatureflowClientImplTestInt {
         .withStringAttributes("user_role", Arrays.asList("pvt_tester", "administrator"));
 
     @Test
-    public void testEvaluateWithUser() throws Exception {
+    public void testEvaluateWithUserProvider() throws Exception {
+
+        String apiKey = "srv-env-3ecfe421a6cd47f6bd32488378b8eb1e";
+
+        FeatureflowConfig config = FeatureflowConfig.builder()
+                .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
+                .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
+                .withWaitForStartup(5000l)
+                .build();
+        FeatureflowUser user = new FeatureflowUser("jimmy@example.com")
+                .withAttribute("firstName", "Jimmy")
+                .withAttribute("lastName", "Hendrix");
+
+        featureflowClient = FeatureflowClient.builder(apiKey)
+                .withConfig(config)
+                .withUpdateCallback(control -> System.out.println("Received a control update event: " + control.getKey()))
+                .build();
+
+        String evaluatedVariant = featureflowClient.evaluate("oli1", user).value();
+        System.out.println(evaluatedVariant);
+        lock.await(500000, TimeUnit.MILLISECONDS);
+
+    }
+
+    @Test
+    public void testEvaluate() throws Exception {
 
         String apiKey = "srv-env-99862cfee6ea4a9fad4b3e255266a131";
 
@@ -37,11 +62,8 @@ public class FeatureflowClientImplTestInt {
                 .withWaitForStartup(5000l)
                 .build();
 
-        FeatureflowUserProvider userProvider = () -> user;
-
         featureflowClient = FeatureflowClient.builder(apiKey)
                 .withConfig(config)
-                .withUserProvider(userProvider)
                 .withFeatures(Arrays.asList(
                         new Feature("example-feature"),
                         new Feature("facebook-login"),
@@ -51,7 +73,7 @@ public class FeatureflowClientImplTestInt {
                 ))
                 .withUpdateCallback(control -> System.out.println("Received a control update event: " + control.getKey()))
                 .withUpdateCallback(control -> {
-                    System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(userProvider.getUser()) + "\n");
+                    System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(user) + "\n");
                     lock.countDown();
                 }).build();
         String evaluatedVariant = featureflowClient.evaluate("example-feature", user).value();
