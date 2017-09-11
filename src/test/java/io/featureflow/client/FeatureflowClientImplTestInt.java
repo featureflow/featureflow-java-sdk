@@ -29,32 +29,43 @@ public class FeatureflowClientImplTestInt {
     @Test
     public void testEvaluateWithUserProvider() throws Exception {
 
-        String apiKey = "srv-env-3ecfe421a6cd47f6bd32488378b8eb1e";
+        String apiKey = "srv-env-";
 
         FeatureflowConfig config = FeatureflowConfig.builder()
                 .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
                 .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
                 .withWaitForStartup(5000l)
                 .build();
-        FeatureflowUser user = new FeatureflowUser("jimmy@example.com")
-                .withAttribute("firstName", "Jimmy")
-                .withAttribute("lastName", "Hendrix");
+
+        FeatureflowUserProvider userProvider = () -> user;
 
         featureflowClient = FeatureflowClient.builder(apiKey)
                 .withConfig(config)
-                .withUpdateCallback(control -> System.out.println("Received a control update event: " + control.getKey()))
-                .build();
+                .withUserProvider(userProvider)
+                .withFeatures(Arrays.asList(
+                        new Feature("example-feature"),
+                        new Feature("facebook-login"),
+                        new Feature("standard-login"),
+                        new Feature("summary-dashboard")
 
-        String evaluatedVariant = featureflowClient.evaluate("oli1", user).value();
+                ))
+                .withUpdateCallback(control -> System.out.println("Received a control update event: " + control.getKey()))
+                .withUpdateCallback(control -> {
+                    System.out.println("Feature updated: " + control.getKey() + " - variant: " + control.evaluate(userProvider.getUser()) + "\n");
+                    lock.countDown();
+                }).build();
+        String evaluatedVariant = featureflowClient.evaluate("example-feature").value();
+        System.out.println(featureflowClient.evaluate(FeatureKeys.billing.name()).value());
         System.out.println(evaluatedVariant);
         lock.await(500000, TimeUnit.MILLISECONDS);
 
+        System.out.println(featureflowClient.evaluate("alpha"));
     }
 
     @Test
     public void testEvaluate() throws Exception {
 
-        String apiKey = "srv-env-99862cfee6ea4a9fad4b3e255266a131";
+        String apiKey = "srv-env-";
 
         FeatureflowConfig config = FeatureflowConfig.builder()
                 .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
