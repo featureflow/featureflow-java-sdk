@@ -106,8 +106,8 @@ public class FeatureflowClient implements Closeable{
     }
 
     public Evaluate evaluate(String featureKey) {
-        //create an anonymous user
-        FeatureflowUser user = new FeatureflowUser();
+        //create an anonymous user if no provider
+        FeatureflowUser user = userProvider==null?new FeatureflowUser():userProvider.getUser();
         return evaluate(featureKey, user);
     }
 
@@ -132,7 +132,7 @@ public class FeatureflowClient implements Closeable{
         }
 
         //add featureflow.context
-        addAdditionalContext(user);
+        addAdditionalAttributes(user);
 
 
         String variant = control.evaluate(user);
@@ -140,7 +140,7 @@ public class FeatureflowClient implements Closeable{
 
     }
 
-    private void addAdditionalContext(FeatureflowUser user) {
+    private void addAdditionalAttributes(FeatureflowUser user) {
         user.getAttributes().put(FeatureflowUser.FEATUREFLOW_USER_ID, new JsonPrimitive(user.getId()));
         user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_HOUROFDAY, new JsonPrimitive(LocalTime.now().getHour()));
         user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowUser.toIso(new DateTime())));
@@ -259,4 +259,5 @@ public class FeatureflowClient implements Closeable{
             return evaluateResult;
         }
     }
+
 }
