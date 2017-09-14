@@ -1,9 +1,8 @@
 package io.featureflow.client;
 
-import com.google.gson.JsonPrimitive;
+import io.featureflow.client.core.RestClientImpl;
 import io.featureflow.client.model.Event;
 import io.featureflow.client.core.RestClient;
-import org.junit.Test;
 
 import java.util.Arrays;
 
@@ -15,13 +14,13 @@ public class RestClientTest {
     public void postFeatureEvalEvent() throws Exception {
         String apiKey = "API_KEY";
         FeatureflowConfig config =
-                new FeatureflowConfig(false, null, null,
+                new FeatureflowConfig(null, null,
                         1,0,0,"http://localhost:8081", "http://localhost:7999", 10000l);
 
 
         FeatureflowUser user = new FeatureflowUser("mykey");
         user.withAttribute("user_role", "admin");
-        RestClient client = new RestClient(apiKey, config);
+        RestClient client = new RestClientImpl(apiKey, config);
         Event   event = new Event("feature-key1", "evaluate", user, "pink", "green");
         client.postEvents(Arrays.asList(event));
     }

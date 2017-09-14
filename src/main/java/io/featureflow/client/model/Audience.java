@@ -1,6 +1,5 @@
 package io.featureflow.client.model;
 
-import io.featureflow.client.FeatureflowContext;
 import io.featureflow.client.FeatureflowUser;
 
 import java.util.List;

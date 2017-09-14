@@ -18,19 +18,15 @@ public class FeatureControlTest {
 
     public static final String RED = "red";
     public static final String BLUE = "blue";
-    public static final String JOHN = "john";
-    public static final String NAME = "name";
     public static final String USER_KEY = "userKey";
     public static final String ROLE = "role";
     public static final String TESTER = "tester";
     public static final String END_USER = "endUser";
-    public static final String TESTER1 = "tester";
 
     @Test
     public void getKey() throws Exception {
         FeatureControl control = new FeatureControl();
         control.key = "FF-01";
-
         assertTrue(control.getKey().equals("FF-01"));
     }
 
@@ -80,52 +76,6 @@ public class FeatureControlTest {
 
         status = featureControl.evaluate(user);
         assertTrue(status.equals(RED)); //Red sa default rule
-/*
-
-        assertTrue(status()==true);
-        assertTrue(status.evaluate().equals("red"));
-
-        //Check non matching variants return defaults
-        context =  new FeatureflowContext("key1");
-        context.getValues().put("role", new JsonPrimitive("anonymous"));
-        status = featureControl.evaluate(context, false, "black");
-        assertTrue(status.isEnabled()==false);
-        assertTrue(status.evaluate().equals("black"));
-
-        context =  new FeatureflowContext("key1");
-        context.getValues().put("role", new JsonPrimitive("anonymous"));
-        status = featureControl.evaluate(context, false, "black");
-        assertTrue(status.isEnabled()==false);
-        assertTrue(status.evaluate().equals("black"));*/
-
-
 
     }
-  /*  @Test
-    public void testIsWithinRollout(){
-        FeatureControl featureControl = new FeatureControl();
-        featureControl.key = "FF-01";
-        featureControl.enabled = true;
-        featureControl.rolloutPercent = 25l;
-
-        FeatureflowContext context =  new FeatureflowContext("1");
-        context.getValues().put("role", new JsonPrimitive("admin"));
-        assertFalse(featureControl.isWithinRollout(context));
-
-        context =  new FeatureflowContext("2");
-        context.getValues().put("role", new JsonPrimitive("admin"));
-        assertTrue(featureControl.isWithinRollout(context));
-
-        context =  new FeatureflowContext("3");
-        context.getValues().put("role", new JsonPrimitive("admin"));
-        assertFalse(featureControl.isWithinRollout(context));
-
-        context =  new FeatureflowContext("4");
-        context.getValues().put("role", new JsonPrimitive("admin"));
-        assertFalse(featureControl.isWithinRollout(context));
-
-        context =  new FeatureflowContext("5");
-        context.getValues().put("role", new JsonPrimitive("admin"));
-        assertFalse(featureControl.isWithinRollout(context));
-    }*/
 }

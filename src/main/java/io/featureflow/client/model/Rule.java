@@ -1,6 +1,5 @@
 package io.featureflow.client.model;
 
-import io.featureflow.client.FeatureflowContext;
 import io.featureflow.client.FeatureflowUser;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -36,9 +35,9 @@ public class Rule {
         return audience==null || audience.matches(user);
     }
 
-    public String getVariantSplitKey(String contextKey, String featureKey, String salt){
-        if(contextKey==null)contextKey= ANONYMOUS;
-        long variantValue = getVariantValue(getHash(contextKey, featureKey, salt));
+    public String getVariantSplitKey(String userId, String featureKey, String salt){
+        if(userId==null)userId= ANONYMOUS;
+        long variantValue = getVariantValue(getHash(userId, featureKey, salt));
         return getSplitKey(variantValue);
     }
 
@@ -56,13 +55,13 @@ public class Rule {
      *      thats the max we can get before we blow out of the long range (fffffffffffffff)16 = (1152921504606846975)10
      * 2. We turn that hex into its representative number
      * 3. We find the remainder from 100 and use that as our variant bucket
-     * @param contextKey - the contexts unique identifier key
+     * @param userId - the users unique identifier key or bucket key
      * @param featureKey - The feature key we are testing
      * @param salt - A salt value
      * @return hash - the hashed value
      */
-    public String getHash(String contextKey, String featureKey, String salt){
-        String hash = DigestUtils.sha1Hex(salt + ":" + featureKey + ":" + contextKey).substring(0, 15);
+    public String getHash(String userId, String featureKey, String salt){
+        String hash = DigestUtils.sha1Hex(salt + ":" + featureKey + ":" + userId).substring(0, 15);
         return hash;
     }
 
