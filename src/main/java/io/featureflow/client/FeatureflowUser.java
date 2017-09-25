@@ -70,6 +70,7 @@ public class FeatureflowUser {
 
 
     public FeatureflowUser withAttribute(String key, String value) {
+        if(value==null)return this;
         JsonPrimitive jsonValue = new JsonPrimitive(value);
         this.attributes.put(key, jsonValue);
         return this;
@@ -81,20 +82,24 @@ public class FeatureflowUser {
     }
 
     public FeatureflowUser withAttribute(String key, DateTime value) {
+        if(value==null)return this;
         JsonPrimitive jsonValue = new JsonPrimitive(toIso(value));
         this.attributes.put(key, jsonValue);
         return this;
     }
 
     public FeatureflowUser withAttribute(String key, Number value) {
+        if(value==null)return this;
         JsonPrimitive jsonValue = new JsonPrimitive(value);
         this.attributes.put(key, jsonValue);
         return this;
     }
 
     public FeatureflowUser withDateAttributes(String key, List<DateTime> values) {
+        if(values==null)return this;
         JsonArray vals = new JsonArray();
         for (DateTime value : values) {
+            if(value==null)continue;
             vals.add(new JsonPrimitive(toIso(value)));
         }
         this.attributes.put(key, vals);
@@ -103,8 +108,10 @@ public class FeatureflowUser {
     }
 
     public FeatureflowUser withNumberAttributes(String key, List<Number> values) {
+        if(values==null)return this;
         JsonArray vals = new JsonArray();
         for (Number value : values) {
+            if(value==null)continue;
             vals.add(new JsonPrimitive(value));
         }
         this.attributes.put(key, vals);
@@ -112,8 +119,10 @@ public class FeatureflowUser {
     }
 
     public FeatureflowUser withStringAttributes(String key, List<String> values) {
+        if(values==null)return this;
         JsonArray vals = new JsonArray();
         for (String value : values) {
+            if(value==null)continue;
             vals.add(new JsonPrimitive(value));
         }
         this.attributes.put(key, vals);
@@ -121,6 +130,7 @@ public class FeatureflowUser {
     }
 
     public FeatureflowUser withAttributes(Map<String, JsonElement> values) {
+        if(values==null)return this;
         this.attributes.putAll(values);
         return this;
     }
