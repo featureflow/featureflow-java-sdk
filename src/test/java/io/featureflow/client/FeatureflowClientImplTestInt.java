@@ -29,7 +29,7 @@ public class FeatureflowClientImplTestInt {
     @Test
     public void testEvaluateWithUserProvider() throws Exception {
 
-        String apiKey = "srv-env-";
+        String apiKey = "srv-env-d052272ca9e749b18c384837e34518b2";
 
         FeatureflowConfig config = FeatureflowConfig.builder()
                 .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
@@ -40,7 +40,7 @@ public class FeatureflowClientImplTestInt {
         FeatureflowUserProvider userProvider = () -> user;
 
         featureflowClient = FeatureflowClient.builder(apiKey)
-                .withConfig(config)
+                //.withConfig(config)
                 .withUserProvider(userProvider)
                 .withFeatures(Arrays.asList(
                         new Feature("example-feature"),
