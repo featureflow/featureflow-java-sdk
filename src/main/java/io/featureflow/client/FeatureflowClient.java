@@ -30,7 +30,6 @@ import java.util.concurrent.TimeoutException;
  */
 public class FeatureflowClient implements Closeable{
     private static final Logger logger = LoggerFactory.getLogger(FeatureflowClient.class);
-    private final FeatureflowConfig config;
     private final FeatureControlStreamClient featureControlStreamClient; // manages pubsub events to update a feature control
     private final FeatureControlCache featureControlCache; //holds the featureControls
     private final RestClient restClient; //manages retrieving features and pushing updates
@@ -52,8 +51,7 @@ public class FeatureflowClient implements Closeable{
             FeatureflowUserProvider userProvider,
             FeatureflowUserLookupProvider userLookupProvider,
             boolean offline ) {
-        //set config, use a builder
-        this.config = config;
+        
         this.userProvider = userProvider;
         this.userLookupProvider = userLookupProvider;
         this.offline = offline;
