@@ -125,13 +125,14 @@ public class FeatureflowClient implements Closeable{
 
     private String eval(String featureKey, FeatureflowUser user) {
 
-        String failoverVariant = (featuresMap.get(featureKey)!=null&&featuresMap.get(featureKey).failoverVariant!=null)?featuresMap.get(featureKey).failoverVariant: Variant.off;
+        boolean featureRegistered = featuresMap.containsKey(featureKey);
+        String failoverVariant = (featuresMap.containsKey(featureKey)&&featuresMap.get(featureKey).failoverVariant!=null)?featuresMap.get(featureKey).failoverVariant: Variant.off;
         FeatureControl control = featureControlCache.get(featureKey);
         if(!offline&&!featureControlStreamClient.initialized()){
             logger.warn("FeatureFlow is not initialized yet.");
         }
         if(control == null){
-            logger.warn("Control does not exist, returning failover variant of " + failoverVariant);
+            logger.warn("Control {} does not exist, control registered: {}. Returning failover variant of {}", featureKey, featureRegistered, failoverVariant);
             return failoverVariant;
         }
 

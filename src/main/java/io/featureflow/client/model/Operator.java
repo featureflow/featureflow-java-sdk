@@ -27,12 +27,6 @@ public enum Operator {
             return false;
         }
     },
-    testRuleEquals{
-        @Override
-        public boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues){
-            return contextValue.isNumber() && targetValues.get(0).isNumber() && contextValue.getAsDouble() > targetValues.get(0).getAsDouble();
-        }
-    },
     lessThan{
         @Override
         public boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues){
@@ -117,18 +111,6 @@ public enum Operator {
             return true;
         }
     },
-    /*  IN{
-          @Override
-          public boolean evaluate(JsonPrimitive contextValue, JsonPrimitive targetValue){
-              return contextValue.equals(targetValue);
-          }
-      }, //must match one of a list
-      NOT_IN{
-          @Override
-          public boolean evaluate(JsonPrimitive contextValue, JsonPrimitive targetValue){
-              return contextValue.equals(targetValue);
-          }
-      }, *///must not match any of a list
     contains{
         @Override
         public boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues){
