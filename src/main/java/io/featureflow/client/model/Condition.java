@@ -18,7 +18,9 @@ public class Condition {
     public Operator operator; // = < > like in out
     public List<JsonPrimitive> values = new ArrayList<>(); //some value 1,2,dave,timestamp,2016-01-11-10:10:10:0000UTC
 
-    public Condition() {}
+    public Condition() {
+    }
+
     public Condition(String target, Operator operator, List<JsonPrimitive> values) {
         this.target = target;
         this.operator = operator;
@@ -27,23 +29,21 @@ public class Condition {
 
     public boolean matches(FeatureflowUser user) {
         //see if context contains target
-        if(user == null || (user.getAttributes()==null && user.getSessionAttributes() ==null))return false;
+        if (user == null || (user.getAttributes() == null && user.getSessionAttributes() == null)) return false;
         Map<String, JsonElement> combined = new HashMap<>();
         combined.putAll(user.getAttributes());
         combined.putAll(user.getSessionAttributes());
-        for(String attributeKey : combined.keySet()){
-            if(attributeKey.equals(target)){
-                //compare the value using the comparator
-                JsonElement contextValue = user.getAttributes().get(attributeKey);
-                if(contextValue.isJsonArray()){ //if the context value is an array of values
-                    JsonArray ar = contextValue.getAsJsonArray();
-                    for (JsonElement jsonElement : ar) {//return true if any of the list of context values for the key matches
-                        if (operator.evaluate(jsonElement.getAsJsonPrimitive(), values))return true;
-                    }
-                    return false; //else return false
+        if (combined.containsKey(target)) {
+            //compare the value using the comparator
+            JsonElement contextValue = combined.get(target);
+            if (contextValue.isJsonArray()) { //if the context value is an array of values
+                JsonArray ar = contextValue.getAsJsonArray();
+                for (JsonElement jsonElement : ar) {//return true if any of the list of context values for the key matches
+                    if (operator.evaluate(jsonElement.getAsJsonPrimitive(), values)) return true;
                 }
-                return operator.evaluate(user.getAttributes().get(attributeKey).getAsJsonPrimitive(), values); //if its a single value then just return the eval
+                return false; //else return false
             }
+            return operator.evaluate(combined.get(target).getAsJsonPrimitive(), values); //if its a single value then just return the eval
         }
         return false;
     }

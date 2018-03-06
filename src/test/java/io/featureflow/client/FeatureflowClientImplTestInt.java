@@ -38,7 +38,7 @@ public class FeatureflowClientImplTestInt {
                 .build();
 
         FeatureflowUserProvider userProvider = () -> user;
-
+               
         featureflowClient = FeatureflowClient.builder(apiKey)
                 //.withConfig(config)
                 .withUserProvider(userProvider)
@@ -46,7 +46,8 @@ public class FeatureflowClientImplTestInt {
                         new Feature("example-feature"),
                         new Feature("facebook-login"),
                         new Feature("standard-login"),
-                        new Feature("summary-dashboard")
+                        new Feature("summary-dashboard"),
+                        new Feature("unknown-feature", "green")
 
                 ))
                 .withUpdateCallback(control -> System.out.println("Received a control update event: " + control.getKey()))
@@ -55,6 +56,8 @@ public class FeatureflowClientImplTestInt {
                     lock.countDown();
                 }).build();
         String evaluatedVariant = featureflowClient.evaluate("example-feature").value();
+        String unknown = featureflowClient.evaluate("unknown-feature").value();
+        String nonexistant = featureflowClient.evaluate("nonexistent-feature").value();
         System.out.println(featureflowClient.evaluate(FeatureKeys.billing.name()).value());
         System.out.println(evaluatedVariant);
         lock.await(500000, TimeUnit.MILLISECONDS);
@@ -67,6 +70,7 @@ public class FeatureflowClientImplTestInt {
 
         String apiKey = "srv-env-";
 
+        
         FeatureflowConfig config = FeatureflowConfig.builder()
                 .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
                 .withStreamBaseUri(TestConfiguration.LOCAL_BASE_STREAM_URL)
