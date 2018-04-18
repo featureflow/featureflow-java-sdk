@@ -34,7 +34,8 @@ public class Condition {
         for(String attributeKey : combined.keySet()){
             if(attributeKey.equals(target)){
                 //compare the value using the comparator
-                JsonElement contextValue = user.getAttributes().get(attributeKey);
+                JsonElement contextValue = combined.get(attributeKey);
+                if(contextValue==null) return false; //does not match if there is no matching value
                 if(contextValue.isJsonArray()){ //if the context value is an array of values
                     JsonArray ar = contextValue.getAsJsonArray();
                     for (JsonElement jsonElement : ar) {//return true if any of the list of context values for the key matches
@@ -42,9 +43,10 @@ public class Condition {
                     }
                     return false; //else return false
                 }
-                return operator.evaluate(user.getAttributes().get(attributeKey).getAsJsonPrimitive(), values); //if its a single value then just return the eval
+                return operator.evaluate(contextValue.getAsJsonPrimitive(), values); //if its a single value then just return the eval
             }
         }
         return false;
+
     }
 }
