@@ -14,6 +14,7 @@ import org.apache.http.client.ServiceUnavailableRetryStrategy;
 import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -76,8 +77,7 @@ public class RestClientImpl implements RestClient {
     public void registerFeatureControls(List<Feature> featureRegistrations) throws IOException{
         logger.info("Registering features with featureflow");
         HttpCacheContext context = HttpCacheContext.create();
-        String resource = FeatureflowConfig.REGISTER_REST_PATH;
-        HttpPut request = putRequest(apiKey, resource, gson.toJson(featureRegistrations));
+        HttpPut request = putRequest(apiKey, gson.toJson(featureRegistrations));
         CloseableHttpResponse response = null;
         try {
             logger.debug("Putting: " + request);
@@ -117,22 +117,11 @@ public class RestClientImpl implements RestClient {
         }
     }
 
-    private HttpPut putRequest(String apiKey, String path, String data) {
-        URIBuilder builder = this.getBuilder().setPath(path);
-
+    private HttpPut putRequest(String apiKey, String data) {
+        URI path =  URI.create(config.getSdkBaseUri() + config.FEATURES_REST_PATH);
         try {
-            HttpPut request = new HttpPut(builder.build());
-            StringEntity params =new StringEntity(data,"UTF-8");
-            params.setContentType("application/json");
-            request.addHeader("content-type", "application/json");
-            request.addHeader("Accept", "*/*");
-            request.addHeader("Accept-Encoding", "gzip,deflate,sdch");
-            request.addHeader("Accept-Language", "en-US,en;q=0.8");
-            request.setEntity(params);
-
-            request.addHeader("Authorization", "Bearer " + apiKey);
-            request.addHeader("X-Featureflow-Client", "JavaClient/" + FeatureflowConfig.VERSION); //We use this as we can pass it alongside default browser agent headers in JS
-
+            HttpPut request = new HttpPut(path);
+            setRequestVals(request, data);
             return request;
         } catch (Exception e) {
             logger.error("Problem in PUT request ", e);
@@ -141,20 +130,17 @@ public class RestClientImpl implements RestClient {
     }
 
     private HttpPost postRequest(String apiKey, String path, String data) {
-        URIBuilder builder = this.getBuilder().setPath(path);
+        URI base = URI.create(config.getEventBaseUri());
+
         try {
-            HttpPost request = new HttpPost(builder.build());
-            StringEntity params =new StringEntity(data,"UTF-8");
-            params.setContentType("application/json");
-            request.addHeader("content-type", "application/json");
-            request.addHeader("Accept", "*/*");
-            request.addHeader("Accept-Encoding", "gzip,deflate,sdch");
-            request.addHeader("Accept-Language", "en-US,en;q=0.8");
-            request.setEntity(params);
+            URI uri = new URIBuilder()
+                    .setScheme(base.getScheme())
+                    .setHost(base.getHost())
+                    .setPort(base.getPort())
+                    .setPath(path).build();
 
-            request.addHeader("Authorization", "Bearer " + apiKey);
-            request.addHeader("X-Featureflow-Client", "JavaClient/" + FeatureflowConfig.VERSION);
-
+            HttpPost request = new HttpPost(uri);
+            setRequestVals(request, data);
             return request;
         } catch (Exception e) {
             logger.error("Problem in POST request ", e);
@@ -162,12 +148,18 @@ public class RestClientImpl implements RestClient {
         }
     }
 
-    private URIBuilder getBuilder() {
-        URI base = URI.create(config.getBaseUri());
-        return new URIBuilder()
-                .setScheme(base.getScheme())
-                .setHost(base.getHost())
-                .setPort(base.getPort());
+    private void setRequestVals(HttpEntityEnclosingRequestBase request, String data){
+        StringEntity params =new StringEntity(data,"UTF-8");
+        params.setContentType("application/json");
+        request.addHeader("content-type", "application/json");
+        request.addHeader("Accept", "*/*");
+        request.addHeader("Accept-Encoding", "gzip,deflate,sdch");
+        request.addHeader("Accept-Language", "en-US,en;q=0.8");
+        request.setEntity(params);
+
+        request.addHeader("Authorization", "Bearer " + apiKey);
+        request.addHeader("X-Featureflow-Client", "JavaClient/" + FeatureflowConfig.VERSION);
+
     }
 
     private CloseableHttpClient createHttpClient() {

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -59,7 +60,8 @@ public class FeatureControlStreamClient implements Closeable {
                 .add("Cache-Control", "no-cache")
                 .add("Accept", "text/event-stream")
                 .build();
-        eventSource = new EventSource(config.getControlStreamUri(), 5000l, headers, getHandler(initFuture));
+        URI path =  URI.create(config.getStreamBaseUri() + config.FEATURES_STREAM_PATH);
+        eventSource = new EventSource(path, 5000l, headers, getHandler(initFuture));
         eventSource.init();
         return initFuture;
     }

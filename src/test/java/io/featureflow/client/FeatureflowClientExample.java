@@ -18,12 +18,15 @@ public class FeatureflowClientExample {
 
     FeatureflowClient featureflowClient;
     private CountDownLatch lock = new CountDownLatch(100);
+
+    private static final String API_KEY = "";
     @Test
     public void testEvaluate() throws Exception {
 
 
         //Any Additional Config
         FeatureflowConfig config = FeatureflowConfig.builder()
+                .withBaseUri("http://app.featureflow.localdev/")
                 .withWaitForStartup(5000l)
                 .build();
 
@@ -39,7 +42,7 @@ public class FeatureflowClientExample {
 
 
         //Initialise the client - You would do this as a Singleton when your servers start up.
-        featureflowClient = new FeatureflowClient.Builder("")
+        featureflowClient = new FeatureflowClient.Builder(API_KEY)
                 .withFeatures(Arrays.asList(
                         //Actively registering features helps keep track of them across environments, reduce clutter and manage technical debt
                         new Feature("login-button", "red"),
