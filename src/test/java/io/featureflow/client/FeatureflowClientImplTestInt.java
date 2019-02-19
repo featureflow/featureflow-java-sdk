@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static io.featureflow.client.TestConfiguration.*;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -29,7 +30,7 @@ public class FeatureflowClientImplTestInt {
     @Test
     public void testEvaluateWithUserProvider() throws Exception {
 
-        String apiKey = "srv-env-";
+
 
         FeatureflowConfig config = FeatureflowConfig.builder()
                 .withBaseUri(TestConfiguration.LOCAL_BASE_URL)
@@ -39,7 +40,7 @@ public class FeatureflowClientImplTestInt {
 
         FeatureflowUserProvider userProvider = () -> user;
 
-        featureflowClient = FeatureflowClient.builder(apiKey)
+        featureflowClient = FeatureflowClient.builder(API_KEY)
                 .withConfig(config)
                 .withUserProvider(userProvider)
                 .withFeatures(Arrays.asList(
@@ -73,7 +74,7 @@ public class FeatureflowClientImplTestInt {
                 .withWaitForStartup(5000l)
                 .build();
 
-        featureflowClient = FeatureflowClient.builder(apiKey)
+        featureflowClient = FeatureflowClient.builder(API_KEY)
                 .withConfig(config)
                 .withFeatures(Arrays.asList(
                         new Feature("example-feature"),
