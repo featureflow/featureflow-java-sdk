@@ -117,7 +117,7 @@ public class RestClientImpl implements RestClient {
     }
 
     private HttpPut putFeaturesRequest(String apiKey, String data) {
-        URI path =  URI.create(config.getSdkBaseUri() + "/api/sdk/v1/features");
+        URI path =  URI.create(config.getSdkBaseUri() + "/api/sdk/v1/register");
         try {
             HttpPut request = new HttpPut(path);
             setRequestVals(request, data);
