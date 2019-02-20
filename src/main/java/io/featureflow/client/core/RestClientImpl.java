@@ -77,7 +77,7 @@ public class RestClientImpl implements RestClient {
     public void registerFeatureControls(List<Feature> featureRegistrations) throws IOException{
         logger.info("Registering features with featureflow");
         HttpCacheContext context = HttpCacheContext.create();
-        HttpPut request = putRequest(apiKey, gson.toJson(featureRegistrations));
+        HttpPut request = putFeaturesRequest(apiKey, gson.toJson(featureRegistrations));
         CloseableHttpResponse response = null;
         try {
             logger.debug("Putting: " + request);
@@ -96,10 +96,9 @@ public class RestClientImpl implements RestClient {
     @Override
     public void postEvents(List<? extends Event> events) {
         CloseableHttpResponse response = null;
-        String eventsPath = FeatureflowConfig.EVENTS_REST_PATH;
         Type type = new TypeToken<List<Event>>() {}.getType();
         String json = gson.toJson(events, type);
-        HttpPost request = postRequest(apiKey, eventsPath, json);
+        HttpPost request = postRequest(apiKey, "/api/sdk/v1/events", json);
         StringEntity entity = new StringEntity(json, UTF_8);
         entity.setContentType(APPLICATION_JSON);
         request.setEntity(entity);
@@ -117,8 +116,8 @@ public class RestClientImpl implements RestClient {
         }
     }
 
-    private HttpPut putRequest(String apiKey, String data) {
-        URI path =  URI.create(config.getSdkBaseUri() + config.FEATURES_REST_PATH);
+    private HttpPut putFeaturesRequest(String apiKey, String data) {
+        URI path =  URI.create(config.getSdkBaseUri() + "/api/sdk/v1/features");
         try {
             HttpPut request = new HttpPut(path);
             setRequestVals(request, data);
@@ -219,8 +218,8 @@ public class RestClientImpl implements RestClient {
         };
 
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(config.connectTimeout)
-                .setSocketTimeout(config.socketTimeout)
+                .setConnectTimeout(config.getConnectTimeout())
+                .setSocketTimeout(config.getSocketTimeout())
                 .setProxy(config.getHttpProxyHost())
                 .build();
         client = CachingHttpClients.custom()

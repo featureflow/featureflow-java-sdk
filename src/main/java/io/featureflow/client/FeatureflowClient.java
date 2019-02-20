@@ -40,6 +40,12 @@ public class FeatureflowClient implements Closeable{
     private final FeatureflowUserLookupProvider userLookupProvider;
     private final boolean offline;
 
+    FeatureflowClient(String apiKey){
+        this(apiKey, null, new FeatureflowConfig.Builder().build(), null, null, null, false);
+    }
+    FeatureflowClient(String apiKey, List<Feature> features){
+        this(apiKey, features, new FeatureflowConfig.Builder().build(), null, null, null, false);
+    }
     FeatureflowClient(
             String apiKey, List<Feature> features, FeatureflowConfig config, Map<CallbackEvent,
             List<FeatureControlCallbackHandler>> callbacks,

@@ -60,7 +60,7 @@ public class FeatureControlStreamClient implements Closeable {
                 .add("Cache-Control", "no-cache")
                 .add("Accept", "text/event-stream")
                 .build();
-        URI path =  URI.create(config.getStreamBaseUri() + config.FEATURES_STREAM_PATH);
+        URI path =  URI.create(config.getStreamBaseUri() + "/api/sdk/v1/features");
         eventSource = new EventSource(path, 5000l, headers, getHandler(initFuture));
         eventSource.init();
         return initFuture;
