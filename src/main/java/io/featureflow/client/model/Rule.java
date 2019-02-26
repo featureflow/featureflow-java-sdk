@@ -18,7 +18,9 @@ public class Rule {
     public void setAudience(Audience audience) {
         this.audience = audience;
     }
-
+    public Audience getAudience() {
+        return audience;
+    }
     public int getPriority() {
         return priority;
     }
