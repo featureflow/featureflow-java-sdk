@@ -2,6 +2,8 @@ version: 2 # use CircleCI 2.1 - Enabled preview
 
 jobs:
     build:
+        docker: # run the steps with Docker
+            - image: circleci/openjdk:8-jdk-browsers # ...with this image as the primary container; this is where all `steps` will run
         steps:
             - checkout
             - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
