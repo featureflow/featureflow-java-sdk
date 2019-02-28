@@ -16,6 +16,15 @@ jobs:
                   paths:
                       - ~/.m2
                   key: featureflow-server-{{ checksum "pom.xml" }}
+
+            - run: wget http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-2.6.5.tar.gz
+            - run: tar -xzvf libressl-2.6.5.tar.gz
+            - run: cd libressl-2.6.5
+            - run: ./configure
+            - run: make
+            - run: sudo make install
+            - run: sudo ldconfig
+            - run: cd ..
             - run: openssl version
             - run: openssl aes-256-cbc -d -in codesigning.asc.enc -out codesigning.asc -k $ENCKEY
             - run: gpg --fast-import codesigning.asc
