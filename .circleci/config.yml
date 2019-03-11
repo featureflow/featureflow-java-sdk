@@ -26,7 +26,9 @@ jobs:
             - run: openssl version
             - run: gpg --version
             - run: openssl aes-256-cbc -d -in codesigning.asc.enc -md md5 -out codesigning.asc -k $ENCKEY
-            - run: GPG_TTY=$(tty) && export GPG_TTY && gpg --import codesigning.asc
+            - run: GPG_TTY=$(tty)
+            - run: export GPG_TTY
+            - run: gpg --import codesigning.asc
             - run: mvn deploy -P sign,build-extras --settings settings.xml
             - store_test_results: # uploads the test metadata from the `target/surefire-reports` directory so that it can show up in the CircleCI dashboard.
                   # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
