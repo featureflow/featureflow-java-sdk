@@ -25,6 +25,7 @@ jobs:
             #- run: cd libressl-2.6.5 && sudo ldconfig
             - run: openssl version
             - run: gpg --version
+            - run: export GPG_TTY=$(tty)
             - run: openssl aes-256-cbc -d -in codesigning.asc.enc -md md5 -out codesigning.asc -k $ENCKEY
             - run: gpg --batch --import codesigning.asc
             - run: mvn deploy -P sign,build-extras --settings settings.xml
