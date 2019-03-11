@@ -40,6 +40,12 @@ public class FeatureflowClient implements Closeable{
     private final FeatureflowUserLookupProvider userLookupProvider;
     private final boolean offline;
 
+    FeatureflowClient(String apiKey){
+        this(apiKey, null, new FeatureflowConfig.Builder().build(), null, null, null, false);
+    }
+    FeatureflowClient(String apiKey, List<Feature> features){
+        this(apiKey, features, new FeatureflowConfig.Builder().build(), null, null, null, false);
+    }
     FeatureflowClient(
             String apiKey, List<Feature> features, FeatureflowConfig config, Map<CallbackEvent,
             List<FeatureControlCallbackHandler>> callbacks,
@@ -141,7 +147,8 @@ public class FeatureflowClient implements Closeable{
     }
 
     private void addAdditionalAttributes(FeatureflowUser user) {
-        user.getAttributes().put(FeatureflowUser.FEATUREFLOW_USER_ID, new JsonPrimitive(user.getId()));
+
+        user.getAttributes().put(FeatureflowUser.FEATUREFLOW_USER_ID, new JsonPrimitive(user.getId())); //this will be removed (we use the id value)
         user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_HOUROFDAY, new JsonPrimitive(LocalTime.now().getHour()));
         user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowUser.toIso(new DateTime())));
     }
