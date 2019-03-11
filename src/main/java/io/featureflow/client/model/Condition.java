@@ -33,23 +33,18 @@ public class Condition {
         Map<String, JsonElement> combined = new HashMap<>();
         combined.putAll(user.getAttributes());
         combined.putAll(user.getSessionAttributes());
-        for(String attributeKey : combined.keySet()){
-            if(attributeKey.equals(target)){
-                //compare the value using the comparator
-                JsonElement contextValue = combined.get(attributeKey);
-                if(contextValue==null) return false; //does not match if there is no matching value
-                if(contextValue.isJsonArray()){ //if the context value is an array of values
-                    JsonArray ar = contextValue.getAsJsonArray();
-                    for (JsonElement jsonElement : ar) {//return true if any of the list of context values for the key matches
-                        if (operator.evaluate(jsonElement.getAsJsonPrimitive(), values))return true;
-                    }
-                    return false; //else return false
+        if (combined.containsKey(target)) {
+            //compare the value using the comparator
+            JsonElement contextValue = combined.get(target);
+            if (contextValue.isJsonArray()) { //if the context value is an array of values
+                JsonArray ar = contextValue.getAsJsonArray();
+                for (JsonElement jsonElement : ar) {//return true if any of the list of context values for the key matches
+                    if (operator.evaluate(jsonElement.getAsJsonPrimitive(), values)) return true;
                 }
-                return operator.evaluate(contextValue.getAsJsonPrimitive(), values); //if its a single value then just return the eval
+                return false; //else return false
             }
             return operator.evaluate(combined.get(target).getAsJsonPrimitive(), values); //if its a single value then just return the eval
         }
         return false;
-
     }
 }
