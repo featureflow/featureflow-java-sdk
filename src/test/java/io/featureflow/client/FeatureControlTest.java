@@ -51,12 +51,10 @@ public class FeatureControlTest {
                         new Condition(ROLE, Operator.equals,
                                 Arrays.asList(new JsonPrimitive(TESTER)))));
         rule1.setAudience(audience);
-        rule1.setPriority(2);
         rule1.setVariantSplits(Arrays.asList(new VariantSplit(RED, 0l), new VariantSplit(BLUE, 100l)));
 
         //create default rule
         Rule rule2 = new Rule();
-        rule2.setPriority(1);
         rule2.setVariantSplits(Arrays.asList(new VariantSplit(RED, 100l), new VariantSplit(BLUE, 0l)));
 
         featureControl.rules = Arrays.asList(rule1,rule2);

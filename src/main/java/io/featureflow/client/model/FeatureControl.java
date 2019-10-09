@@ -74,7 +74,7 @@ public class FeatureControl {//<V> {
                 "  available=" + available + "\n" +
                 "  deleted=" + deleted + "\n" +
                 //insert barely readable one-liner here:
-                "  rules=" + rules.stream().map(r -> "Rule " + r.getPriority() + ": " + r.getVariantSplits().stream().map(s -> s.getVariantKey() + ":" + s.getSplit() +"% ").reduce("", String::concat) + "\n").reduce("", String::concat) + "\n" +
+                "  rules=" + rules.stream().map(r -> "Rule: " + r.getVariantSplits().stream().map(s -> s.getVariantKey() + ":" + s.getSplit() +"% ").reduce("", String::concat) + "\n").reduce("", String::concat) + "\n" +
                 "  offVariantKey=" + offVariantKey + "\n" +
                 "  inClientApi=" + inClientApi + "\n" +
                 "  variants=" + (variants==null?null:variants.stream().map(v -> v.name +" ").reduce("", String::concat)) + "\n" +

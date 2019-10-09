@@ -11,7 +11,6 @@ import java.util.List;
 public class Rule {
 
     public static final String ANONYMOUS = "anonymous";
-    private int priority;
     private Audience audience;
     private List<VariantSplit> variantSplits; //user may split the variant between users
 
@@ -20,12 +19,6 @@ public class Rule {
     }
     public Audience getAudience() {
         return audience;
-    }
-    public int getPriority() {
-        return priority;
-    }
-    public void setPriority(int priority) {
-        this.priority = priority;
     }
     public List<VariantSplit> getVariantSplits() {
         return variantSplits;
