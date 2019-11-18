@@ -27,7 +27,7 @@ public class Condition {
 
     public boolean matches(FeatureflowUser user) {
         //see if context contains target
-        if(user == null || (user.getAttributes()==null && user.getSessionAttributes() ==null))return false;
+        if(values == null || values.size() == 0 || user == null || (user.getAttributes() == null && user.getSessionAttributes() == null))return false;
         Map<String, JsonElement> combined = new HashMap<>();
         combined.putAll(user.getAttributes());
         combined.putAll(user.getSessionAttributes());
