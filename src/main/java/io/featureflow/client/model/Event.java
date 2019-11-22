@@ -39,6 +39,16 @@ public class Event {
         this.evaluatedVariants = evaluatedVariants;
     }
 
+    @Override
+    public String toString() {
+        return "Event{" +
+                "user=" + user.getId() +
+                ", featureKey='" + featureKey + '\'' +
+                ", goalKey='" + goalKey + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
+
     public String getFeatureKey() {
         return featureKey;
     }

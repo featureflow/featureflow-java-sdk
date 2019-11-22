@@ -79,7 +79,7 @@ public class FeatureControlStreamClient implements Closeable {
                 if (event.getData().startsWith("{\"heartbeat\"")) {
                     if (!initialized.getAndSet(true)) {
                         initFuture.completed(null);
-                        logger.info("Featureflow client inititalised.");
+                        logger.info("Featureflow client initialised.");
                     }
                     return;
                 }

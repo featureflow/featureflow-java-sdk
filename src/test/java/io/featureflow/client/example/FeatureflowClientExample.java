@@ -13,8 +13,6 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertTrue;
-
 /**
  * This is a simple one-class example demonstrating the main features and usage of featureflow java client.
  */

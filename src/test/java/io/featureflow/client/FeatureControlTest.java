@@ -27,7 +27,7 @@ public class FeatureControlTest {
     public void getKey() throws Exception {
         FeatureControl control = new FeatureControl();
         control.key = "FF-01";
-        assertTrue(control.getKey().equals("FF-01"));
+        assertEquals("FF-01", control.getKey());
     }
 
 
@@ -64,7 +64,7 @@ public class FeatureControlTest {
         contextValues.put(ROLE, new JsonPrimitive(TESTER));
         user.withAttributes(contextValues);
         String status = featureControl.evaluate(user);
-        assertEquals(BLUE, status); //Blue as we are ROLE TSETER
+        assertEquals(BLUE, status); //Blue as we are ROLE TESTER
 
         user = new FeatureflowUser(USER_KEY);
         contextValues = new HashMap<>();
@@ -73,7 +73,7 @@ public class FeatureControlTest {
         user.withAttributes(contextValues);
 
         status = featureControl.evaluate(user);
-        assertTrue(status.equals(RED)); //Red sa default rule
+        assertEquals(status, RED); //Red sa default rule
 
     }
 }

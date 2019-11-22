@@ -2,8 +2,6 @@ package io.featureflow.client;
 
 import org.apache.http.HttpHost;
 
-import java.net.URI;
-
 /**
  * Created by oliver on 23/05/2016.
  */

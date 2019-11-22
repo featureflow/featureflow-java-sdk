@@ -1,8 +1,5 @@
 package io.featureflow.client.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by oliver on 26/05/2016.
  *
