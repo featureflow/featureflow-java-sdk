@@ -37,7 +37,7 @@ public class EventSourceParser {
 
     /**
      * Parse a single line up until the /n character
-     * @param line the lince to parse
+     * @param line the line to parse
      */
     public void line(String line) {
         logger.debug("Parsing line: " + line);

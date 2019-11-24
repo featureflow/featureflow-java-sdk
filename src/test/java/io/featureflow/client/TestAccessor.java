@@ -1,9 +1,6 @@
 package io.featureflow.client;
 
-import com.google.gson.JsonElement;
 import io.featureflow.client.model.Rule;
-
-import java.util.Map;
 
 /**
  * Created by oliver.oldfieldhodge on 14/3/17.

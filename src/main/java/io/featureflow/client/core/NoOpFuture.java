@@ -3,8 +3,6 @@ package io.featureflow.client.core;
 import org.apache.http.concurrent.BasicFuture;
 import org.apache.http.concurrent.FutureCallback;
 
-import java.util.concurrent.Future;
-
 public class NoOpFuture extends BasicFuture<Void> {
 
   public NoOpFuture() {

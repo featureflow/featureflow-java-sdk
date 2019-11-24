@@ -191,16 +191,16 @@ public class RestClientImpl implements RestClient {
                 // Do not retry if over max retry count
                 return false;
             }
+            if (exception instanceof ConnectTimeoutException) {
+                // Connection refused
+                return false;
+            }
             if (exception instanceof InterruptedIOException) {
                 // Timeout
                 return false;
             }
             if (exception instanceof UnknownHostException) {
                 // Unknown host
-                return false;
-            }
-            if (exception instanceof ConnectTimeoutException) {
-                // Connection refused
                 return false;
             }
             if (exception instanceof SSLException) {
