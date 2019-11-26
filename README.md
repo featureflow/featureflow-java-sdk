@@ -27,7 +27,7 @@ Using Maven
 
 ## Usage
 
-### Quick start
+### Create a featureflow client
 
 Get your 'Server Environment Api Key' from the environment page in featureflow and instantiate a singleton client:
 
@@ -37,6 +37,7 @@ FeatureflowClient featureflow = FeatureflowClient.builder(apiKey).build();
 ```
 This is a singleton, so if you're using spring you should make it a @Bean in a @Configuration class.
 
+### Evaluate a feature
 In your code, you can test the value of your feature where the value of `my-feature-key` is equal to `'on'` 
 ```java
   if (featureflow.evaluate('my-feature-key', user).is('on')){
@@ -48,20 +49,26 @@ Because the default variants for any feature are `'on'` and `'off'`, we have pro
 
 ```java
 
-if(featureflow.evaluate('my-feature-key', user).isOn()){
+if(featureflow.evaluate("my-feature-key", user).isOn()){
   // this feature code will be run because 'my-feature-key' is set to 'on'
 }
 
-if(featureflow.evaluate('my-feature-key', user).isOff()){
+if(featureflow.evaluate("my-feature-key", user).isOff()){
   // this feature code won't be run because 'my-feature-key' is not set to 'off'
 }
 ```
+Variants can be any value based on your feature rules:
+```java
+    if (featureflow.evaluate("my-feature-key", user).is("red")){
+        System.out.println("my-feature-key is " + featureflow.evaluate("my-feature-key").value());
+    }
+```
 
-### Adding a User
+### Evaluating a User
 You can pass user information in to allow features to be targeted.
 At the point in time of evaluation (e.g. on a rest call or other call) you can create and pass in a user by creating a `FeatureflowUser` object. We have a builder to help:
 
-```aidl
+```java
 FeatureflowUser user = new FeatureflowUser("uniqueuserId")
     .withAttribute("tier", "silver")
     .withAttribute("age", 32)
@@ -79,9 +86,75 @@ If you do not want the user saved in featureflow set '.saveUser(false)' on the F
  
 Evaluate by passing the user into the evaluate method:
 
+```java
+featureflow.evaluate("example-feature", user).isOn();
 ```
-featureflow.evaluate("example-feature", user).value());
+
+
+## Advanced uses
+### UserProviders
+
+You can create a common 'userProvider' - featureflow will use the userProvider when evaluating any features. This can be useful, for example, to obtain a common user (such as logged in user details) when evaluating features.
+
+Implement a ```FeatureflowUserProvider``` to obtain a user without 
+requiring a lookup key, for example if you know you can get a user from a 
+current login - an example that may use spring:
+
+```java
+...
+    @Bean
+    public FeatureflowClient featureflowClient(){
+        return FeatureflowClient.builder("apiKey").withUserProvider(() -> getFeatureflowUser()).build();
+    }
+
+    private FeatureflowUser getFeatureflowUser(){
+        User myAppLogin = userService.getCurrentUser();
+        return new FeatureflowUser(myAppLogin.getId())
+            .withAttribute("name", myAppLogin.getName())
+            .withStringAttributes("user_role", myAppLogin.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
+        //etc
+    }
+```   
+
+If you require a lookup then implement a ```FeatureflowUserLookupProvider```
+
+This provider will attempt to obtain the user when a feature is evaluated passing in a userId - i.e. when calling ``` public Evaluate evaluate (String featureKey, String userId) { ```
+
+```java
+@Bean
+    public FeatureflowClient featureflowClient(){
+        return FeatureflowClient.builder("apiKey").withUserLookupProvider((userId) -> getFeatureflowUser(userId)).build();
+    }
+
+    private FeatureflowUser getFeatureflowUser(String userId){
+        User myAppLogin = userService.findOneById(userId);
+        return new FeatureflowUser(myAppLogin.getId())
+            .withAttribute("name", myAppLogin.getName())
+            .withStringAttributes("user_role", myAppLogin.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
+        //etc
+    }
+    
+    ...
+    
+        client.evaluate("my-feature", "user1").isOn();
+    }
 ```
+
+### Callbacks
+You can declare callbacks to act upon a feature control being updated:
+```java
+FeatureflowClient featureflowClient = FeatureflowClient.builder(PROD_API_KEY)
+                .withFeatures(Arrays.asList(
+                        new Feature(FeatureKeys.FEATURE_ONE),
+                        new Feature(FeatureKeys.FEATURE_TWO),
+                        new Feature(FeatureKeys.FEATURE_THREE),
+                        new Feature(FeatureKeys.FEATURE_FOUR)
+
+                ))
+                .withUpdateCallback(control -> System.out.println("Received a control update event: " + control.getKey()))
+                .build();
+```
+
 
 
 Further documentation can be found [here](http://docs.featureflow.io/docs)
