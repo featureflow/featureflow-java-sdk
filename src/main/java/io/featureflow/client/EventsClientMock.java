@@ -10,16 +10,18 @@ import java.io.IOException;
 
 public class EventsClientMock implements EventsClient {
     private static final Logger log = LoggerFactory.getLogger(EventsClientMock.class);
+
     public EventsClientMock(FeatureflowConfig config, RestClient restClient) {
         log.warn("Events will not be sent to featureflow - offline mode enabled");
     }
 
     @Override
     public boolean queueEvent(Event event) {
-        log.debug("Event {} received but not sent to featureflow - offline mode enabled");
+        log.debug("Event {} received but not sent to featureflow - offline mode enabled", event.toString());
         return true;
     }
 
     @Override
-    public void close() throws IOException { }
+    public void close() throws IOException {
+    }
 }
