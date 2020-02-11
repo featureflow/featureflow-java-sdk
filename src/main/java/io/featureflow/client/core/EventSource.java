@@ -62,7 +62,7 @@ public class EventSource implements ConnectionHandler, Closeable {
             throw new RuntimeException(e);
         }
         this.client = new OkHttpClient().newBuilder()
-                .sslSocketFactory(sslSocketFactory)
+                .sslSocketFactory(sslSocketFactory, trustManager)
                 .readTimeout(0L, TimeUnit.SECONDS).writeTimeout(0L, TimeUnit.SECONDS).connectTimeout(0L, TimeUnit.SECONDS).retryOnConnectionFailure(true).build();
     }
 
