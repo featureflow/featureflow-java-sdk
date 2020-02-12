@@ -21,7 +21,7 @@ Using Maven
 <dependency>
     <groupId>io.featureflow</groupId>
     <artifactId>featureflow-java-sdk</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 
