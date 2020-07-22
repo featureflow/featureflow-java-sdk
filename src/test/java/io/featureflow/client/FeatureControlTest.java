@@ -32,16 +32,13 @@ public class FeatureControlTest {
 
 
     @Test
-    public void evaluate() throws Exception {
+    public void evaluate() {
 
         //create feature and variant
         FeatureControl featureControl = new FeatureControl();
         featureControl.key = "FF-01";
         featureControl.enabled = true;
 
-        Variant red = new Variant(RED, RED);
-        Variant blue = new Variant(BLUE, BLUE);
-        featureControl.variants = Arrays.asList(red,blue);
 
 
         //create one rule with an audience
@@ -73,7 +70,7 @@ public class FeatureControlTest {
         user.withAttributes(contextValues);
 
         status = featureControl.evaluate(user);
-        assertEquals(status, RED); //Red sa default rule
+        assertEquals(status, RED); //Red is the default rule
 
     }
 }

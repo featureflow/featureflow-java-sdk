@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  */
 public class OperatorTest {
     @Test
-    public void evaluateOperators() throws Exception {
+    public void evaluateOperators() {
         assertTrue(Operator.after.evaluate(new JsonPrimitive("2016-11-20T20:36:19Z"), Arrays.asList(new JsonPrimitive("2016-11-20T20:36:18Z"))));
         assertTrue(Operator.before.evaluate(new JsonPrimitive("2016-11-20T20:36:18Z"), Arrays.asList(new JsonPrimitive("2016-11-20T20:36:19Z"))));
         assertTrue(Operator.contains.evaluate(new JsonPrimitive("oliver"), Arrays.asList(new JsonPrimitive("liver"))));
@@ -25,6 +25,8 @@ public class OperatorTest {
         assertTrue(Operator.greaterThanOrEqual.evaluate(new JsonPrimitive(1d), Arrays.asList(new JsonPrimitive(0.999d))));
         assertTrue(Operator.greaterThanOrEqual.evaluate(new JsonPrimitive(1d), Arrays.asList(new JsonPrimitive(1d))));
         assertTrue(Operator.greaterThan.evaluate(new JsonPrimitive(1d), Arrays.asList(new JsonPrimitive(0.999d))));
+        assertTrue(Operator.lessThan.evaluate(new JsonPrimitive(0.998d), Arrays.asList(new JsonPrimitive(0.999d))));
+        assertFalse(Operator.lessThan.evaluate(new JsonPrimitive(1d), Arrays.asList(new JsonPrimitive(1d))));
         assertTrue(Operator.lessThanOrEqual.evaluate(new JsonPrimitive(0.999d), Arrays.asList(new JsonPrimitive(1d))));
         assertTrue(Operator.lessThanOrEqual.evaluate(new JsonPrimitive(1d), Arrays.asList(new JsonPrimitive(1d))));
         assertTrue(Operator.lessThanOrEqual.evaluate(new JsonPrimitive(1d), Arrays.asList(new JsonPrimitive(1d))));

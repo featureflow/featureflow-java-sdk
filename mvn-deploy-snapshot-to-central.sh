@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# eg ./mvn-deploy-to-cenral.sh 0.0.2-SNAPSHOT 0.0.3-SNAPSHOT
+# eg ./mvn-deploy-to-central.sh 0.0.2-SNAPSHOT 0.0.3-SNAPSHOT
 #-DgenerateBackupPoms=false
 mvn versions:set -DnewVersion=$1
 mvn versions:commit

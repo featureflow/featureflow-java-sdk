@@ -17,9 +17,6 @@ public class Rule {
     public void setAudience(Audience audience) {
         this.audience = audience;
     }
-    public Audience getAudience() {
-        return audience;
-    }
     public List<VariantSplit> getVariantSplits() {
         return variantSplits;
     }
@@ -27,11 +24,13 @@ public class Rule {
         this.variantSplits = variantSplits;
     }
     public boolean matches(FeatureflowUser user){
-        return audience==null || audience.matches(user);
+        return audience == null || audience.matches(user);
     }
 
     public String getVariantSplitKey(String userId, String featureKey, String salt){
-        if(userId==null)userId= ANONYMOUS;
+        if(userId == null){
+            userId= ANONYMOUS;
+        }
         long variantValue = getVariantValue(getHash(userId, featureKey, salt));
         return getSplitKey(variantValue);
     }
@@ -40,7 +39,9 @@ public class Rule {
         int percent = 0;
         for (VariantSplit variantSplit : variantSplits) {
             percent += variantSplit.getSplit();
-            if(percent >= variantValue)return variantSplit.getVariantKey();
+            if(percent >= variantValue){
+                return variantSplit.getVariantKey();
+            }
         }
         return null;
     }
