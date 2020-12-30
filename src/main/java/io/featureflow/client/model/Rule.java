@@ -17,6 +17,9 @@ public class Rule {
     public void setAudience(Audience audience) {
         this.audience = audience;
     }
+    public Audience getAudience() {
+        return audience;
+    }
     public List<VariantSplit> getVariantSplits() {
         return variantSplits;
     }
