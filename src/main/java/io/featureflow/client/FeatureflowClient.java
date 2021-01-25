@@ -134,7 +134,7 @@ public class FeatureflowClient implements Closeable {
             logger.warn("FeatureFlow is not initialized yet.");
         }
         if (control == null) {
-            logger.warn("Control does not exist, returning failover variant of " + failoverVariant);
+            logger.warn("Feature " + featureKey + " does not exist, returning failover variant of " + failoverVariant);
             return failoverVariant;
         }
 
