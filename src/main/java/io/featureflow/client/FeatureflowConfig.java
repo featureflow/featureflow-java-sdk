@@ -12,7 +12,7 @@ public class FeatureflowConfig {
     private static final String DEFAULT_STREAM_BASE_URI     = "https://rtm.featureflow.io"; //The SSE Stream Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
     private static final String DEFAULT_SDK_BASE_URL        = "https://app.featureflow.io"; //The REST backup polling URL - eg https://sdk.featureflow.io/api/sdk/v1/features
     private static final String DEFAULT_EVENTS_BASE_URI      = "https://events.featureflow.io"; //POST Events URL - eg https://events.featureflow.io/api/sdk/v1/events https://events.featureflow.io/api/sdk/v1/register
-    public static final String VERSION                      = "1.0.4";
+    public static final String VERSION                      = "1.1.3";
 
 
     private boolean offline;
