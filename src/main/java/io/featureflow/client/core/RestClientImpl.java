@@ -76,8 +76,9 @@ public class RestClientImpl implements RestClient {
     @Override
     public void registerFeatureControls(List<Feature> featureRegistrations) throws IOException{
         logger.info("Registering features with featureflow");
+        URI uri =  URI.create(config.getRegisterFeatureUri());
         HttpCacheContext context = HttpCacheContext.create();
-        HttpPut request = putFeaturesRequest(apiKey, gson.toJson(featureRegistrations));
+        HttpPut request = createPutRequest(uri, gson.toJson(featureRegistrations));
         CloseableHttpResponse response = null;
         try {
             logger.debug("Putting: " + request);
@@ -95,10 +96,11 @@ public class RestClientImpl implements RestClient {
     }
     @Override
     public void postEvents(List<? extends Event> events) {
+        URI uri =  URI.create(config.getFeatureEventUri());
         CloseableHttpResponse response = null;
         Type type = new TypeToken<List<Event>>() {}.getType();
         String json = gson.toJson(events, type);
-        HttpPost request = postRequest(apiKey, "/api/sdk/v1/events", json);
+        HttpPost request = createPostRequest(uri, json);
         StringEntity entity = new StringEntity(json, UTF_8);
         entity.setContentType(APPLICATION_JSON);
         request.setEntity(entity);
@@ -116,10 +118,9 @@ public class RestClientImpl implements RestClient {
         }
     }
 
-    private HttpPut putFeaturesRequest(String apiKey, String data) {
-        URI path =  URI.create(config.getSdkBaseUri() + "/api/sdk/v1/register");
+    private HttpPut createPutRequest(URI uri, String data) {
         try {
-            HttpPut request = new HttpPut(path);
+            HttpPut request = new HttpPut(uri);
             setRequestVals(request, data);
             return request;
         } catch (Exception e) {
@@ -128,16 +129,9 @@ public class RestClientImpl implements RestClient {
         }
     }
 
-    private HttpPost postRequest(String apiKey, String path, String data) {
-        URI base = URI.create(config.getEventBaseUri());
+    private HttpPost createPostRequest(URI uri, String data) {
 
         try {
-            URI uri = new URIBuilder()
-                    .setScheme(base.getScheme())
-                    .setHost(base.getHost())
-                    .setPort(base.getPort())
-                    .setPath(path).build();
-
             HttpPost request = new HttpPost(uri);
             setRequestVals(request, data);
             return request;

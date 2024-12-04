@@ -7,12 +7,13 @@ import org.apache.http.HttpHost;
  */
 public class FeatureflowConfig {
 
-    private static final int DEFAULT_CONNECT_TIMEOUT        = 30000;
-    private static final int DEFAULT_SOCKET_TIMEOUT         = 20000;
-    private static final String DEFAULT_STREAM_BASE_URI     = "https://rtm.featureflow.io"; //The SSE Stream Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
-    private static final String DEFAULT_SDK_BASE_URL        = "https://app.featureflow.io"; //The REST backup polling URL - eg https://sdk.featureflow.io/api/sdk/v1/features
-    private static final String DEFAULT_EVENTS_BASE_URI      = "https://events.featureflow.io"; //POST Events URL - eg https://events.featureflow.io/api/sdk/v1/events https://events.featureflow.io/api/sdk/v1/register
-    public static final String VERSION                      = "1.1.3";
+    private static final int DEFAULT_CONNECT_TIMEOUT = 30000;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 20000;
+
+    public static final String DEFAULT_FEATURE_EVENT_URI = "https://events.featureflow.io/api/sdk/v1/events"; //The Feature Event URL - eg https://events.featureflow.io/api/sdk/v1/events"
+    public static final String DEFAULT_REGISTER_FEATURE_URI = "https://events.featureflow.io/api/sdk/v1/register"; //The Register URL - eg https://events.featureflow.io/api/sdk/v1/register
+    private static final String DEFAULT_STREAM_URI = "https://rtm.featureflow.io/api/sdk/v1/features"; //The SSE Stream Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
+    public static final String VERSION = "1.2.0";
 
 
     private boolean offline;
@@ -21,28 +22,28 @@ public class FeatureflowConfig {
     private int proxyPort;
     private int connectTimeout;
     private int socketTimeout;
+    private String featureEventUri;
+    private String registerFeatureUri;
+    private String streamUri;
 
 
-    private String sdkBaseUri;
-    private String eventsBaseUri;
-    private String streamBaseUri;
+    public long waitForStartup = 10000l;
 
-
-    public long waitForStartup  = 10000l;
-
-    FeatureflowConfig(String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String sdkBaseUri, String streamBaseUri, String eventsBaseUri, long waitForStartup, boolean offline) {
+    FeatureflowConfig(String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String featureEventUri, String registerFeatureUri, String streamUri, long waitForStartup, boolean offline) {
         this.proxyHost = proxyHost;
         this.proxyScheme = proxyScheme;
         this.proxyPort = proxyPort;
         this.connectTimeout = connectTimeout;
         this.socketTimeout = socketTimeout;
-        this.sdkBaseUri = sdkBaseUri;
-        this.streamBaseUri = streamBaseUri;
-        this.eventsBaseUri = eventsBaseUri;
+        this.featureEventUri = featureEventUri;
+        this.registerFeatureUri = registerFeatureUri;
+        this.streamUri = streamUri;
+
         this.waitForStartup = waitForStartup;
         this.offline = offline;
     }
-    public static Builder builder(){
+
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -59,30 +60,44 @@ public class FeatureflowConfig {
     public boolean isOffline() {
         return offline;
     }
+
     public String getProxyHost() {
         return proxyHost;
     }
+
     public String getProxyScheme() {
         return proxyScheme;
     }
+
     public int getProxyPort() {
         return proxyPort;
     }
+
     public int getConnectTimeout() {
         return connectTimeout;
     }
+
     public int getSocketTimeout() {
         return socketTimeout;
     }
 
-    public String getSdkBaseUri() {return sdkBaseUri;}
-    public String getEventBaseUri() {
-        return eventsBaseUri;
+    public String getRegisterFeatureUri() {
+        return registerFeatureUri;
     }
-    public String getStreamBaseUri() {return streamBaseUri;}
-    public long getWaitForStartup(){
+    public String getFeatureEventUri() {
+        return featureEventUri;
+    }
+
+    public String getStreamUri() {
+        return streamUri;
+    }
+
+    public long getWaitForStartup() {
         return waitForStartup;
     }
+
+
+
     public class Event {
         public int queueSize = 10000;
     }
@@ -90,14 +105,14 @@ public class FeatureflowConfig {
 
     public static class Builder {
         private String proxyHost = null;
-        private String proxyScheme= null;
+        private String proxyScheme = null;
         private int proxyPort = -1;
         private int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
         private int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
 
-        private String sdkBaseURI = DEFAULT_SDK_BASE_URL;
-        private String streamBaseUri = DEFAULT_STREAM_BASE_URI;
-        private String eventsBaseUri = DEFAULT_EVENTS_BASE_URI;
+        private String featureEventUri = DEFAULT_FEATURE_EVENT_URI;
+        private String registerFeatureUri = DEFAULT_REGISTER_FEATURE_URI;
+        private String streamUri = DEFAULT_STREAM_URI;
 
         long waitForStartup = 10000;
         boolean offline = false;
@@ -127,34 +142,34 @@ public class FeatureflowConfig {
             return this;
         }
 
-        @Deprecated//use withSdkBaseUri
-        public Builder withBaseUri(String baseUri) {
-            this.sdkBaseURI = baseUri;
+        public Builder withFeatureEventUri(String featureEventUri) {
+            this.featureEventUri = featureEventUri;
             return this;
         }
-        public Builder withSdkBaseUri(String sdkBaseURI) {
-            this.sdkBaseURI = sdkBaseURI;
+
+        public Builder withRegisterFeatureUri(String registerFeatureUri) {
+            this.registerFeatureUri = registerFeatureUri;
             return this;
         }
-        public Builder withStreamBaseUri(String streamBaseUri) {
-            this.streamBaseUri = streamBaseUri;
+
+        public Builder withStreamUri(String streamUri) {
+            this.streamUri = streamUri;
             return this;
         }
-        public Builder withEventsBaseUri(String eventsBaseUri){
-            this.eventsBaseUri = eventsBaseUri;
-            return this;
-        }
-        public Builder withWaitForStartup(long waitTimeMilliseconds){
+
+        public Builder withWaitForStartup(long waitTimeMilliseconds) {
             this.waitForStartup = waitTimeMilliseconds;
             return this;
         }
-        public Builder withOffline(boolean offline){
+
+        public Builder withOffline(boolean offline) {
             this.offline = offline;
             return this;
         }
+
         public FeatureflowConfig build() {
-            return new FeatureflowConfig(proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, sdkBaseURI, streamBaseUri, eventsBaseUri, waitForStartup, offline);
+            return new FeatureflowConfig(proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, featureEventUri, registerFeatureUri, streamUri, waitForStartup, offline);
         }
     }
-     
+
 }
