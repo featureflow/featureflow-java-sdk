@@ -6,15 +6,16 @@ import io.featureflow.client.model.Audience;
 import io.featureflow.client.model.Condition;
 import io.featureflow.client.model.Operator;
 import io.featureflow.client.model.Rule;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * Created by oliver on 21/11/16.
+ * Updated to use JUnit 5
  */
 public class RuleMatchesTest {
 
@@ -37,7 +38,7 @@ public class RuleMatchesTest {
         contextValues.put("name", new JsonPrimitive("oliver"));
         user.withAttributes(contextValues);
 
-        Assert.assertTrue(rule.matches(user));
+        assertTrue(rule.matches(user));
 
     }
 
@@ -66,7 +67,7 @@ public class RuleMatchesTest {
         contextValues.put("tier", new JsonPrimitive("silver"));
         user.withAttributes(contextValues);
 
-        Assert.assertTrue(!rule.matches(user));
+        assertTrue(!rule.matches(user));
 
     }
 
@@ -89,7 +90,7 @@ public class RuleMatchesTest {
 
         user.withAttributes(contextValues);
 
-        Assert.assertTrue(rule.matches(user));
+        assertTrue(rule.matches(user));
 
     }
 
@@ -108,7 +109,7 @@ public class RuleMatchesTest {
 
         user.withAttributes(contextValues);
 
-        Assert.assertTrue(rule.matches(user));
+        assertTrue(rule.matches(user));
 
     }
 

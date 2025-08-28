@@ -1,9 +1,9 @@
 package io.featureflow.client;
 
-import org.apache.http.HttpHost;
+import org.apache.hc.core5.http.HttpHost;
 
 /**
- * Created by oliver on 23/05/2016.
+ * Updated to use HttpClient 5.x
  */
 public class FeatureflowConfig {
 
@@ -53,7 +53,7 @@ public class FeatureflowConfig {
         } else {
             String hostname = this.proxyHost == null ? "localhost" : this.proxyHost;
             String scheme = this.proxyScheme == null ? "https" : this.proxyScheme;
-            return new HttpHost(hostname, this.proxyPort, scheme);
+            return new HttpHost(scheme, hostname, this.proxyPort);
         }
     }
 

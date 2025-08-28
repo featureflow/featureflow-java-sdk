@@ -1,25 +1,56 @@
 package io.featureflow.client.core;
 
-import org.apache.http.concurrent.BasicFuture;
-import org.apache.http.concurrent.FutureCallback;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
-public class NoOpFuture extends BasicFuture<Void> {
+/**
+ * Updated to use standard Java concurrency APIs instead of HttpClient-specific ones
+ */
+public class NoOpFuture implements Future<Void> {
 
-  public NoOpFuture() {
-    super(new NoOpFutureCallback());
-  }
+    private final CompletableFuture<Void> future;
 
-  static class NoOpFutureCallback implements FutureCallback<Void> {
+    public NoOpFuture() {
+        this.future = new CompletableFuture<>();
+    }
+
     @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return future.cancel(mayInterruptIfRunning);
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return future.isCancelled();
+    }
+
+    @Override
+    public boolean isDone() {
+        return future.isDone();
+    }
+
+    @Override
+    public Void get() throws InterruptedException, ExecutionException {
+        return future.get();
+    }
+
+    @Override
+    public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        return future.get(timeout, unit);
+    }
+
     public void completed(Void result) {
+        future.complete(result);
     }
 
-    @Override
     public void failed(Exception ex) {
+        future.completeExceptionally(ex);
     }
 
-    @Override
     public void cancelled() {
+        future.cancel(true);
     }
-  }
 }

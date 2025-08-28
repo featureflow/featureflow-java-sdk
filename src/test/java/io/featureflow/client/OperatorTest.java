@@ -2,14 +2,14 @@ package io.featureflow.client;
 
 import com.google.gson.JsonPrimitive;
 import io.featureflow.client.model.Operator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Created by oliver on 21/11/16.
+ * Updated to use JUnit 5
  */
 public class OperatorTest {
     @Test
@@ -31,7 +31,6 @@ public class OperatorTest {
         assertTrue(Operator.lessThanOrEqual.evaluate(new JsonPrimitive(1d), Arrays.asList(new JsonPrimitive(1d))));
         assertTrue(Operator.lessThanOrEqual.evaluate(new JsonPrimitive(1d), Arrays.asList(new JsonPrimitive(1d))));
         assertTrue(Operator.matches.evaluate(new JsonPrimitive("oliver@featureflow.io"), Arrays.asList(new JsonPrimitive( "^(oliver).*$"))));
-
     }
 
 }

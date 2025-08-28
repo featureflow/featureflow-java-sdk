@@ -1,9 +1,9 @@
 package io.featureflow.client;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
- * Created by oliver on 11/11/2015.
+ * Updated to use JUnit 5
  */
 public class FeatureManagerTest {
 

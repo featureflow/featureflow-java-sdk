@@ -3,16 +3,16 @@ package io.featureflow.client;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import io.featureflow.client.model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Created by oliver on 15/08/2016.
+ * Updated to use JUnit 5
  */
 public class FeatureControlTest {
 

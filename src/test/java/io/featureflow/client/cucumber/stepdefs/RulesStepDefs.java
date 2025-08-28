@@ -2,25 +2,24 @@ package io.featureflow.client.cucumber.stepdefs;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import cucumber.api.DataTable;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import gherkin.formatter.model.DataTableRow;
+import io.cucumber.datatable.DataTable;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.featureflow.client.*;
 import io.featureflow.client.model.*;
-import org.junit.Assert;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Created by oliver.oldfieldhodge on 9/3/17.
+ * Updated to use modern Cucumber API
  */
 public class RulesStepDefs {
     Rule rule = new Rule();
@@ -35,92 +34,105 @@ public class RulesStepDefs {
     Gson gson = new Gson();
     JsonParser parser = new JsonParser();
 
-    @Given("^the rule is a default rule$")
-    public void the_rule_is_a_default_rule() throws Throwable {
+    @Given("the rule is a default rule")
+    public void the_rule_is_a_default_rule() {
         rule = new Rule();
     }
 
-    @When("^the rule is matched against the user$")
-    public void the_rule_is_matched_against_the_user() throws Throwable {
+    @When("the rule is matched against the user")
+    public void the_rule_is_matched_against_the_user() {
         ruleToUserMatch = TestAccessor.matches(rule, user);
     }
 
-
-    @Then("^the result from the match should be true$")
-    public void the_result_from_the_match_should_be_true() throws Throwable {
+    @Then("the result from the match should be true")
+    public void the_result_from_the_match_should_be_true() {
         assertTrue(ruleToUserMatch);
     }
 
-    @Given("^the user values are$")
-    public void the_user_values_are(DataTable userAttributes) throws Throwable {
+    @Given("the user values are")
+    public void the_user_values_are(DataTable userAttributes) {
         user = new FeatureflowUser("uniqueuserid");
         Map<String, JsonElement> userAttrs = new HashMap<>();
-        for (DataTableRow dataTableRow : userAttributes.getGherkinRows()) {
-            if("key".equals(dataTableRow.getCells().get(0)))continue;
-            //JsonElement lement = gson.fromJson(dataTableRow.getCells().get(1));
-            //we need to convert to an array or a primitive
-            JsonElement userVal;
-            if(dataTableRow.getCells().get(1).startsWith("[")) {
+        List<Map<String, String>> rows = userAttributes.asMaps();
 
-                JsonElement el = parser.parse(dataTableRow.getCells().get(1));
+        for (Map<String, String> row : rows) {
+            String key = row.get("key");
+            String value = row.get("value");
+
+            // Skip header if present
+            if (key == null || key.equals("key")) continue;
+
+            JsonElement userVal;
+            if (value.startsWith("[")) {
+                JsonElement el = parser.parse(value);
                 JsonArray arr = el.getAsJsonArray();
                 userVal = arr;
-            }else{
-                userVal = parser.parse(dataTableRow.getCells().get(1)).getAsJsonPrimitive();
+            } else {
+                userVal = parser.parse(value).getAsJsonPrimitive();
             }
 
-            userAttrs.put(dataTableRow.getCells().get(0), userVal);
+            userAttrs.put(key, userVal);
         }
         user.withAttributes(userAttrs);
     }
 
-    @Given("^the rule's audience conditions are$")
-    public void the_rule_s_audience_conditions_are(DataTable audienceValues) throws Throwable {
+    @Given("the rule's audience conditions are")
+    public void the_rule_s_audience_conditions_are(DataTable audienceValues) {
         conditions = new ArrayList<>();
         rule = new Rule();
-        for (DataTableRow dataTableRow : audienceValues.getGherkinRows()) {
-            if("operator".equals(dataTableRow.getCells().get(0)))continue;
-            Operator operator = Operator.valueOf(dataTableRow.getCells().get(0)); //get operator
-            String target = dataTableRow.getCells().get(1);
-            List<JsonPrimitive> values = gson.fromJson(dataTableRow.getCells().get(2), new TypeToken<List<JsonPrimitive>>(){}.getType()); //get values array
+        List<Map<String, String>> rows = audienceValues.asMaps();
+
+        for (Map<String, String> row : rows) {
+            String operatorStr = row.get("operator");
+            String target = row.get("target");
+            String valuesStr = row.get("values");
+
+            // Skip header if present
+            if (operatorStr == null || operatorStr.equals("operator")) continue;
+
+            Operator operator = Operator.valueOf(operatorStr);
+            List<JsonPrimitive> values = gson.fromJson(valuesStr, new TypeToken<List<JsonPrimitive>>(){}.getType());
             Condition condition = new Condition(target, operator, values);
             conditions.add(condition);
         }
         audience = new Audience("audience1", "Audience One", conditions);
         rule.setAudience(audience);
-
     }
 
-    @Then("^the result from the match should be false$")
-    public void the_result_from_the_match_should_be_false() throws Throwable {
+    @Then("the result from the match should be false")
+    public void the_result_from_the_match_should_be_false() {
         assertFalse(audience.matches(user));
     }
 
-    @Given("^the variant value of (\\d+)$")
-    public void the_variant_value_of(int variantSplitValue) throws Throwable {
+    @Given("the variant value of {int}")
+    public void the_variant_value_of(int variantSplitValue) {
         this.variantSplitValue = variantSplitValue;
     }
 
-    @Given("^the variant splits are$")
-    public void the_variant_splits_are(DataTable variantSplitTable) throws Throwable {
+    @Given("the variant splits are")
+    public void the_variant_splits_are(DataTable variantSplitTable) {
         variantSplits = new ArrayList<>();
-        for (DataTableRow dataTableRow : variantSplitTable.getGherkinRows()) {
-            if(dataTableRow.getCells().get(0).equals("variantKey"))continue;
-            variantSplits.add(new VariantSplit(dataTableRow.getCells().get(0), new Long(dataTableRow.getCells().get(1))));
+        List<Map<String, String>> rows = variantSplitTable.asMaps();
+
+        for (Map<String, String> row : rows) {
+            String variantKey = row.get("variantKey");
+            String splitValue = row.get("splitValue");
+
+            // Skip header if present
+            if (variantKey == null || variantKey.equals("variantKey")) continue;
+
+            variantSplits.add(new VariantSplit(variantKey, Long.valueOf(splitValue)));
         }
         rule.setVariantSplits(variantSplits);
     }
 
-    @When("^the variant split key is calculated$")
-    public void the_variant_split_key_is_calculated() throws Throwable {
+    @When("the variant split key is calculated")
+    public void the_variant_split_key_is_calculated() {
         variantSplitKey = rule.getSplitKey(variantSplitValue);
-
     }
 
-    @Then("^the resulting variant should be \"([^\"]*)\"$")
-    public void the_resulting_variant_should_be(String variantResult) throws Throwable {
-        Assert.assertEquals(variantResult, variantSplitKey);
+    @Then("the resulting variant should be {string}")
+    public void the_resulting_variant_should_be(String variantResult) {
+        assertEquals(variantResult, variantSplitKey);
     }
-
-
 }

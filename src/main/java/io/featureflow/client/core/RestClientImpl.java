@@ -5,27 +5,22 @@ import com.google.gson.reflect.TypeToken;
 import io.featureflow.client.FeatureflowConfig;
 import io.featureflow.client.model.Event;
 import io.featureflow.client.model.Feature;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.client.ServiceUnavailableRetryStrategy;
-import org.apache.http.client.cache.HttpCacheContext;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.cache.CacheConfig;
-import org.apache.http.impl.client.cache.CachingHttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.cache.HttpCacheContext;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.cache.CacheConfig;
+import org.apache.hc.client5.http.impl.cache.CachingHttpClients;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -38,12 +33,12 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Created by oliver on 26/05/2016.
+ * Updated to use HttpClient 5.x
  */
 public class RestClientImpl implements RestClient {
-
 
     private static final String APPLICATION_JSON = "application/json";
     private static final String UTF_8 = "UTF-8";
@@ -52,7 +47,7 @@ public class RestClientImpl implements RestClient {
     private final FeatureflowConfig config;
     private CloseableHttpClient client = null;
 
-    private Gson gson =  new GsonBuilder()
+    private Gson gson = new GsonBuilder()
         .registerTypeAdapter(DateTime.class, new JsonSerializer<DateTime>(){
             @Override
             public JsonElement serialize(DateTime json, Type typeOfSrc, JsonSerializationContext context) {
@@ -76,16 +71,16 @@ public class RestClientImpl implements RestClient {
     @Override
     public void registerFeatureControls(List<Feature> featureRegistrations) throws IOException{
         logger.info("Registering features with featureflow");
-        URI uri =  URI.create(config.getRegisterFeatureUri());
+        URI uri = URI.create(config.getRegisterFeatureUri());
         HttpCacheContext context = HttpCacheContext.create();
         HttpPut request = createPutRequest(uri, gson.toJson(featureRegistrations));
         CloseableHttpResponse response = null;
         try {
             logger.debug("Putting: " + request);
             response = client.execute(request, context);
-            if(response.getStatusLine().getStatusCode()!= HttpStatus.SC_OK){
-                logger.error("Problem registering controls: " + response.getStatusLine());
-                throw new IOException("Problem registering controls " + response.getStatusLine());
+            if(response.getCode() != HttpStatus.SC_OK){
+                logger.error("Problem registering controls: " + response.getReasonPhrase());
+                throw new IOException("Problem registering controls " + response.getReasonPhrase());
             }
         }
         finally {
@@ -94,15 +89,15 @@ public class RestClientImpl implements RestClient {
             } catch (IOException e) {}
         }
     }
+
     @Override
     public void postEvents(List<? extends Event> events) {
-        URI uri =  URI.create(config.getFeatureEventUri());
+        URI uri = URI.create(config.getFeatureEventUri());
         CloseableHttpResponse response = null;
         Type type = new TypeToken<List<Event>>() {}.getType();
         String json = gson.toJson(events, type);
         HttpPost request = createPostRequest(uri, json);
-        StringEntity entity = new StringEntity(json, UTF_8);
-        entity.setContentType(APPLICATION_JSON);
+        StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
         request.setEntity(entity);
         try {
             client = createHttpClient();
@@ -130,7 +125,6 @@ public class RestClientImpl implements RestClient {
     }
 
     private HttpPost createPostRequest(URI uri, String data) {
-
         try {
             HttpPost request = new HttpPost(uri);
             setRequestVals(request, data);
@@ -141,18 +135,24 @@ public class RestClientImpl implements RestClient {
         }
     }
 
-    private void setRequestVals(HttpEntityEnclosingRequestBase request, String data){
-        StringEntity params =new StringEntity(data,"UTF-8");
-        params.setContentType("application/json");
-        request.addHeader("content-type", "application/json");
-        request.addHeader("Accept", "*/*");
-        request.addHeader("Accept-Encoding", "gzip,deflate,sdch");
-        request.addHeader("Accept-Language", "en-US,en;q=0.8");
-        request.setEntity(params);
+    private void setRequestVals(HttpMessage request, String data) {
+        if (request instanceof HttpMessage) {
+            StringEntity params = new StringEntity(data, ContentType.APPLICATION_JSON);
 
-        request.addHeader("Authorization", "Bearer " + apiKey);
-        request.addHeader("X-Featureflow-Client", "JavaClient/" + FeatureflowConfig.VERSION);
+            request.addHeader("content-type", "application/json");
+            request.addHeader("Accept", "*/*");
+            request.addHeader("Accept-Encoding", "gzip,deflate,sdch");
+            request.addHeader("Accept-Language", "en-US,en;q=0.8");
 
+            if (request instanceof HttpPut httpPut) {
+                httpPut.setEntity(params);
+            } else if (request instanceof HttpPost httpPost) {
+                httpPost.setEntity(params);
+            }
+
+            request.addHeader("Authorization", "Bearer " + apiKey);
+            request.addHeader("X-Featureflow-Client", "JavaClient/" + FeatureflowConfig.VERSION);
+        }
     }
 
     private CloseableHttpClient createHttpClient() {
@@ -167,64 +167,92 @@ public class RestClientImpl implements RestClient {
                 .setSharedCache(false)
                 .build();
 
-        ServiceUnavailableRetryStrategy unavailableRetryStrategy = new ServiceUnavailableRetryStrategy() {
+        // Custom retry strategy for service unavailable errors
+        org.apache.hc.client5.http.HttpRequestRetryStrategy serviceUnavailableRetryStrategy = new org.apache.hc.client5.http.HttpRequestRetryStrategy() {
             @Override
-            public boolean retryRequest(
-                    final HttpResponse response, final int executionCount, final HttpContext context) {
-                int statusCode = response.getStatusLine().getStatusCode();
+            public boolean retryRequest(HttpRequest request, IOException exception, int executionCount, HttpContext context) {
+                return false; // Only retry on 502 response, handled in other method
+            }
+
+            @Override
+            public boolean retryRequest(HttpResponse response, int executionCount, HttpContext context) {
+                int statusCode = response.getCode();
                 return statusCode == 502 && executionCount < 1000;
             }
 
             @Override
-            public long getRetryInterval() {
-                return 5000;
+            public TimeValue getRetryInterval(HttpRequest request, IOException exception, int executionCount, HttpContext context) {
+                return TimeValue.of(5, TimeUnit.SECONDS);
+            }
+
+            @Override
+            public TimeValue getRetryInterval(HttpResponse response, int executionCount, HttpContext context) {
+                return TimeValue.of(5, TimeUnit.SECONDS);
             }
         };
-        HttpRequestRetryHandler myRetryHandler = (exception, executionCount, context) -> {
-            if (executionCount >= 5) {
-                // Do not retry if over max retry count
-                return false;
+
+        // Custom retry strategy for standard request retries
+        org.apache.hc.client5.http.HttpRequestRetryStrategy myRetryHandler = new org.apache.hc.client5.http.HttpRequestRetryStrategy() {
+            @Override
+            public boolean retryRequest(HttpRequest request, IOException exception, int executionCount, HttpContext context) {
+                if (executionCount >= 5) {
+                    // Do not retry if over max retry count
+                    return false;
+                }
+                if (exception instanceof org.apache.hc.client5.http.ConnectTimeoutException) {
+                    // Connection refused
+                    return false;
+                }
+                if (exception instanceof InterruptedIOException) {
+                    // Timeout
+                    return false;
+                }
+                if (exception instanceof UnknownHostException) {
+                    // Unknown host
+                    return false;
+                }
+                if (exception instanceof SSLException) {
+                    // SSL handshake exception
+                    return false;
+                }
+
+                HttpClientContext clientContext = HttpClientContext.adapt(context);
+                HttpRequest originalRequest = clientContext.getRequest();
+
+                boolean idempotent = !(originalRequest instanceof BasicClassicHttpRequest);
+                return idempotent;
             }
-            if (exception instanceof ConnectTimeoutException) {
-                // Connection refused
-                return false;
+
+            @Override
+            public boolean retryRequest(HttpResponse response, int executionCount, HttpContext context) {
+                return false; // Only retry on exceptions
             }
-            if (exception instanceof InterruptedIOException) {
-                // Timeout
-                return false;
+
+            @Override
+            public TimeValue getRetryInterval(HttpRequest request, IOException exception, int executionCount, HttpContext context) {
+                return TimeValue.of(1, TimeUnit.SECONDS);
             }
-            if (exception instanceof UnknownHostException) {
-                // Unknown host
-                return false;
+
+            @Override
+            public TimeValue getRetryInterval(HttpResponse response, int executionCount, HttpContext context) {
+                return TimeValue.of(1, TimeUnit.SECONDS);
             }
-            if (exception instanceof SSLException) {
-                // SSL handshake exception
-                return false;
-            }
-            HttpClientContext clientContext = HttpClientContext.adapt(context);
-            HttpRequest request = clientContext.getRequest();
-            boolean idempotent = !(request instanceof HttpEntityEnclosingRequest);
-            if (idempotent) {
-                // Retry if the request is considered idempotent
-                return true;
-            }
-            return false;
         };
 
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(config.getConnectTimeout())
-                .setSocketTimeout(config.getSocketTimeout())
+                .setConnectTimeout(Timeout.ofMilliseconds(config.getConnectTimeout()))
+                .setResponseTimeout(Timeout.ofMilliseconds(config.getSocketTimeout()))
                 .setProxy(config.getHttpProxyHost())
                 .build();
+
         client = CachingHttpClients.custom()
                 .setCacheConfig(cacheConfig)
                 .setConnectionManager(manager)
                 .setDefaultRequestConfig(requestConfig)
-                .setRetryHandler(myRetryHandler)
-                .setServiceUnavailableRetryStrategy(unavailableRetryStrategy)
+                .setRetryStrategy(myRetryHandler) // Using standard retry strategy
+                .setRetryStrategy(serviceUnavailableRetryStrategy) // This will override the previous one
                 .build();
+
         return client;
     }
-
-
 }

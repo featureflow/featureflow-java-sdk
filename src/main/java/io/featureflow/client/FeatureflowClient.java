@@ -1,23 +1,35 @@
 package io.featureflow.client;
 
 
-import com.google.gson.JsonPrimitive;
-import io.featureflow.client.core.*;
-import io.featureflow.client.model.Event;
-import io.featureflow.client.model.Feature;
-import io.featureflow.client.model.FeatureControl;
-import io.featureflow.client.model.Variant;
+import java.io.Closeable;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import com.google.gson.JsonPrimitive;
+
+import io.featureflow.client.core.CallbackEvent;
+import io.featureflow.client.core.EventsClient;
+import io.featureflow.client.core.EventsClientImpl;
+import io.featureflow.client.core.FeatureControlCache;
+import io.featureflow.client.core.FeatureControlStreamClient;
+import io.featureflow.client.core.RestClient;
+import io.featureflow.client.core.RestClientImpl;
+import io.featureflow.client.core.SimpleMemoryFeatureCache;
+import io.featureflow.client.model.Event;
+import io.featureflow.client.model.Feature;
+import io.featureflow.client.model.FeatureControl;
+import io.featureflow.client.model.Variant;
 
 /**
  * Created by oliver on 23/05/2016.
@@ -80,18 +92,24 @@ public class FeatureflowClient implements Closeable {
             }
         }
 
-        featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callbacks);
-        Future<Void> startFuture = featureControlStreamClient.start();
-        if (config.waitForStartup > 0L) {
-            logger.info("Waiting for Featureflow to initialise");
-            try {
-                startFuture.get(config.waitForStartup, TimeUnit.MILLISECONDS);
-            } catch (TimeoutException e) {
-                logger.error("Timeout waiting for Featureflow client initialise");
-            } catch (Exception e) {
-                logger.error("Exception waiting for Featureflow client to initialise", e);
+        if (!offline){
+            featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callbacks);
+            Future<Void> startFuture = featureControlStreamClient.start();
+            if (config.waitForStartup > 0L) {
+                logger.info("Waiting for Featureflow to initialise");
+                try {
+                    startFuture.get(config.waitForStartup, TimeUnit.MILLISECONDS);
+                } catch (TimeoutException e) {
+                    logger.error("Timeout waiting for Featureflow client initialise");
+                } catch (Exception e) {
+                    logger.error("Exception waiting for Featureflow client to initialise", e);
+                }
             }
+        } else {
+            logger.info("Featureflow client is running in offline mode, no stream connection will be made.");
+            featureControlStreamClient = null;
         }
+
     }
 
     /**
@@ -134,7 +152,7 @@ public class FeatureflowClient implements Closeable {
             logger.warn("FeatureFlow is not initialized yet.");
         }
         if (control == null) {
-            logger.warn("Feature " + featureKey + " does not exist, returning failover variant of " + failoverVariant);
+            logger.warn("Feature '" + featureKey + " 'does not exist, returning failover variant of " + failoverVariant);
             return failoverVariant;
         }
 

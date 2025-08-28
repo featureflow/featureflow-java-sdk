@@ -2,21 +2,20 @@ package io.featureflow.client;
 
 import io.featureflow.client.model.Rule;
 import io.featureflow.client.model.VariantSplit;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * Created by oliver on 21/11/16.
+ * Updated to use JUnit 5
  */
 public class RuleVariantsTest {
 
-
     @Test
     public void testDefaultOnVariant() throws Exception {
-
         Rule rule = new Rule();
 
         String onId = "onId";
@@ -32,7 +31,7 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(onId, rule.getVariantSplitKey("oliver", "f1", "1"));
+        assertEquals(onId, rule.getVariantSplitKey("oliver", "f1", "1"));
     }
 
     @Test
@@ -54,7 +53,7 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(onSplit, offSplit));
 
-        Assert.assertEquals(offId, rule.getVariantSplitKey("oliver", "f1","1"));
+        assertEquals(offId, rule.getVariantSplitKey("oliver", "f1","1"));
     }
 
     @Test
@@ -82,11 +81,11 @@ public class RuleVariantsTest {
 
         rule.setVariantSplits(Arrays.asList(redSplit, blueSplit, greenSplit));
 
-        Assert.assertEquals(id1, rule.getVariantSplitKey("oliver", "f1", "1"));
+        assertEquals(id1, rule.getVariantSplitKey("oliver", "f1", "1"));
 
-        Assert.assertEquals(id2, rule.getVariantSplitKey("alan", "f1","1"));
+        assertEquals(id2, rule.getVariantSplitKey("alan", "f1","1"));
 
-        Assert.assertEquals(id2, rule.getVariantSplitKey("sarah", "f1","1"));
+        assertEquals(id2, rule.getVariantSplitKey("sarah", "f1","1"));
     }
 
 
