@@ -56,7 +56,14 @@ public class RulesStepDefs {
 
     @Then("the result from the match should be true")
     public void the_result_from_the_match_should_be_true() {
+
         assertTrue(ruleToUserMatch);
+    }
+
+    @Then("the result from the match should be {string}")
+    public void the_result_from_the_match_should_be(String expectedResult) {
+        boolean expected = Boolean.parseBoolean(expectedResult);
+        assertEquals(expected, ruleToUserMatch);
     }
 
     @Given("the user attributes are")
@@ -66,11 +73,11 @@ public class RulesStepDefs {
         List<Map<String, String>> rows = userAttributes.asMaps();
 
         for (Map<String, String> row : rows) {
-            String key = row.get("key");
+            String key = row.get("attribute");
             String value = row.get("value");
 
             // Skip header if present
-            if (key == null || key.equals("key")) continue;
+            if (key == null || key.equals("attribute")) continue;
 
             JsonElement userVal;
             if (value.startsWith("[")) {
@@ -111,7 +118,7 @@ public class RulesStepDefs {
 
     @Then("the result from the match should be false")
     public void the_result_from_the_match_should_be_false() {
-        assertFalse(audience.matches(user));
+        assertFalse(ruleToUserMatch);
     }
 
     @Given("the variant value of {int}")
@@ -130,6 +137,9 @@ public class RulesStepDefs {
 
             // Skip header if present
             if (variantKey == null || variantKey.equals("variantKey")) continue;
+            
+            // Skip rows with null split values
+            if (splitValue == null) continue;
 
             variantSplits.add(new VariantSplit(variantKey, Long.valueOf(splitValue)));
         }

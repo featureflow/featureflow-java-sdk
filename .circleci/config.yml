@@ -17,6 +17,6 @@ jobs:
             - run: export GPG_TTY=$(tty)
             - run: openssl aes-256-cbc -d -in codesigning.asc.enc -out codesigning.asc -k $ENCKEY -pbkdf2
             - run: gpg --batch --import codesigning.asc
-            - run: mvn deploy -P sign,build-extras --settings settings.xml -DskipTests
+            - run: mvn deploy -P sign,build-extras --settings settings.xml
             - store_test_results:
                   path: target/surefire-reports
