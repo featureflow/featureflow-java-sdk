@@ -1,14 +1,5 @@
 package io.featureflow.client.cucumber.stepdefs;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import io.cucumber.datatable.DataTable;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import io.featureflow.client.*;
-import io.featureflow.client.model.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +8,25 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
+
+import io.cucumber.datatable.DataTable;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import io.featureflow.client.FeatureflowUser;
+import io.featureflow.client.TestAccessor;
+import io.featureflow.client.model.Audience;
+import io.featureflow.client.model.Condition;
+import io.featureflow.client.model.Operator;
+import io.featureflow.client.model.Rule;
+import io.featureflow.client.model.VariantSplit;
 
 /**
  * Updated to use modern Cucumber API
@@ -49,7 +59,7 @@ public class RulesStepDefs {
         assertTrue(ruleToUserMatch);
     }
 
-    @Given("the user values are")
+    @Given("the user attributes are")
     public void the_user_values_are(DataTable userAttributes) {
         user = new FeatureflowUser("uniqueuserid");
         Map<String, JsonElement> userAttrs = new HashMap<>();
@@ -116,7 +126,7 @@ public class RulesStepDefs {
 
         for (Map<String, String> row : rows) {
             String variantKey = row.get("variantKey");
-            String splitValue = row.get("splitValue");
+            String splitValue = row.get("split");
 
             // Skip header if present
             if (variantKey == null || variantKey.equals("variantKey")) continue;
