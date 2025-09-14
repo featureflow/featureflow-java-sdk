@@ -23,6 +23,7 @@ import io.featureflow.client.core.EventsClient;
 import io.featureflow.client.core.EventsClientImpl;
 import io.featureflow.client.core.FeatureControlCache;
 import io.featureflow.client.core.FeatureControlStreamClient;
+import io.featureflow.client.core.FeatureflowPollingClient;
 import io.featureflow.client.core.RestClient;
 import io.featureflow.client.core.RestClientImpl;
 import io.featureflow.client.core.SimpleMemoryFeatureCache;
@@ -42,6 +43,7 @@ public class FeatureflowClient implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(FeatureflowClient.class);
     private final FeatureflowConfig config;
     private final FeatureControlStreamClient featureControlStreamClient; // manages pubsub events to update a feature control
+    private final FeatureflowPollingClient featureControlPollingClient; // manages polling to update feature controls
     private final FeatureControlCache featureControlCache; //holds the featureControls
     private final RestClient restClient; //manages retrieving features and pushing updates
     private final EventsClient eventHandler;
@@ -93,21 +95,47 @@ public class FeatureflowClient implements Closeable {
         }
 
         if (!offline){
-            featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callbacks);
-            Future<Void> startFuture = featureControlStreamClient.start();
-            if (config.waitForStartup > 0L) {
-                logger.info("Waiting for Featureflow to initialise");
-                try {
-                    startFuture.get(config.waitForStartup, TimeUnit.MILLISECONDS);
-                } catch (TimeoutException e) {
-                    logger.error("Timeout waiting for Featureflow client initialise");
-                } catch (Exception e) {
-                    logger.error("Exception waiting for Featureflow client to initialise", e);
+            if (config.isUseStreaming()) {
+                // Use streaming client
+                featureControlStreamClient = new FeatureControlStreamClient(apiKey, config, featureControlCache, callbacks);
+                featureControlPollingClient = null;
+                Future<Void> startFuture = featureControlStreamClient.start();
+                if (config.waitForStartup > 0L) {
+                    logger.info("Waiting for Featureflow to initialise");
+                    try {
+                        startFuture.get(config.waitForStartup, TimeUnit.MILLISECONDS);
+                    } catch (TimeoutException e) {
+                        logger.error("Timeout waiting for Featureflow client initialise");
+                    } catch (Exception e) {
+                        logger.error("Exception waiting for Featureflow client to initialise", e);
+                    }
+                }
+            } else {
+                // Use polling client (default)
+                featureControlStreamClient = null;
+                featureControlPollingClient = new FeatureflowPollingClient(apiKey, config, featureControlCache, callbacks);
+                if (config.waitForStartup > 0L) {
+                    logger.info("Waiting for Featureflow polling client to initialise");
+                    // Wait for polling client to initialize
+                    long startTime = System.currentTimeMillis();
+                    while (!featureControlPollingClient.initialized() && 
+                           (System.currentTimeMillis() - startTime) < config.waitForStartup) {
+                        try {
+                            Thread.sleep(100); // Sleep in small increments to check initialization
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                    }
+                    if (!featureControlPollingClient.initialized()) {
+                        logger.warn("Featureflow polling client did not initialize within timeout");
+                    }
                 }
             }
         } else {
-            logger.info("Featureflow client is running in offline mode, no stream connection will be made.");
+            logger.info("Featureflow client is running in offline mode, no connection will be made.");
             featureControlStreamClient = null;
+            featureControlPollingClient = null;
         }
 
     }
@@ -148,8 +176,16 @@ public class FeatureflowClient implements Closeable {
 
         String failoverVariant = (featuresMap.get(featureKey) != null && featuresMap.get(featureKey).failoverVariant != null) ? featuresMap.get(featureKey).failoverVariant : Variant.off;
         FeatureControl control = featureControlCache.get(featureKey);
-        if (!offline && !featureControlStreamClient.initialized()) {
-            logger.warn("FeatureFlow is not initialized yet.");
+        if (!offline) {
+            boolean initialized = false;
+            if (featureControlStreamClient != null) {
+                initialized = featureControlStreamClient.initialized();
+            } else if (featureControlPollingClient != null) {
+                initialized = featureControlPollingClient.initialized();
+            }
+            if (!initialized) {
+                logger.warn("FeatureFlow is not initialized yet.");
+            }
         }
         if (control == null) {
             logger.warn("Feature '" + featureKey + " 'does not exist, returning failover variant of " + failoverVariant);
@@ -172,8 +208,15 @@ public class FeatureflowClient implements Closeable {
         user.getSessionAttributes().put(FeatureflowUser.FEATUREFLOW_DATE, new JsonPrimitive(FeatureflowUser.toIso(new DateTime())));
     }
 
+    @Override
     public void close() throws IOException {
         this.eventHandler.close();
+        if (featureControlStreamClient != null) {
+            featureControlStreamClient.close();
+        }
+        if (featureControlPollingClient != null) {
+            featureControlPollingClient.close();
+        }
     }
 
     public static Builder builder(String apiKey) {

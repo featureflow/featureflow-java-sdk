@@ -13,6 +13,7 @@ public class FeatureflowConfig {
     public static final String DEFAULT_FEATURE_EVENT_URI = "https://events.featureflow.io/api/sdk/v1/events"; //The Feature Event URL - eg https://events.featureflow.io/api/sdk/v1/events"
     public static final String DEFAULT_REGISTER_FEATURE_URI = "https://events.featureflow.io/api/sdk/v1/register"; //The Register URL - eg https://events.featureflow.io/api/sdk/v1/register
     private static final String DEFAULT_STREAM_URI = "https://rtm.featureflow.io/api/sdk/v1/features"; //The SSE Stream Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
+    private static final String DEFAULT_POLLING_URI = "https://rtm.featureflow.io/api/sdk/v1/features"; //The Polling Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
     public static final String VERSION = "1.2.0";
 
 
@@ -25,11 +26,14 @@ public class FeatureflowConfig {
     private String featureEventUri;
     private String registerFeatureUri;
     private String streamUri;
+    private String pollingUri;
+    private int pollingInterval;
+    private boolean useStreaming;
 
 
     public long waitForStartup = 10000l;
 
-    FeatureflowConfig(String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String featureEventUri, String registerFeatureUri, String streamUri, long waitForStartup, boolean offline) {
+    FeatureflowConfig(String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String featureEventUri, String registerFeatureUri, String streamUri, String pollingUri, int pollingInterval, boolean useStreaming, long waitForStartup, boolean offline) {
         this.proxyHost = proxyHost;
         this.proxyScheme = proxyScheme;
         this.proxyPort = proxyPort;
@@ -38,6 +42,9 @@ public class FeatureflowConfig {
         this.featureEventUri = featureEventUri;
         this.registerFeatureUri = registerFeatureUri;
         this.streamUri = streamUri;
+        this.pollingUri = pollingUri;
+        this.pollingInterval = pollingInterval;
+        this.useStreaming = useStreaming;
 
         this.waitForStartup = waitForStartup;
         this.offline = offline;
@@ -92,6 +99,18 @@ public class FeatureflowConfig {
         return streamUri;
     }
 
+    public String getPollingUri() {
+        return pollingUri;
+    }
+
+    public int getPollingInterval() {
+        return pollingInterval;
+    }
+
+    public boolean isUseStreaming() {
+        return useStreaming;
+    }
+
     public long getWaitForStartup() {
         return waitForStartup;
     }
@@ -113,6 +132,9 @@ public class FeatureflowConfig {
         private String featureEventUri = DEFAULT_FEATURE_EVENT_URI;
         private String registerFeatureUri = DEFAULT_REGISTER_FEATURE_URI;
         private String streamUri = DEFAULT_STREAM_URI;
+        private String pollingUri = DEFAULT_POLLING_URI;
+        private int pollingInterval = 60000; // 60 seconds default
+        private boolean useStreaming = false; // Use polling by default
 
         long waitForStartup = 10000;
         boolean offline = false;
@@ -157,6 +179,21 @@ public class FeatureflowConfig {
             return this;
         }
 
+        public Builder withPollingUri(String pollingUri) {
+            this.pollingUri = pollingUri;
+            return this;
+        }
+
+        public Builder withPollingInterval(int pollingIntervalSeconds) {
+            this.pollingInterval = pollingIntervalSeconds * 1000; // Convert to milliseconds
+            return this;
+        }
+
+        public Builder withUseStreaming(boolean useStreaming) {
+            this.useStreaming = useStreaming;
+            return this;
+        }
+
         public Builder withWaitForStartup(long waitTimeMilliseconds) {
             this.waitForStartup = waitTimeMilliseconds;
             return this;
@@ -168,7 +205,7 @@ public class FeatureflowConfig {
         }
 
         public FeatureflowConfig build() {
-            return new FeatureflowConfig(proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, featureEventUri, registerFeatureUri, streamUri, waitForStartup, offline);
+            return new FeatureflowConfig(proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, featureEventUri, registerFeatureUri, streamUri, pollingUri, pollingInterval, useStreaming, waitForStartup, offline);
         }
     }
 
