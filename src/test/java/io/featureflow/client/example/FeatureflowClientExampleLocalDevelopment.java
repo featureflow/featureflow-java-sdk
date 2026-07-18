@@ -21,7 +21,14 @@ public class FeatureflowClientExampleLocalDevelopment {
     FeatureflowClient featureflowClient;
     private CountDownLatch lock = new CountDownLatch(100);
 
-    private static final String API_KEY = "srv-env-685e066dea464f88be14effbf65cf69c";//localhost test/test
+    // Reads the key/base URL from the environment rather than a literal in source, so
+    // no real SDK key is checked into source. Defaults to a local dev stack so this
+    // still does something sensible once un-@Ignore'd without FEATUREFLOW_TEST_* set.
+    private static final String API_KEY = System.getenv("FEATUREFLOW_TEST_API_KEY");
+    private static final String BASE_URL = System.getenv("FEATUREFLOW_TEST_BASE_URL") != null
+            ? System.getenv("FEATUREFLOW_TEST_BASE_URL")
+            : "http://localhost:8080";
+
     @Test
     @Ignore
     public void testEvaluate() throws Exception {
@@ -29,9 +36,9 @@ public class FeatureflowClientExampleLocalDevelopment {
 
         //Any Additional Config
         FeatureflowConfig config = FeatureflowConfig.builder()
-                .withStreamUri("http://localhost:8080api/sdk/v1/features")
-                .withRegisterFeatureUri("http://localhost:8080api/sdk/v1/register")
-                .withFeatureEventUri("http://localhost:8080api/sdk/v1/events")
+                .withStreamUri(BASE_URL + "/api/sdk/v1/features")
+                .withRegisterFeatureUri(BASE_URL + "/api/sdk/v1/register")
+                .withFeatureEventUri(BASE_URL + "/api/sdk/v1/events")
                 .withWaitForStartup(5000l)
                 .build();
 
