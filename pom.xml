@@ -58,7 +58,15 @@
                 <directory>src/test/resources</directory>
             </testResource>
             <testResource>
-                <directory>src/test/features</directory>
+                <!-- Shared scenarios from github.com/featureflow/featureflow-sdk-testbed (git submodule).
+                     Restricted to the files this SDK has step definitions for: conditions/userBuilder-
+                     equivalent coverage here comes from plain JUnit tests (OperatorTest, RuleMatchesTest,
+                     etc.) instead of Cucumber. -->
+                <directory>testbed/gherkin</directory>
+                <includes>
+                    <include>bucketing.feature</include>
+                    <include>rules.feature</include>
+                </includes>
             </testResource>
         </testResources>
         <plugins>

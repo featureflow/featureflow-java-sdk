@@ -73,11 +73,11 @@ public class RulesStepDefs {
         List<Map<String, String>> rows = userAttributes.asMaps();
 
         for (Map<String, String> row : rows) {
-            String key = row.get("attribute");
+            String key = row.get("key");
             String value = row.get("value");
 
             // Skip header if present
-            if (key == null || key.equals("attribute")) continue;
+            if (key == null || key.equals("key")) continue;
 
             JsonElement userVal;
             if (value.startsWith("[")) {

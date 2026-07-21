@@ -13,21 +13,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class HashingAlgorithmStepDefs {
     String salt;
     String featureKey;
-    String contextKey;
+    String id;
     String hash;
     private long result;
 
-    @Given("the salt is {string}, the feature is {string} and the key is {string}")
-    public void the_salt_is_the_feature_is_and_the_key_is(String salt, String featureKey, String contextKey) {
+    @Given("the salt is {string}, the feature is {string} and the id is {string}")
+    public void the_salt_is_the_feature_is_and_the_id_is(String salt, String featureKey, String id) {
         this.salt = salt;
         this.featureKey = featureKey;
-        this.contextKey = contextKey;
+        this.id = id;
     }
 
     @When("the variant value is calculated")
     public void the_variant_value_is_calculated() {
         Rule rule = new Rule();
-        this.hash = rule.getHash(this.contextKey, this.featureKey, this.salt);
+        this.hash = rule.getHash(this.id, this.featureKey, this.salt);
         this.result = rule.getVariantValue(this.hash);
     }
 
