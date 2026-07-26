@@ -2,6 +2,10 @@ package io.featureflow.client;
 
 import org.apache.hc.core5.http.HttpHost;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Updated to use HttpClient 5.x
  */
@@ -14,7 +18,26 @@ public class FeatureflowConfig {
     public static final String DEFAULT_REGISTER_FEATURE_URI = "https://events.featureflow.io/api/sdk/v1/register"; //The Register URL - eg https://events.featureflow.io/api/sdk/v1/register
     private static final String DEFAULT_STREAM_URI = "https://rtm.featureflow.io/api/sdk/v1/features"; //The SSE Stream Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
     private static final String DEFAULT_POLLING_URI = "https://app.featureflow.io/api/sdk/v1/features"; //The Polling Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
-    public static final String VERSION = "1.3.0";
+    public static final String VERSION = loadVersion();
+
+    // Populated by Maven resource filtering from ${project.version} at build time, so this
+    // always tracks the pom.xml version instead of drifting from a hand-maintained constant.
+    // Falls back to "unknown" when run straight from an IDE/classpath without filtering applied.
+    private static String loadVersion() {
+        try (InputStream in = FeatureflowConfig.class.getResourceAsStream("/featureflow-sdk-version.properties")) {
+            if (in != null) {
+                Properties properties = new Properties();
+                properties.load(in);
+                String version = properties.getProperty("version");
+                if (version != null && !version.isBlank() && !version.startsWith("${")) {
+                    return version;
+                }
+            }
+        } catch (IOException e) {
+            // fall through to the "unknown" fallback below
+        }
+        return "unknown";
+    }
 
 
     private boolean offline;
