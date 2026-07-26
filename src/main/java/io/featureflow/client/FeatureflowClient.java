@@ -27,7 +27,6 @@ import io.featureflow.client.core.FeatureflowPollingClient;
 import io.featureflow.client.core.RestClient;
 import io.featureflow.client.core.RestClientImpl;
 import io.featureflow.client.core.SimpleMemoryFeatureCache;
-import io.featureflow.client.model.Event;
 import io.featureflow.client.model.Feature;
 import io.featureflow.client.model.FeatureControl;
 import io.featureflow.client.model.Variant;
@@ -113,7 +112,10 @@ public class FeatureflowClient implements Closeable {
             } else {
                 // Use polling client (default)
                 featureControlStreamClient = null;
-                featureControlPollingClient = new FeatureflowPollingClient(apiKey, config, featureControlCache, callbacks);
+                // Forward server-driven SDK config from the features poll (eventsEnabled/
+                // mode/flushIntervalSeconds) to the events client; pollIntervalSeconds is
+                // applied by the polling client to itself.
+                featureControlPollingClient = new FeatureflowPollingClient(apiKey, config, featureControlCache, callbacks, eventHandler::applyServerConfig, null);
                 if (config.waitForStartup > 0L) {
                     logger.info("Waiting for Featureflow polling client to initialise");
                     // Wait for polling client to initialize
@@ -201,6 +203,27 @@ public class FeatureflowClient implements Closeable {
 
     }
 
+    // Per-flag exposure fidelity (dormant until server-side experimentation ships): a
+    // feature carrying trackEvents: true has each distinct user attached once per
+    // (user, flag) per flush interval, instead of the global once-per-user dedupe.
+    private boolean isTrackEvents(String featureKey) {
+        FeatureControl control = featureControlCache.get(featureKey);
+        return control != null && control.trackEvents;
+    }
+
+    // Package-private test accessors (see TestAccessor) — no public API surface added.
+    FeatureControlCache getFeatureControlCache() {
+        return featureControlCache;
+    }
+
+    EventsClient getEventHandler() {
+        return eventHandler;
+    }
+
+    FeatureflowPollingClient getFeatureControlPollingClient() {
+        return featureControlPollingClient;
+    }
+
     private void addAdditionalAttributes(FeatureflowUser user) {
 
         user.getAttributes().put(FeatureflowUser.FEATUREFLOW_USER_ID, new JsonPrimitive(user.getId())); //this will be removed (we use the id value)
@@ -224,8 +247,18 @@ public class FeatureflowClient implements Closeable {
     }
 
     public void track(String goalKey, FeatureflowUser user) {
-        eventHandler.queueEvent(new Event(goalKey, user, evaluateAll(user)));
+        track(goalKey, user, null);
+    }
 
+    /**
+     * Records a goal (conversion/metric) event for experimentation and metric-gated
+     * rollouts. {@code details} is a {@link Number} (the metric value), a {@code Map}
+     * with an optional numeric {@code "value"} plus custom fields, or {@code null} — the
+     * OpenFeature tracking API shape. Goals are sent raw in the same batch as evaluate
+     * events; servers without experimentation ignore them.
+     */
+    public void track(String goalKey, FeatureflowUser user, Object details) {
+        eventHandler.trackEvent(goalKey, user, details);
     }
 
     public static class Builder {
@@ -303,12 +336,14 @@ public class FeatureflowClient implements Closeable {
         private final String featureKey;
         private final FeatureflowUser user;
         private final FeatureflowClient client;
+        private final boolean trackEvents;
 
         Evaluate(FeatureflowClient featureflowClient, String featureKey, FeatureflowUser user) {
             this.featureKey = featureKey;
             this.user = user;
             this.evaluateResult = featureflowClient.eval(featureKey, user);
             this.client = featureflowClient;
+            this.trackEvents = featureflowClient.isTrackEvents(featureKey);
         }
 
         Evaluate(FeatureflowClient featureflowClient, String featureKey, String userId) {
@@ -319,6 +354,7 @@ public class FeatureflowClient implements Closeable {
                                     new FeatureflowUser(userId);
             this.client = featureflowClient;
             this.evaluateResult = featureflowClient.eval(featureKey, user);
+            this.trackEvents = featureflowClient.isTrackEvents(featureKey);
         }
 
         public boolean isOn() {
@@ -331,13 +367,13 @@ public class FeatureflowClient implements Closeable {
 
         public boolean is(String variant) {
             if (!client.offline)
-                eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, user, evaluateResult, variant));
+                eventHandler.evaluateEvent(featureKey, evaluateResult, user, trackEvents);
             return variant.equals(evaluateResult);
         }
 
         public String value() {
             if (!client.offline)
-                eventHandler.queueEvent(new Event(featureKey, Event.EVALUATE_EVENT, user, evaluateResult, null));
+                eventHandler.evaluateEvent(featureKey, evaluateResult, user, trackEvents);
             return evaluateResult;
         }
     }

@@ -13,6 +13,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import javax.net.ssl.SSLException;
 
@@ -53,8 +54,11 @@ public class FeatureflowPollingClient implements Closeable {
     
     // Default configuration values
     private static final int DEFAULT_INTERVAL = 60000; // 60 seconds
+    private static final int MIN_SERVER_POLL_INTERVAL_SECONDS = 5;
+    private static final int MAX_SERVER_POLL_INTERVAL_SECONDS = 3600;
     private static final String CLIENT_VERSION = "JavaClient/" + FeatureflowConfig.VERSION;
-    
+    private static final String SDK_CONFIG_HEADER = "X-Featureflow-Sdk-Config";
+
     private final String apiKey;
     private final FeatureflowConfig config;
     private final FeatureControlCache repository;
@@ -62,12 +66,19 @@ public class FeatureflowPollingClient implements Closeable {
     private final CloseableHttpClient httpClient;
     private final ScheduledExecutorService scheduler;
     private final Gson gson;
-    
+    // Called with the parsed X-Featureflow-Sdk-Config header (server-driven SDK config)
+    // whenever a features response carries one — on 304s too, which is what a polling
+    // client mostly sees.
+    private final Consumer<Map<String, Object>> onSdkConfig;
+    // Called when a poll observes changed features (a 200 with a new ETag after the
+    // initial load).
+    private final Runnable onUpdate;
+
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final AtomicBoolean closed = new AtomicBoolean(false);
-    
+
     private String etag = "";
-    private final int pollingInterval;
+    private volatile int pollingInterval;
     private ScheduledFuture<?> pollingTask;
     
     // Type tokens for JSON deserialization
@@ -85,10 +96,21 @@ public class FeatureflowPollingClient implements Closeable {
                                    FeatureflowConfig config,
                                    FeatureControlCache repository,
                                    Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks) {
+        this(apiKey, config, repository, callbacks, null, null);
+    }
+
+    public FeatureflowPollingClient(String apiKey,
+                                   FeatureflowConfig config,
+                                   FeatureControlCache repository,
+                                   Map<CallbackEvent, List<FeatureControlCallbackHandler>> callbacks,
+                                   Consumer<Map<String, Object>> onSdkConfig,
+                                   Runnable onUpdate) {
         this.apiKey = apiKey;
         this.config = config;
         this.repository = repository;
         this.callbacks = callbacks;
+        this.onSdkConfig = onSdkConfig;
+        this.onUpdate = onUpdate;
         this.httpClient = createHttpClient();
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "featureflow-polling-client");
@@ -143,36 +165,50 @@ public class FeatureflowPollingClient implements Closeable {
             
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getCode();
-                
+
+                // The config header is delivered on both 200 and 304 responses — a
+                // polling client mostly sees 304s, so it must be read here regardless
+                // of status.
+                handleSdkConfigHeader(response.getFirstHeader(SDK_CONFIG_HEADER));
+
                 if (statusCode == HttpStatus.SC_OK) {
+                    String previousEtag = this.etag;
+
                     // Update ETag for future requests
                     Header etagHeader = response.getFirstHeader(HttpHeaders.ETAG);
                     if (etagHeader != null) {
                         this.etag = etagHeader.getValue();
                     }
-                    
+
                     // Parse and update features
                     String responseBody = new String(response.getEntity().getContent().readAllBytes());
                     Map<String, FeatureControl> controls = gson.fromJson(responseBody, mapOfFeatureControlsType);
-                    
+
                     if (controls != null) {
                         logger.debug("Updating features from polling response");
                         updateFeatures(controls);
                     }
-                    
+
                     // Mark as initialized on first successful fetch
                     if (!initialized.getAndSet(true)) {
                         logger.info("Featureflow polling client initialized.");
                     }
-                    
+
+                    // Notify only on an actual change after the initial load — not on
+                    // the first fetch (previousEtag empty) and not when the ETag is
+                    // unchanged.
+                    if (!previousEtag.isEmpty() && !previousEtag.equals(this.etag) && onUpdate != null) {
+                        onUpdate.run();
+                    }
+
                 } else if (statusCode == HttpStatus.SC_NOT_MODIFIED) {
                     // No changes since last request (ETag optimization)
                     logger.debug("No feature changes detected (304 Not Modified)");
-                    
+
                 } else if (statusCode >= 400) {
                     logger.warn("Request for features failed with response status {}", statusCode);
                 }
-                
+
             } catch (Exception e) {
                 logger.error("Error fetching features", e);
             }
@@ -325,37 +361,100 @@ public class FeatureflowPollingClient implements Closeable {
     }
     
     /**
-     * Gets the polling interval from config, with validation.
+     * Gets the polling interval from config, with validation. An explicit 0 disables
+     * polling entirely and is never overridden (including by server config, below) —
+     * distinct from "not configured", which falls back to the default.
      */
     private int getPollingInterval(FeatureflowConfig config) {
         int interval = config.getPollingInterval();
-        // Validate interval - must be at least 20 seconds or 0 (disabled)
+        if (interval == 0) {
+            return 0;
+        }
+        // Validate interval - must be at least 20 seconds
         if (interval > 0 && interval < 20000) {
             logger.warn("Polling interval {}ms is too short, using minimum of 20 seconds", interval);
             return 20000;
         }
         return interval > 0 ? interval : DEFAULT_INTERVAL;
     }
-    
+
+    /**
+     * Applies server-driven config: {@code pollIntervalSeconds} retunes the features
+     * polling period fleet-wide. Invalid values are ignored, and a locally disabled
+     * poller (interval 0) is never re-enabled.
+     */
+    private void handleSdkConfigHeader(Header header) {
+        if (header == null) {
+            return;
+        }
+        Map<String, Object> parsed;
+        try {
+            parsed = gson.fromJson(header.getValue(), Map.class);
+        } catch (Exception e) {
+            logger.debug("ignoring malformed {} header: {}", SDK_CONFIG_HEADER, header.getValue());
+            return;
+        }
+        if (parsed == null) {
+            return;
+        }
+        applyServerConfig(parsed);
+        if (onSdkConfig != null) {
+            onSdkConfig.accept(parsed);
+        }
+    }
+
+    private void applyServerConfig(Map<String, Object> config) {
+        Object seconds = config.get("pollIntervalSeconds");
+        if (seconds instanceof Number) {
+            double value = ((Number) seconds).doubleValue();
+            if (value >= MIN_SERVER_POLL_INTERVAL_SECONDS && value <= MAX_SERVER_POLL_INTERVAL_SECONDS) {
+                setPollInterval((int) value);
+            }
+        }
+    }
+
+    private synchronized void setPollInterval(int seconds) {
+        int intervalMs = seconds * 1000;
+        if (pollingInterval <= 0 || intervalMs == pollingInterval) {
+            return;
+        }
+        logger.debug("Polling interval changed by server config: {}ms -> {}ms", pollingInterval, intervalMs);
+        pollingInterval = intervalMs;
+        if (pollingTask != null) {
+            pollingTask.cancel(false);
+            pollingTask = scheduler.scheduleWithFixedDelay(this::getFeatures, pollingInterval, pollingInterval, TimeUnit.MILLISECONDS);
+        }
+    }
+
     /**
      * Validates the API key.
      */
     private boolean isValidApiKey(String apiKey) {
         return apiKey != null && apiKey.length() > 10;
     }
-    
+
     /**
      * Gets the polling URI from config.
      */
     private String getPollingUri() {
         return config.getPollingUri();
     }
-    
+
     /**
      * Checks if the client is initialized.
      */
     public boolean initialized() {
         return initialized.get();
+    }
+
+    /** Triggers an immediate synchronous fetch, bypassing the scheduled timer. */
+    public void refresh() {
+        getFeatures();
+    }
+
+    /** The current effective polling interval, in milliseconds (0 means disabled). */
+    public int getPollingIntervalMillis() {
+        return pollingInterval;
     }
     
     @Override

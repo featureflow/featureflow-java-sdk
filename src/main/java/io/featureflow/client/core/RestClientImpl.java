@@ -91,7 +91,7 @@ public class RestClientImpl implements RestClient {
     }
 
     @Override
-    public void postEvents(List<? extends Event> events) {
+    public EventsPostResult postEvents(List<? extends Event> events) {
         URI uri = URI.create(config.getFeatureEventUri());
         CloseableHttpResponse response = null;
         Type type = new TypeToken<List<Event>>() {}.getType();
@@ -102,8 +102,13 @@ public class RestClientImpl implements RestClient {
         try {
             client = createHttpClient();
             response = client.execute(request);
+            int statusCode = response.getCode();
+            Header retryAfter = response.getFirstHeader("Retry-After");
+            String body = response.getEntity() == null ? null : new String(response.getEntity().getContent().readAllBytes());
+            return new EventsPostResult(statusCode, retryAfter == null ? null : retryAfter.getValue(), body);
         } catch (IOException e) {
             logger.error("Network exception posting events", e);
+            return null;
         } finally {
             try {
                 if (response != null) response.close();

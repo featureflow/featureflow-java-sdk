@@ -14,7 +14,7 @@ public class FeatureflowConfig {
     public static final String DEFAULT_REGISTER_FEATURE_URI = "https://events.featureflow.io/api/sdk/v1/register"; //The Register URL - eg https://events.featureflow.io/api/sdk/v1/register
     private static final String DEFAULT_STREAM_URI = "https://rtm.featureflow.io/api/sdk/v1/features"; //The SSE Stream Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
     private static final String DEFAULT_POLLING_URI = "https://app.featureflow.io/api/sdk/v1/features"; //The Polling Base URL - eg https://rtm.featureflow.io/api/sdk/v1/features
-    public static final String VERSION = "1.2.3";
+    public static final String VERSION = "1.3.0";
 
 
     private boolean offline;

@@ -6,43 +6,56 @@ import org.joda.time.DateTime;
 import java.util.Map;
 
 /**
- * Created by oliver.oldfieldhodge on 3/1/17.
+ * Wire shape for both event types the SDK sends: a summarised evaluate event
+ * (featureKey, evaluatedVariant, impressions, one user) and a raw goal/track event
+ * (goalKey, user, optional numeric value, optional custom data). Fields irrelevant to a
+ * given event's type are left null and omitted from JSON (Gson skips nulls by default),
+ * so the two shapes never bleed into each other on the wire.
  */
 public class Event {
     public static final String EVALUATE_EVENT = "evaluate";
     public static final String GOAL_EVENT = "goal";
 
-    FeatureflowUser user;
-    String featureKey;
-    String goalKey;
-    String type;
-    DateTime timestamp;
+    private String featureKey;
+    private String goalKey;
+    private String type;
+    private DateTime timestamp;
+    private FeatureflowUser user;
 
-    String evaluatedVariant;
-    String expectedVariant;
-    Map<String, String> evaluatedVariants;
+    private String evaluatedVariant;
+    private Integer impressions;
 
-    public Event(String featureKey, String type, FeatureflowUser user, String evaluatedVariant, String expectedVariant) {
-        this.featureKey = featureKey;
-        this.type = type;
+    private Double value;
+    private Map<String, Object> data;
+
+    private Event() {
         this.timestamp = new DateTime();
-        this.user = user;
-        this.evaluatedVariant = evaluatedVariant;
-        this.expectedVariant = expectedVariant;
     }
 
-    public Event(String goalKey, FeatureflowUser user, Map<String, String> evaluatedVariants) {
-        this.type = GOAL_EVENT;
-        this.goalKey = goalKey;
-        this.timestamp = new DateTime();
-        this.user = user;
-        this.evaluatedVariants = evaluatedVariants;
+    public static Event evaluate(String featureKey, String evaluatedVariant, int impressions, FeatureflowUser user) {
+        Event event = new Event();
+        event.type = EVALUATE_EVENT;
+        event.featureKey = featureKey;
+        event.evaluatedVariant = evaluatedVariant;
+        event.impressions = impressions;
+        event.user = user;
+        return event;
+    }
+
+    public static Event goal(String goalKey, FeatureflowUser user, Double value, Map<String, Object> data) {
+        Event event = new Event();
+        event.type = GOAL_EVENT;
+        event.goalKey = goalKey;
+        event.user = user;
+        event.value = value;
+        event.data = data;
+        return event;
     }
 
     @Override
     public String toString() {
         return "Event{" +
-                "user=" + user.getId() +
+                "user=" + (user == null ? null : user.getId()) +
                 ", featureKey='" + featureKey + '\'' +
                 ", goalKey='" + goalKey + '\'' +
                 ", type='" + type + '\'' +
@@ -53,47 +66,39 @@ public class Event {
         return featureKey;
     }
 
-    public void setFeatureKey(String featureKey) {
-        this.featureKey = featureKey;
-    }
-
     public String getGoalKey() {
         return goalKey;
-    }
-
-    public void setGoalKey(String goalKey) {
-        this.goalKey = goalKey;
     }
 
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public DateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(DateTime timestamp) {
-        this.timestamp = timestamp;
+    public FeatureflowUser getUser() {
+        return user;
     }
 
     public String getEvaluatedVariant() {
         return evaluatedVariant;
     }
 
-    public void setEvaluatedVariant(String evaluatedVariant) {
-        this.evaluatedVariant = evaluatedVariant;
+    public Integer getImpressions() {
+        return impressions;
     }
 
-    public Map<String, String> getEvaluatedVariants() {
-        return evaluatedVariants;
+    public void setImpressions(int impressions) {
+        this.impressions = impressions;
     }
 
-    public void setEvaluatedVariants(Map<String, String> evaluatedVariants) {
-        this.evaluatedVariants = evaluatedVariants;
+    public Double getValue() {
+        return value;
+    }
+
+    public Map<String, Object> getData() {
+        return data;
     }
 }

@@ -1,5 +1,6 @@
 package io.featureflow.client;
 
+import io.featureflow.client.core.EventsPostResult;
 import io.featureflow.client.core.RestClient;
 import io.featureflow.client.model.Event;
 import io.featureflow.client.model.Feature;
@@ -21,7 +22,8 @@ public class RestClientMock implements RestClient {
     }
 
     @Override
-    public void postEvents(List<? extends Event> events) {
+    public EventsPostResult postEvents(List<? extends Event> events) {
         log.debug("Not posting events - offline mode enabled");
+        return null;
     }
 }

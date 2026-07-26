@@ -22,6 +22,7 @@ public class FeatureControl {
     public List<Rule> rules = new ArrayList<>(); //A list of feature rules which contain rules to target variant splits at particular audiences
     public String offVariantKey; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
     public boolean inClientApi; //is this in the JS api (for any required logic)
+    public boolean trackEvents; //dormant until server-side experimentation ships: per-flag exposure fidelity for evaluate events, see SDK-CONFIG.md
 
 
     public String getKey(){
