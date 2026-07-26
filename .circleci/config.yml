@@ -19,6 +19,16 @@ jobs:
             - run: export GPG_TTY=$(tty)
             - run: openssl aes-256-cbc -d -in codesigning.asc.enc -out codesigning.asc -k $ENCKEY -pbkdf2
             - run: gpg --batch --import codesigning.asc
-            - run: mvn deploy -P sign,build-extras --settings settings.xml
+            - run:
+                  name: Build (deploy releases to Central; SNAPSHOTs are verified only, not published)
+                  command: |
+                      VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+                      if [[ "$VERSION" == *-SNAPSHOT ]]; then
+                          echo "SNAPSHOT version ($VERSION): running verify only"
+                          mvn verify
+                      else
+                          echo "Release version ($VERSION): signing and deploying to Central"
+                          mvn deploy -P sign,build-extras --settings settings.xml
+                      fi
             - store_test_results:
                   path: target/surefire-reports

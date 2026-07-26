@@ -325,5 +325,9 @@
             <id>central</id>
             <url>https://central.sonatype.com/content/repositories/releases</url>
         </repository>
+        <snapshotRepository>
+            <id>central</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
