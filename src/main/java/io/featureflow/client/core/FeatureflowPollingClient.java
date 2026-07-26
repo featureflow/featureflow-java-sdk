@@ -180,13 +180,27 @@ public class FeatureflowPollingClient implements Closeable {
                         this.etag = etagHeader.getValue();
                     }
 
-                    // Parse and update features
-                    String responseBody = new String(response.getEntity().getContent().readAllBytes());
-                    Map<String, FeatureControl> controls = gson.fromJson(responseBody, mapOfFeatureControlsType);
+                    // The underlying CachingHttpClients transport can transparently
+                    // reconstruct a 200 (with the cached body) from a successfully
+                    // revalidated 304 — observed in practice once the Vary-derived
+                    // cache variant lookup mismatches (e.g. an Accept-Encoding header
+                    // whose element order differs from what was cached), at which point
+                    // the caching layer stops passing the raw 304 through to the
+                    // caller. So the HTTP status alone cannot be trusted to mean "the
+                    // features changed" — the ETag comparison is the reliable signal.
+                    boolean firstFetch = previousEtag.isEmpty();
+                    boolean changed = firstFetch || !previousEtag.equals(this.etag);
 
-                    if (controls != null) {
-                        logger.debug("Updating features from polling response");
-                        updateFeatures(controls);
+                    if (changed) {
+                        String responseBody = new String(response.getEntity().getContent().readAllBytes());
+                        Map<String, FeatureControl> controls = gson.fromJson(responseBody, mapOfFeatureControlsType);
+
+                        if (controls != null) {
+                            logger.debug("Updating features from polling response");
+                            updateFeatures(controls);
+                        }
+                    } else {
+                        logger.debug("No feature changes detected (ETag unchanged: {})", this.etag);
                     }
 
                     // Mark as initialized on first successful fetch
@@ -195,9 +209,8 @@ public class FeatureflowPollingClient implements Closeable {
                     }
 
                     // Notify only on an actual change after the initial load — not on
-                    // the first fetch (previousEtag empty) and not when the ETag is
-                    // unchanged.
-                    if (!previousEtag.isEmpty() && !previousEtag.equals(this.etag) && onUpdate != null) {
+                    // the first fetch and not when the ETag is unchanged.
+                    if (!firstFetch && changed && onUpdate != null) {
                         onUpdate.run();
                     }
 
