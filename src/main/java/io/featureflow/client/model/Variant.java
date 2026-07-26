@@ -1,5 +1,7 @@
 package io.featureflow.client.model;
 
+import com.google.gson.JsonElement;
+
 /**
  * Created by oliver on 26/05/2016.
  *
@@ -19,5 +21,6 @@ public class Variant {
     public static final String on = "on";
     public String key; //unique key - true/false/blue/green or another feature
     public String name; //the value of the variant
+    public JsonElement value; //optional JSON config payload carried by this variant, in addition to its key
 
 }

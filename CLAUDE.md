@@ -24,11 +24,11 @@ Publishing to Maven Central is via CircleCI (`.circleci/config.yml`): `mvn deplo
 
 Two styles coexist:
 
-- **Plain JUnit** (`OperatorTest`, `RuleMatchesTest`, `RuleVariantsTest`, `FeatureControlTest`, `FeatureManagerTest`) for pure evaluation-logic unit tests.
+- **Plain JUnit** (`OperatorTest`, `RuleMatchesTest`, `RuleVariantsTest`, `FeatureControlTest`, `FeatureManagerTest`, `JsonValueTest`) for pure evaluation-logic unit tests.
 - **Cucumber** (`cucumber/CucumberTest` + `cucumber/stepdefs/`), driven by Gherkin scenarios shared across SDKs via the `testbed` submodule. Only a subset of the testbed's `.feature` files are wired up here — see the `<testResource><includes>` list in `pom.xml`. Add a new `<include>` there (and matching step definitions) when picking up a new shared scenario file.
 - `TestAccessor` (`src/test/java/io/featureflow/client/TestAccessor.java`) exposes a few package-private internals (feature-control cache injection, event-handler access) to test code without reflection — extend it rather than widening production-code visibility just for tests.
 
-`json_value.feature` in the testbed is intentionally **not** wired up — it's tagged `@json-value` as a scenario specific to the JS-family SDKs (browser/React/React Native), not part of the required cross-SDK contract. This SDK has no `jsonValue()`-equivalent.
+`json_value.feature` in the testbed is tagged `@json-value` and still not wired up as Cucumber — its final scenario assumes a raw per-evaluation event shape (`{featureKey, evaluatedVariant, user}`) that doesn't match this SDK's summarised evaluate events. `Evaluate.jsonValue()`/`jsonValue(JsonElement defaultValue)` (`FeatureflowClient.java`) implements the same `jsonValue()` contract as the JS-family SDKs — a JSON config payload carried per-variant, resolved via `FeatureControl.variants`/`Variant.value` — with equivalent coverage in `JsonValueTest` instead.
 
 ## Architecture
 

@@ -1,5 +1,7 @@
 package io.featureflow.client.model;
 
+import com.google.gson.JsonElement;
+
 import io.featureflow.client.FeatureflowUser;
 
 import java.util.ArrayList;
@@ -23,10 +25,25 @@ public class FeatureControl {
     public String offVariantKey; // This is served if the feature is toggled off and is the last call but one (the coded in value is the final failover value)
     public boolean inClientApi; //is this in the JS api (for any required logic)
     public boolean trackEvents; //dormant until server-side experimentation ships: per-flag exposure fidelity for evaluate events, see SDK-CONFIG.md
+    public List<Variant> variants = new ArrayList<>(); //optional catalogue of this feature's variants, carrying each one's JSON config payload (if any)
 
 
     public String getKey(){
         return this.key;
+    }
+
+    // Looks up the JSON config payload carried by a variant, by key. Returns null when the
+    // variant isn't in the catalogue or carries no value.
+    public JsonElement getVariantValue(String variantKey) {
+        if (variantKey == null) {
+            return null;
+        }
+        for (Variant variant : variants) {
+            if (variantKey.equals(variant.key)) {
+                return variant.value;
+            }
+        }
+        return null;
     }
 
     public String evaluate(FeatureflowUser user) {

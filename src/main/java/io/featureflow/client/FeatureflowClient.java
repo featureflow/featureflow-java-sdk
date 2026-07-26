@@ -16,6 +16,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 import io.featureflow.client.core.CallbackEvent;
@@ -211,6 +212,14 @@ public class FeatureflowClient implements Closeable {
         return control != null && control.trackEvents;
     }
 
+    // Looks up the JSON config payload carried by the evaluated variant, by feature key.
+    // Returns null when the feature is unknown, the evaluated variant isn't in its variants
+    // catalogue, or the variant carries no value.
+    private JsonElement evalJsonValue(String featureKey, String evaluatedVariant) {
+        FeatureControl control = featureControlCache.get(featureKey);
+        return control == null ? null : control.getVariantValue(evaluatedVariant);
+    }
+
     // Package-private test accessors (see TestAccessor) — no public API surface added.
     FeatureControlCache getFeatureControlCache() {
         return featureControlCache;
@@ -375,6 +384,27 @@ public class FeatureflowClient implements Closeable {
             if (!client.offline)
                 eventHandler.evaluateEvent(featureKey, evaluateResult, user, trackEvents);
             return evaluateResult;
+        }
+
+        /**
+         * Returns the JSON config payload carried by the evaluated variant, or {@code null}
+         * if the variant carries no value (or the feature has no variants catalogue at all).
+         * Records the same evaluate event as {@link #value()} — the JSON value is never
+         * itself attached to the event.
+         */
+        public JsonElement jsonValue() {
+            return jsonValue(null);
+        }
+
+        /**
+         * As {@link #jsonValue()}, but returns {@code defaultValue} instead of {@code null}
+         * when the evaluated variant carries no value.
+         */
+        public JsonElement jsonValue(JsonElement defaultValue) {
+            if (!client.offline)
+                eventHandler.evaluateEvent(featureKey, evaluateResult, user, trackEvents);
+            JsonElement value = client.evalJsonValue(featureKey, evaluateResult);
+            return value != null ? value : defaultValue;
         }
     }
 
