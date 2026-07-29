@@ -121,6 +121,14 @@
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens java.base/java.util=ALL-UNNAMED
                         --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+                        <!-- The whole test JVM runs on a deliberately non-UTC zone. A date-only
+                             condition value such as 2026-07-03 must denote UTC midnight on every
+                             SDK and every host; an implementation that parses it in local time
+                             passes those assertions anyway whenever the runner sits on UTC, which
+                             is how the bug survived unnoticed here. Asia/Tokyo is +09:00 all year
+                             - a whole-hour offset with no DST, so expected instants stay easy to
+                             reason about. Do not remove this to "fix" a failing date test. -->
+                        -Duser.timezone=Asia/Tokyo
                     </argLine>
                     <properties>
                         <configurationParameters>
