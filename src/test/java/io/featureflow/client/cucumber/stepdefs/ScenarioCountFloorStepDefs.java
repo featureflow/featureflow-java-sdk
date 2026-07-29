@@ -20,8 +20,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ScenarioCountFloorStepDefs {
 
-    /** 61 scenarios run today across the six included testbed feature files. */
-    private static final int MIN_SCENARIOS = 55;
+    /**
+     * 138 scenarios run today across the seven included testbed feature files.
+     *
+     * This floor sat at 55 while the real total was 61, and stayed green when a testbed bump
+     * added fourteen scenarios that this SDK never ran — conditions.feature was missing from
+     * pom.xml's include list. A floor cannot detect a file that was never included, only one
+     * that stopped loading, so keep it close enough to the real total to be informative.
+     */
+    private static final int MIN_SCENARIOS = 130;
 
     private static final AtomicInteger SCENARIOS_RUN = new AtomicInteger();
 

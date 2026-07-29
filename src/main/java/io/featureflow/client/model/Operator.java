@@ -8,6 +8,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Created by oliver on 26/05/2016.
@@ -74,8 +75,17 @@ public enum Operator {
     matches{
         @Override
         public boolean evaluate(JsonPrimitive contextValue, List<JsonPrimitive> targetValues){
-            return targetValues.get(0).isString() && contextValue.isString()
-                    && Pattern.matches(targetValues.get(0).getAsString(),contextValue.getAsString());
+            if (!targetValues.get(0).isString() || !contextValue.isString()) return false;
+            try {
+                return Pattern.matches(targetValues.get(0).getAsString(), contextValue.getAsString());
+            } catch (PatternSyntaxException invalidPattern) {
+                // The pattern comes from a targeting rule someone typed into the dashboard, so an
+                // invalid one is reachable in production. Evaluation must fail closed: the condition
+                // does not match, the rule is skipped, and the host application is unaffected.
+                // Letting PatternSyntaxException escape would propagate out of evaluate() into
+                // caller code that has no reason to expect a flag check to throw.
+                return false;
+            }
         }
     },
     in{

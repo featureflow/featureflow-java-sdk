@@ -75,14 +75,24 @@
             </testResource>
             <testResource>
                 <!-- Shared scenarios from github.com/featureflow/featureflow-sdk-testbed (git submodule).
-                     Restricted to the files this SDK has step definitions for: conditions/userBuilder-
-                     equivalent coverage here comes from plain JUnit tests (OperatorTest, RuleMatchesTest,
-                     etc.) instead of Cucumber. json_value.feature is excluded — tagged @json-value in the
-                     testbed as JS-family-only, not part of the required cross-SDK contract; this SDK has
-                     no jsonValue()-equivalent. -->
+                     Restricted to the files this SDK has step definitions for, because the suite runs
+                     strict: an included file with no matching steps is a build failure, not a skip.
+
+                     conditions.feature was previously excluded on the grounds that OperatorTest and
+                     OperatorDateTest covered the same ground in plain JUnit. They do, but hand-written
+                     tests drift from the cross-SDK contract without anything noticing — this SDK's
+                     scenario count stayed at 61 across a testbed bump that added fourteen scenarios
+                     elsewhere, which is what exposed the gap. It now runs the shared file too
+                     (ConditionsStepDefs); the JUnit tests remain as the Java-specific timezone cases.
+
+                     feature_evaluation.feature and user_builder.feature are still not run here — no
+                     step definitions yet (SDK-BACKLOG item 10). json_value.feature is excluded
+                     deliberately: tagged @json-value in the testbed as JS-family-only, not part of the
+                     required cross-SDK contract, and this SDK has no jsonValue() equivalent. -->
                 <directory>testbed/gherkin</directory>
                 <includes>
                     <include>bucketing.feature</include>
+                    <include>conditions.feature</include>
                     <include>rules.feature</include>
                     <include>events.feature</include>
                     <include>goals.feature</include>
