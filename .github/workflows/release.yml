@@ -67,7 +67,25 @@ jobs:
             *"BEGIN PGP PRIVATE KEY BLOCK"*) ;;
             *) echo "::error::SIGNING_KEY is not an armoured private key (missing BEGIN/END lines)"; exit 1 ;;
           esac
-          printf '%s\n' "$SIGNING_KEY" | gpg --batch --import
+          # A paste that lost its newlines (single-line secret, or literal \n escapes) is the
+          # most common way this secret goes wrong. Normalise before importing: expand
+          # literal \n escapes, and if the armour is still one line, rebuild it — BEGIN line,
+          # blank line, base64 body, END line. Armour contains no backslashes or spaces, so
+          # both transformations are safe on a well-formed key.
+          python3 - <<'PY' > /tmp/signing-key.asc
+          import os, re, sys
+          key = os.environ["SIGNING_KEY"].replace("\r\n", "\n").replace("\\n", "\n").strip()
+          if "\n" not in key:
+              m = re.match(r"-----BEGIN PGP PRIVATE KEY BLOCK-----(.*)-----END PGP PRIVATE KEY BLOCK-----$", key, re.S)
+              if not m:
+                  sys.exit("SIGNING_KEY is single-line and not delimited by BEGIN/END armour lines")
+              body = "\n".join(m.group(1).split())
+              key = "-----BEGIN PGP PRIVATE KEY BLOCK-----\n\n" + body + "\n-----END PGP PRIVATE KEY BLOCK-----"
+          print(key)
+          PY
+          echo "signing key: $(wc -l < /tmp/signing-key.asc) lines after normalisation"
+          gpg --batch --import /tmp/signing-key.asc
+          rm -f /tmp/signing-key.asc
           KEYNAME=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec/{print $5; exit}')
           echo "GPG_KEYNAME=$KEYNAME" >> "$GITHUB_ENV"
           echo "imported signing key $KEYNAME"
