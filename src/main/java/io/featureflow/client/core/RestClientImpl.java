@@ -157,6 +157,9 @@ public class RestClientImpl implements RestClient {
 
             request.addHeader("Authorization", "Bearer " + apiKey);
             request.addHeader("X-Featureflow-Client", "JavaClient/" + FeatureflowConfig.VERSION);
+            if (config.getApplication() != null) {
+                request.addHeader("X-Featureflow-Application", config.getApplication());
+            }
         }
     }
 

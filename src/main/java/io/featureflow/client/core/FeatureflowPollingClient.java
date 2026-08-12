@@ -267,6 +267,10 @@ public class FeatureflowPollingClient implements Closeable {
         // Set headers
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
         request.setHeader("X-Featureflow-Client", CLIENT_VERSION);
+        if (config.getApplication() != null) {
+            // Write-only telemetry: never affects the response, so it cannot fragment the CDN cache.
+            request.setHeader("X-Featureflow-Application", config.getApplication());
+        }
         request.setHeader(HttpHeaders.ACCEPT, "application/json");
         
         // Add ETag for conditional requests

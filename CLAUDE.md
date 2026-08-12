@@ -18,7 +18,7 @@ git submodule update --init           # required once: pulls in testbed/gherkin
 
 Java 17+ (`java.version` in `pom.xml`). Plain Maven — no lockfile-manager quirks.
 
-Publishing to Maven Central is via CircleCI (`.circleci/config.yml`): `mvn deploy -P sign,build-extras`, signing with a GPG key decrypted from `codesigning.asc.enc` using the `ENCKEY` environment variable. There is no GitHub Actions workflow in this repo.
+Publishing to Maven Central is via GitHub Actions (`release.yml`, migrated off CircleCI 2026-08-11): create a GitHub release with a **bare** tag matching the pom version (`1.4.0`, no v prefix); a `workflow_dispatch` dry-run builds and signs without uploading. See `ops/development/sdk-publishing.md` in the workspace for the full flow and secrets layout.
 
 ## Testing
 

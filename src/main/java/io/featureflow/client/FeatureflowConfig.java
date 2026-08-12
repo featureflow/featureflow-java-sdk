@@ -1,10 +1,13 @@
 package io.featureflow.client;
 
 import org.apache.hc.core5.http.HttpHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Updated to use HttpClient 5.x
@@ -40,6 +43,32 @@ public class FeatureflowConfig {
     }
 
 
+    private static final Logger logger = LoggerFactory.getLogger(FeatureflowConfig.class);
+
+    /**
+     * Contract slug (featureflow-client-sdk-testbed/CONTRACT.md): lowercase [a-z0-9._-],
+     * max 64 chars. The server sanitises defensively; the SDK validates strictly so a typo
+     * is a visible warning here rather than a silently mangled tag there.
+     */
+    private static final Pattern APPLICATION_PATTERN = Pattern.compile("^[a-z0-9._-]{1,64}$");
+
+    /**
+     * Validate an application tag. Case is forgiven (lowercased); anything else invalid is
+     * dropped with a warning and no X-Featureflow-Application header is sent.
+     */
+    static String sanitiseApplication(String raw) {
+        if (raw == null || raw.isEmpty()) {
+            return null;
+        }
+        String value = raw.trim().toLowerCase();
+        if (!APPLICATION_PATTERN.matcher(value).matches()) {
+            logger.warn("Ignoring application \"{}\" — must be lowercase a-z, 0-9, dot, underscore or hyphen, max 64 chars", raw);
+            return null;
+        }
+        return value;
+    }
+
+    private String application;
     private boolean offline;
     private String proxyHost;
     private String proxyScheme;
@@ -56,7 +85,8 @@ public class FeatureflowConfig {
 
     public long waitForStartup = 10000l;
 
-    FeatureflowConfig(String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String featureEventUri, String registerFeatureUri, String streamUri, String pollingUri, int pollingInterval, boolean useStreaming, long waitForStartup, boolean offline) {
+    FeatureflowConfig(String proxyHost, String proxyScheme, int proxyPort, int connectTimeout, int socketTimeout, String featureEventUri, String registerFeatureUri, String streamUri, String pollingUri, int pollingInterval, boolean useStreaming, long waitForStartup, boolean offline, String application) {
+        this.application = application;
         this.proxyHost = proxyHost;
         this.proxyScheme = proxyScheme;
         this.proxyPort = proxyPort;
@@ -89,6 +119,11 @@ public class FeatureflowConfig {
 
     public boolean isOffline() {
         return offline;
+    }
+
+    /** Sanitised application tag sent as X-Featureflow-Application; null = send no tag. */
+    public String getApplication() {
+        return application;
     }
 
     public String getProxyHost() {
@@ -161,6 +196,7 @@ public class FeatureflowConfig {
 
         long waitForStartup = 10000;
         boolean offline = false;
+        private String application = null;
 
         public Builder withProxyHost(String proxyHost) {
             this.proxyHost = proxyHost;
@@ -227,8 +263,22 @@ public class FeatureflowConfig {
             return this;
         }
 
+        /**
+         * Name this workload (e.g. "checkout-api") so the Featureflow dashboard can
+         * attribute SDK usage and flag evaluations to it. Sent as the
+         * X-Featureflow-Application header on every request. A slug: lowercase
+         * [a-z0-9._-], max 64 chars — invalid values are dropped with a warning. Falls
+         * back to the FEATUREFLOW_APPLICATION environment variable when not set here.
+         */
+        public Builder withApplication(String application) {
+            this.application = application;
+            return this;
+        }
+
         public FeatureflowConfig build() {
-            return new FeatureflowConfig(proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, featureEventUri, registerFeatureUri, streamUri, pollingUri, pollingInterval, useStreaming, waitForStartup, offline);
+            String resolvedApplication = sanitiseApplication(
+                    application != null ? application : System.getenv("FEATUREFLOW_APPLICATION"));
+            return new FeatureflowConfig(proxyHost, proxyScheme, proxyPort, connectTimeout, socketTimeout, featureEventUri, registerFeatureUri, streamUri, pollingUri, pollingInterval, useStreaming, waitForStartup, offline, resolvedApplication);
         }
     }
 

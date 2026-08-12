@@ -54,12 +54,15 @@ public class FeatureControlStreamClient implements Closeable {
     public Future<Void> start() {
         final NoOpFuture initFuture = new NoOpFuture();
         //2.else load all feature controls from ff
-        Headers headers = new Headers.Builder()
+        Headers.Builder headersBuilder = new Headers.Builder()
                 .add("Authorization", "Bearer " + this.apiKey)
                 .add("User-Agent", "FeatureflowClient-Java/" + "1.0")
                 .add("Cache-Control", "no-cache")
-                .add("Accept", "text/event-stream")
-                .build();
+                .add("Accept", "text/event-stream");
+        if (config.getApplication() != null) {
+            headersBuilder.add("X-Featureflow-Application", config.getApplication());
+        }
+        Headers headers = headersBuilder.build();
 
         URI path =  URI.create(config.getStreamUri());
         eventSource = new EventSource(path, 5000l, headers, getHandler(initFuture));
