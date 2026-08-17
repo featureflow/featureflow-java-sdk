@@ -16,6 +16,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.apache.hc.core5.http.protocol.HttpContext;
@@ -104,7 +105,7 @@ public class RestClientImpl implements RestClient {
             response = client.execute(request);
             int statusCode = response.getCode();
             Header retryAfter = response.getFirstHeader("Retry-After");
-            String body = response.getEntity() == null ? null : new String(response.getEntity().getContent().readAllBytes());
+            String body = response.getEntity() == null ? null : new String(EntityUtils.toByteArray(response.getEntity()));
             return new EventsPostResult(statusCode, retryAfter == null ? null : retryAfter.getValue(), body);
         } catch (IOException e) {
             logger.error("Network exception posting events", e);
@@ -149,10 +150,10 @@ public class RestClientImpl implements RestClient {
             request.addHeader("Accept-Encoding", "gzip,deflate,sdch");
             request.addHeader("Accept-Language", "en-US,en;q=0.8");
 
-            if (request instanceof HttpPut httpPut) {
-                httpPut.setEntity(params);
-            } else if (request instanceof HttpPost httpPost) {
-                httpPost.setEntity(params);
+            if (request instanceof HttpPut) {
+                ((HttpPut) request).setEntity(params);
+            } else if (request instanceof HttpPost) {
+                ((HttpPost) request).setEntity(params);
             }
 
             request.addHeader("Authorization", "Bearer " + apiKey);

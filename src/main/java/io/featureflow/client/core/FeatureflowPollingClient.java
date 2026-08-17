@@ -30,6 +30,7 @@ import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.util.TimeValue;
@@ -192,7 +193,7 @@ public class FeatureflowPollingClient implements Closeable {
                     boolean changed = firstFetch || !previousEtag.equals(this.etag);
 
                     if (changed) {
-                        String responseBody = new String(response.getEntity().getContent().readAllBytes());
+                        String responseBody = new String(EntityUtils.toByteArray(response.getEntity()));
                         Map<String, FeatureControl> controls = gson.fromJson(responseBody, mapOfFeatureControlsType);
 
                         if (controls != null) {

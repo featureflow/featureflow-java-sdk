@@ -32,7 +32,7 @@ public class FeatureflowConfig {
                 Properties properties = new Properties();
                 properties.load(in);
                 String version = properties.getProperty("version");
-                if (version != null && !version.isBlank() && !version.startsWith("${")) {
+                if (version != null && !version.trim().isEmpty() && !version.startsWith("${")) {
                     return version;
                 }
             }

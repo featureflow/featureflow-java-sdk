@@ -268,7 +268,7 @@ public class EventsClientImpl implements EventsClient {
             goals = mergedGoals;
             return;
         }
-        if (result.statusCode == 200 && result.body != null && !result.body.isBlank()) {
+        if (result.statusCode == 200 && result.body != null && !result.body.trim().isEmpty()) {
             applyServerConfig(parseConfig(result.body));
         }
     }
