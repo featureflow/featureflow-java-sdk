@@ -1,5 +1,11 @@
 # Change log
 
+## [1.4.1] - 2026-08-17
+### Changed
+- The published jar now targets Java 8 again (1.3.2 and 1.4.0 were inadvertently compiled
+  for Java 17), so legacy Java 8 services can compile against and load the SDK. No API or
+  behaviour changes; the application tag support from 1.4.0 is unchanged.
+
 ## [1.4.0] - 2026-08-12
 ### Added
 - `withApplication(String)` on `FeatureflowConfig.Builder` (or the `FEATUREFLOW_APPLICATION`
