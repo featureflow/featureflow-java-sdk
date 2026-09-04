@@ -5,14 +5,12 @@ import com.google.gson.reflect.TypeToken;
 import io.featureflow.client.FeatureflowConfig;
 import io.featureflow.client.model.Event;
 import io.featureflow.client.model.Feature;
-import org.apache.hc.client5.http.cache.HttpCacheContext;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.cache.CacheConfig;
-import org.apache.hc.client5.http.impl.cache.CachingHttpClients;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.*;
@@ -73,7 +71,7 @@ public class RestClientImpl implements RestClient {
     public void registerFeatureControls(List<Feature> featureRegistrations) throws IOException{
         logger.info("Registering features with featureflow");
         URI uri = URI.create(config.getRegisterFeatureUri());
-        HttpCacheContext context = HttpCacheContext.create();
+        HttpClientContext context = HttpClientContext.create();
         HttpPut request = createPutRequest(uri, gson.toJson(featureRegistrations));
         CloseableHttpResponse response = null;
         try {
@@ -170,12 +168,6 @@ public class RestClientImpl implements RestClient {
         manager.setMaxTotal(100);
         manager.setDefaultMaxPerRoute(20);
 
-        CacheConfig cacheConfig = CacheConfig.custom()
-                .setMaxCacheEntries(1000)
-                .setMaxObjectSize(131072)
-                .setSharedCache(false)
-                .build();
-
         // Custom retry strategy for service unavailable errors
         org.apache.hc.client5.http.HttpRequestRetryStrategy serviceUnavailableRetryStrategy = new org.apache.hc.client5.http.HttpRequestRetryStrategy() {
             @Override
@@ -254,8 +246,12 @@ public class RestClientImpl implements RestClient {
                 .setProxy(config.getHttpProxyHost())
                 .build();
 
-        client = CachingHttpClients.custom()
-                .setCacheConfig(cacheConfig)
+        // Plain (non-caching) client: this transport only ever sends POST/PUT (events, register),
+        // which are never cacheable. httpclient5-cache 5.2.x's DefaultCacheInvalidator also logs a
+        // spurious "<uri> is not a valid URI" WARN on every non-cacheable request, so wrapping these
+        // calls in CachingHttpClients only produced log noise. The polling client keeps its caching
+        // transport for ETag handling on GET.
+        client = HttpClients.custom()
                 .setConnectionManager(manager)
                 .setDefaultRequestConfig(requestConfig)
                 .setRetryStrategy(myRetryHandler) // Using standard retry strategy

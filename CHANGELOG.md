@@ -1,5 +1,16 @@
 # Change log
 
+## [1.4.2] - 2026-09-04
+### Fixed
+- Stopped the events/register HTTP client logging a spurious
+  `WARN o.a.h.c.h.i.c.DefaultCacheInvalidator: https://events.featureflow.io/api/sdk/v1/events is not a valid URI`
+  on every event flush. The message comes from an inverted null check in Apache
+  httpclient5-cache 5.2.x that fires on every non-cacheable (POST/PUT) request; the URI was
+  always valid and events were delivered normally. The events/register transport now uses a
+  plain `HttpClients` instance, since it only ever POSTs and PUTs and had no use for the
+  caching layer. Feature polling is unchanged and keeps its caching transport for ETag
+  handling.
+
 ## [1.4.1] - 2026-08-17
 ### Changed
 - The published jar now targets Java 8 again (1.3.2 and 1.4.0 were inadvertently compiled
